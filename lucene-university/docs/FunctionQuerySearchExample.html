@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>Simple search example</title>
+  <title>FunctionQuerySearchExample.java</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -51,6 +51,12 @@
     
     <ul class="sections">
         
+          <li id="title">
+              <div class="annotation">
+                  <h1>FunctionQuerySearchExample.java</h1>
+              </div>
+          </li>
+        
         
         
         <li id="section-1">
@@ -59,37 +65,19 @@
               <div class="sswrap ">
                 <a class="ss" href="#section-1">&#x00a7;</a>
               </div>
-              <h1 id="simple-search-example">Simple search example</h1>
-<p>This will walk through a very simple search example with Lucene.</p>
-<p>The example has the following steps:</p>
-<ol>
-<li>Create documents. Documents are iterable collections of <code>IndexableField</code>.</li>
-<li>Open an <code>IndexWriter</code> over a filesystem directory (<code>FSDirectory</code>).</li>
-<li>Write the documents using the <code>IndexWriter</code>.</li>
-<li>Open an <code>IndexReader</code> from the <code>IndexWriter</code>, then open an <code>IndexSearcher</code> around that <code>IndexReader</code>.</li>
-<li>Construct a <code>TermQuery</code> to search for the word <code>fox</code> in the <code>text</code> field.</li>
-<li>Use the <code>IndexSearcher</code> to find the documents that match the <code>TermQuery</code>.</li>
-<li>Iterate through the returned documents to output their score, ID, and stored <code>text</code> value.</li>
-</ol>
-
+              
             </div>
             
-            <div class="content"><div class='highlight'><pre>
-<span class="hljs-keyword">package</span> example.basic;
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">package</span> example.advanced;
 
+<span class="hljs-keyword">import</span> example.basic.SimpleSearch;
 <span class="hljs-keyword">import</span> org.apache.lucene.document.Field;
+<span class="hljs-keyword">import</span> org.apache.lucene.document.FloatDocValuesField;
+<span class="hljs-keyword">import</span> org.apache.lucene.document.FloatField;
 <span class="hljs-keyword">import</span> org.apache.lucene.document.TextField;
-<span class="hljs-keyword">import</span> org.apache.lucene.index.DirectoryReader;
-<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexReader;
-<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexWriter;
-<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexWriterConfig;
-<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexableField;
-<span class="hljs-keyword">import</span> org.apache.lucene.index.StoredFields;
-<span class="hljs-keyword">import</span> org.apache.lucene.index.Term;
-<span class="hljs-keyword">import</span> org.apache.lucene.search.IndexSearcher;
-<span class="hljs-keyword">import</span> org.apache.lucene.search.ScoreDoc;
-<span class="hljs-keyword">import</span> org.apache.lucene.search.TermQuery;
-<span class="hljs-keyword">import</span> org.apache.lucene.search.TopDocs;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.*;
+<span class="hljs-keyword">import</span> org.apache.lucene.queries.function.FunctionScoreQuery;
+<span class="hljs-keyword">import</span> org.apache.lucene.search.*;
 <span class="hljs-keyword">import</span> org.apache.lucene.store.Directory;
 <span class="hljs-keyword">import</span> org.apache.lucene.store.FSDirectory;
 
@@ -99,7 +87,14 @@
 <span class="hljs-keyword">import</span> java.util.ArrayList;
 <span class="hljs-keyword">import</span> java.util.List;
 
-<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">SimpleSearch</span> {</pre></div></div>
+<span class="hljs-comment">/**
+ * In this test we are going to copy most of the {<span class="hljs-doctag">@link</span> example.basic.SimpleSearch} documents.
+ * However, in this case we are going to leverage FunctionQuery to find an alternative source of scoring.
+ * FunctionQuery is a special query that allows us to change how score is calculated from scratch by providing a source
+ * of score and a function to modify it.
+ * We will demonstrate that alternative score can come from either doc field or doc value field
+ */</span>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">FunctionQuerySearchExample</span> {</pre></div></div>
             
         </li>
         
@@ -121,16 +116,20 @@ stored using <code>Field.Store.YES</code>.</p>
             
             <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> List&lt;List&lt;IndexableField&gt;&gt; <span class="hljs-title function_">createDocuments</span><span class="hljs-params">()</span> {
         List&lt;String&gt; texts = List.of(
-                <span class="hljs-string">&quot;The quick fox jumped over the lazy, brown dog&quot;</span>,
-                <span class="hljs-string">&quot;Lorem ipsum, dolor sit amet&quot;</span>,
-                <span class="hljs-string">&quot;She left the web, she left the loom, she made three paces through the room&quot;</span>,
-                <span class="hljs-string">&quot;The sly fox sneaks past the oblivious dog&quot;</span>
-        );
+                <span class="hljs-string">&quot;Lorem ipsum, dolor sit amet&quot;</span>, <span class="hljs-comment">// Score set to 0</span>
+                <span class="hljs-string">&quot;She left the web, she left the loom, she made three paces through the room&quot;</span>, <span class="hljs-comment">// Score set to 1</span>
+                <span class="hljs-string">&quot;The sly fox sneaks past the oblivious dog&quot;</span>, <span class="hljs-comment">// Score set to 2</span>
+                <span class="hljs-string">&quot;The quick fox jumped over the lazy, brown dog&quot;</span> <span class="hljs-comment">// Score set to 3</span>
+                );
         List&lt;List&lt;IndexableField&gt;&gt; docs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+        <span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
         <span class="hljs-keyword">for</span> (String text : texts) {
             List&lt;IndexableField&gt; doc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
             doc.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TextField</span>(<span class="hljs-string">&quot;text&quot;</span>, text, Field.Store.YES));
+            doc.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">FloatField</span>(<span class="hljs-string">&quot;floatField&quot;</span>, i, Field.Store.YES));
+            doc.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">FloatDocValuesField</span>(<span class="hljs-string">&quot;floatDocValuesField&quot;</span>, i));
             docs.add(doc);
+            i++;
         }
         <span class="hljs-keyword">return</span> docs;
     }</pre></div></div>
@@ -263,12 +262,15 @@ term <code>fox</code> in the <code>text</code> field.</p>
               <div class="sswrap ">
                 <a class="ss" href="#section-10">&#x00a7;</a>
               </div>
-              <p>We ask <code>searcher</code> to run our <code>termQuery</code> and return the top 10 documents. There are only 2 documents
-in our index with the term <code>fox</code>, so it will only return those 2.</p>
+              <p>A <code>FunctionScoreQuery</code> is a query that can wrap around the <code>TermQuery</code> and provide an alternative source
+for scoring using either a DocField or DocValuesField, in this example we will use the DocValuesField</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                <span class="hljs-type">TopDocs</span> <span class="hljs-variable">topDocs</span> <span class="hljs-operator">=</span> searcher.search(termQuery, <span class="hljs-number">10</span>);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>                <span class="hljs-type">FunctionScoreQuery</span> <span class="hljs-variable">functionScoreQuery</span> <span class="hljs-operator">=</span>
+                        <span class="hljs-keyword">new</span> <span class="hljs-title class_">FunctionScoreQuery</span>(
+                                termQuery,
+                                DoubleValuesSource.fromFloatField(<span class="hljs-string">&quot;floatDocValuesField&quot;</span>));</pre></div></div>
             
         </li>
         
@@ -278,6 +280,22 @@ in our index with the term <code>fox</code>, so it will only return those 2.</p>
               
               <div class="sswrap ">
                 <a class="ss" href="#section-11">&#x00a7;</a>
+              </div>
+              <p>We ask <code>searcher</code> to run our <code>termQuery</code> and return the top 10 documents. There are only 2 documents
+in our index with the term <code>fox</code>, so it will only return those 2.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                <span class="hljs-type">TopDocs</span> <span class="hljs-variable">topDocs</span> <span class="hljs-operator">=</span> searcher.search(functionScoreQuery, <span class="hljs-number">10</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-12">&#x00a7;</a>
               </div>
               <p>If our query had matched more than 10 documents, then <code>topDocs</code> would contain the top 10 documents,
 while <code>topDocs.totalHits</code> would have the total number of matching documents (or a lower bound on the
@@ -290,11 +308,11 @@ total number of matching documents, if more than 1000 documents match).</p>
         </li>
         
         
-        <li id="section-12">
+        <li id="section-13">
             <div class="annotation">
               
               <div class="sswrap ">
-                <a class="ss" href="#section-12">&#x00a7;</a>
+                <a class="ss" href="#section-13">&#x00a7;</a>
               </div>
               <p>The <code>topDocs</code> contains a list of <code>ScoreDoc</code>, which just have scores and Lucene-generated doc IDs.
 Since these doc IDs are likely meaningless to us as users, we ask the reader for a <code>StoredFields</code>
@@ -308,11 +326,11 @@ instance able to retrieve stored field values based on the doc IDs.</p>
         </li>
         
         
-        <li id="section-13">
+        <li id="section-14">
             <div class="annotation">
               
               <div class="sswrap ">
-                <a class="ss" href="#section-13">&#x00a7;</a>
+                <a class="ss" href="#section-14">&#x00a7;</a>
               </div>
               <p>Using the doc’s ID, we load a <code>Document</code>, and load the <code>text</code> field (the only field).</p>
 
@@ -323,40 +341,21 @@ instance able to retrieve stored field values based on the doc IDs.</p>
         </li>
         
         
-        <li id="section-14">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-14">&#x00a7;</a>
-              </div>
-              <p>Each document has a BM25 score based on their relevance to the query.
-See <a href="https://en.wikipedia.org/wiki/Okapi_BM25">https://en.wikipedia.org/wiki/Okapi_BM25</a> for details on the BM25 formula.</p>
-<p>The parts of the formula relevant to this example are:</p>
-<ol>
-<li>A search term occurring more frequently in a document makes the score go up.</li>
-<li>More total terms in the field makes the score go down.</li>
-</ol>
-<p>In this case both of our matching documents contain the word <code>fox</code> once, so they’re tied there.
-The last document is shorter than the first document, so the last document gets a higher score.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>                    System.out.println(scoreDoc.score + <span class="hljs-string">&quot; - &quot;</span> + scoreDoc.doc + <span class="hljs-string">&quot; - &quot;</span> + storedText);</pre></div></div>
-            
-        </li>
-        
-        
         <li id="section-15">
             <div class="annotation">
               
               <div class="sswrap ">
                 <a class="ss" href="#section-15">&#x00a7;</a>
               </div>
-              
+              <p>Each document has a score based on it’s value at <code>floatDocValuesField</code>.
+Note that here we got the results sorted based on this score as opposed to the BM25 score from the {@link SimpleSearch} example.</p>
+<p>In this case both of our matching documents contain the word <code>fox</code> once, so they’re tied there.
+The last document is the one with the lower value in <code>floatDocValuesField</code> (e.g. score = 2.0)
+than the first document (score = 3.0) .</p>
+
             </div>
             
-            <div class="content"><div class='highlight'><pre>                }
-            }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>                    System.out.println(scoreDoc.score + <span class="hljs-string">&quot; - &quot;</span> + scoreDoc.doc + <span class="hljs-string">&quot; - &quot;</span> + storedText);</pre></div></div>
             
         </li>
         
@@ -370,7 +369,8 @@ The last document is shorter than the first document, so the last document gets 
               
             </div>
             
-            <div class="content"><div class='highlight'><pre>        } <span class="hljs-keyword">finally</span> {</pre></div></div>
+            <div class="content"><div class='highlight'><pre>                }
+            }</pre></div></div>
             
         </li>
         
@@ -380,6 +380,20 @@ The last document is shorter than the first document, so the last document gets 
               
               <div class="sswrap ">
                 <a class="ss" href="#section-17">&#x00a7;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        } <span class="hljs-keyword">finally</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-18">&#x00a7;</a>
               </div>
               <h2 id="clean-up">Clean up</h2>
 <p>Before we finish the program, we delete each of the files in the directory.</p>
@@ -393,11 +407,11 @@ The last document is shorter than the first document, so the last document gets 
         </li>
         
         
-        <li id="section-18">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="sswrap ">
-                <a class="ss" href="#section-18">&#x00a7;</a>
+                <a class="ss" href="#section-19">&#x00a7;</a>
               </div>
               <p>Then we delete the directory itself.</p>
 

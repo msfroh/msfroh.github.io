@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>Simple search example</title>
+  <title>KnnSearchExample.java</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -51,6 +51,12 @@
     
     <ul class="sections">
         
+          <li id="title">
+              <div class="annotation">
+                  <h1>KnnSearchExample.java</h1>
+              </div>
+          </li>
+        
         
         
         <li id="section-1">
@@ -59,37 +65,17 @@
               <div class="sswrap ">
                 <a class="ss" href="#section-1">&#x00a7;</a>
               </div>
-              <h1 id="simple-search-example">Simple search example</h1>
-<p>This will walk through a very simple search example with Lucene.</p>
-<p>The example has the following steps:</p>
-<ol>
-<li>Create documents. Documents are iterable collections of <code>IndexableField</code>.</li>
-<li>Open an <code>IndexWriter</code> over a filesystem directory (<code>FSDirectory</code>).</li>
-<li>Write the documents using the <code>IndexWriter</code>.</li>
-<li>Open an <code>IndexReader</code> from the <code>IndexWriter</code>, then open an <code>IndexSearcher</code> around that <code>IndexReader</code>.</li>
-<li>Construct a <code>TermQuery</code> to search for the word <code>fox</code> in the <code>text</code> field.</li>
-<li>Use the <code>IndexSearcher</code> to find the documents that match the <code>TermQuery</code>.</li>
-<li>Iterate through the returned documents to output their score, ID, and stored <code>text</code> value.</li>
-</ol>
-
+              
             </div>
             
-            <div class="content"><div class='highlight'><pre>
-<span class="hljs-keyword">package</span> example.basic;
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">package</span> example.advanced;
 
+<span class="hljs-keyword">import</span> example.basic.SimpleSearch;
 <span class="hljs-keyword">import</span> org.apache.lucene.document.Field;
-<span class="hljs-keyword">import</span> org.apache.lucene.document.TextField;
-<span class="hljs-keyword">import</span> org.apache.lucene.index.DirectoryReader;
-<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexReader;
-<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexWriter;
-<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexWriterConfig;
-<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexableField;
-<span class="hljs-keyword">import</span> org.apache.lucene.index.StoredFields;
-<span class="hljs-keyword">import</span> org.apache.lucene.index.Term;
-<span class="hljs-keyword">import</span> org.apache.lucene.search.IndexSearcher;
-<span class="hljs-keyword">import</span> org.apache.lucene.search.ScoreDoc;
-<span class="hljs-keyword">import</span> org.apache.lucene.search.TermQuery;
-<span class="hljs-keyword">import</span> org.apache.lucene.search.TopDocs;
+<span class="hljs-keyword">import</span> org.apache.lucene.document.KnnFloatVectorField;
+<span class="hljs-keyword">import</span> org.apache.lucene.document.StringField;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.*;
+<span class="hljs-keyword">import</span> org.apache.lucene.search.*;
 <span class="hljs-keyword">import</span> org.apache.lucene.store.Directory;
 <span class="hljs-keyword">import</span> org.apache.lucene.store.FSDirectory;
 
@@ -99,7 +85,7 @@
 <span class="hljs-keyword">import</span> java.util.ArrayList;
 <span class="hljs-keyword">import</span> java.util.List;
 
-<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">SimpleSearch</span> {</pre></div></div>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">KnnSearchExample</span> {</pre></div></div>
             
         </li>
         
@@ -120,20 +106,18 @@ stored using <code>Field.Store.YES</code>.</p>
             </div>
             
             <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> List&lt;List&lt;IndexableField&gt;&gt; <span class="hljs-title function_">createDocuments</span><span class="hljs-params">()</span> {
-        List&lt;String&gt; texts = List.of(
-                <span class="hljs-string">&quot;The quick fox jumped over the lazy, brown dog&quot;</span>,
-                <span class="hljs-string">&quot;Lorem ipsum, dolor sit amet&quot;</span>,
-                <span class="hljs-string">&quot;She left the web, she left the loom, she made three paces through the room&quot;</span>,
-                <span class="hljs-string">&quot;The sly fox sneaks past the oblivious dog&quot;</span>
+        List&lt;<span class="hljs-type">float</span>[]&gt; vectors = List.of(
+                <span class="hljs-keyword">new</span> <span class="hljs-title class_">float</span>[] {<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>}, <span class="hljs-comment">// id 0</span>
+                <span class="hljs-keyword">new</span> <span class="hljs-title class_">float</span>[] {<span class="hljs-number">4</span>, <span class="hljs-number">5</span>, <span class="hljs-number">6</span>}, <span class="hljs-comment">// id 1</span>
+                <span class="hljs-keyword">new</span> <span class="hljs-title class_">float</span>[] {<span class="hljs-number">7</span>, <span class="hljs-number">8</span>, <span class="hljs-number">9</span>}, <span class="hljs-comment">// id 2</span>
+                <span class="hljs-keyword">new</span> <span class="hljs-title class_">float</span>[] {<span class="hljs-number">10</span>, <span class="hljs-number">11</span>, <span class="hljs-number">12</span>} <span class="hljs-comment">// id 3</span>
         );
+
         List&lt;List&lt;IndexableField&gt;&gt; docs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
-        <span class="hljs-keyword">for</span> (String text : texts) {
+        <span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">for</span> (<span class="hljs-type">float</span>[] vector : vectors) {
             List&lt;IndexableField&gt; doc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
-            doc.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TextField</span>(<span class="hljs-string">&quot;text&quot;</span>, text, Field.Store.YES));
-            docs.add(doc);
-        }
-        <span class="hljs-keyword">return</span> docs;
-    }</pre></div></div>
+            doc.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">StringField</span>(<span class="hljs-string">&quot;id&quot;</span>, Integer.toString(i), Field.Store.YES));</pre></div></div>
             
         </li>
         
@@ -144,11 +128,19 @@ stored using <code>Field.Store.YES</code>.</p>
               <div class="sswrap ">
                 <a class="ss" href="#section-3">&#x00a7;</a>
               </div>
-              <h2 id="the-example-code">The example code</h2>
+              <p>we are going to use Euclidean distance for our vector fields</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> IOException {</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            doc.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">KnnFloatVectorField</span>(<span class="hljs-string">&quot;knnFloatField&quot;</span>, vector, VectorSimilarityFunction.EUCLIDEAN));
+            docs.add(doc);
+            i++;
+        }
+
+        <span class="hljs-keyword">return</span> docs;
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> IOException {</pre></div></div>
             
         </li>
         
@@ -183,7 +175,7 @@ to write to the directory while we hold the lock (as long as those other process
             </div>
             
             <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">try</span> (<span class="hljs-type">Directory</span> <span class="hljs-variable">directory</span> <span class="hljs-operator">=</span> FSDirectory.open(tmpDir);
-             <span class="hljs-type">IndexWriter</span> <span class="hljs-variable">writer</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexWriter</span>(directory, <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexWriterConfig</span>())) {</pre></div></div>
+            <span class="hljs-type">IndexWriter</span> <span class="hljs-variable">writer</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexWriter</span>(directory, <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexWriterConfig</span>())) {</pre></div></div>
             
         </li>
         
@@ -246,13 +238,19 @@ requires an <code>IndexSearcher</code>. We’ll explore the low-level <code>Inde
               <div class="sswrap ">
                 <a class="ss" href="#section-9">&#x00a7;</a>
               </div>
-              <p>A <code>TermQuery</code> is one of the simpler query types supported by Lucene. It is able to search for a single
-“term” (usually a word, but not necessarily) in a field. In this case, we’re going to search for the
-term <code>fox</code> in the <code>text</code> field.</p>
+              <p>A <code>KnnFloatVectorQuery</code> is the most basic KNN query supported by Lucene. It is able to search for a single
+vector in a field and retrieve the first K closest neighbours. In this case, we’re going to search for the
+vector [1, 2, 3] in the <code>knnFloatField</code> field and search for the 3 (k = 3) nearest neighbours.
+Meaning we are going to search for the 3 “closest” vectors.
+The calculation of similarity between vectors in the <code>knnFloatField</code> will be based on Euclidean distance
+because that’s how we declared the similarity function for the field.
+However, remember that for scoring purposes we want the most similar/matching documents to have the higher score
+while Euclidean distance is <em>lower</em> for more “similar” vectors…
+Therefore, the score will be the <em>inverse</em> of the Euclidean distance with the formula score = 1 / (1 + distance(v1, v2)).</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                <span class="hljs-type">TermQuery</span> <span class="hljs-variable">termQuery</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">TermQuery</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Term</span>(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;fox&quot;</span>));</pre></div></div>
+            <div class="content"><div class='highlight'><pre>                <span class="hljs-type">KnnFloatVectorQuery</span> <span class="hljs-variable">knnFloatVectorQuery</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">KnnFloatVectorQuery</span>(<span class="hljs-string">&quot;knnFloatField&quot;</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">float</span>[] {<span class="hljs-number">1</span>, <span class="hljs-number">2</span>, <span class="hljs-number">3</span>}, <span class="hljs-number">3</span>);</pre></div></div>
             
         </li>
         
@@ -263,12 +261,18 @@ term <code>fox</code> in the <code>text</code> field.</p>
               <div class="sswrap ">
                 <a class="ss" href="#section-10">&#x00a7;</a>
               </div>
-              <p>We ask <code>searcher</code> to run our <code>termQuery</code> and return the top 10 documents. There are only 2 documents
-in our index with the term <code>fox</code>, so it will only return those 2.</p>
+              <p>We ask <code>searcher</code> to run our <code>knnFloatVectorQuery</code> and return the top 10 documents.
+Since vector distance can be measured to all 4 documents we created that contained vector field,
+we would expect to get 4 results sorted from the closest to the furthest.
+However, we already defined the <code>knnFloatVectorQuery</code> to only return k = 3, meaning that we will only
+remain with 3 results sorted from nearest to furthest.
+In our case we will expect the vector [1, 2, 3] that to be the “closest” result because
+it’s exactly similar to the vector we are searching for and therefore the Euclidean distance between them is 0
+and the score would be score = 1 / (1 + 0)</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                <span class="hljs-type">TopDocs</span> <span class="hljs-variable">topDocs</span> <span class="hljs-operator">=</span> searcher.search(termQuery, <span class="hljs-number">10</span>);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>                <span class="hljs-type">TopDocs</span> <span class="hljs-variable">topDocs</span> <span class="hljs-operator">=</span> searcher.search(knnFloatVectorQuery, <span class="hljs-number">10</span>);</pre></div></div>
             
         </li>
         
@@ -285,7 +289,7 @@ total number of matching documents, if more than 1000 documents match).</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                System.out.println(<span class="hljs-string">&quot;Query &quot;</span> + termQuery + <span class="hljs-string">&quot; matched &quot;</span> + topDocs.totalHits + <span class="hljs-string">&quot; documents:&quot;</span>);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>                System.out.println(<span class="hljs-string">&quot;Query &quot;</span> + knnFloatVectorQuery + <span class="hljs-string">&quot; matched &quot;</span> + topDocs.totalHits + <span class="hljs-string">&quot; documents:&quot;</span>);</pre></div></div>
             
         </li>
         
@@ -314,11 +318,11 @@ instance able to retrieve stored field values based on the doc IDs.</p>
               <div class="sswrap ">
                 <a class="ss" href="#section-13">&#x00a7;</a>
               </div>
-              <p>Using the doc’s ID, we load a <code>Document</code>, and load the <code>text</code> field (the only field).</p>
+              <p>Using the doc’s ID, we load a <code>Document</code>, and load the <code>id</code> <code>String</code> field (the field that defines global UUID).</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                    <span class="hljs-type">String</span> <span class="hljs-variable">storedText</span> <span class="hljs-operator">=</span> storedFields.document(scoreDoc.doc).get(<span class="hljs-string">&quot;text&quot;</span>);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>                    <span class="hljs-keyword">final</span> <span class="hljs-type">String</span> <span class="hljs-variable">globalId</span> <span class="hljs-operator">=</span> storedFields.document(scoreDoc.doc).get(<span class="hljs-string">&quot;id&quot;</span>);</pre></div></div>
             
         </li>
         
@@ -329,19 +333,13 @@ instance able to retrieve stored field values based on the doc IDs.</p>
               <div class="sswrap ">
                 <a class="ss" href="#section-14">&#x00a7;</a>
               </div>
-              <p>Each document has a BM25 score based on their relevance to the query.
-See <a href="https://en.wikipedia.org/wiki/Okapi_BM25">https://en.wikipedia.org/wiki/Okapi_BM25</a> for details on the BM25 formula.</p>
-<p>The parts of the formula relevant to this example are:</p>
-<ol>
-<li>A search term occurring more frequently in a document makes the score go up.</li>
-<li>More total terms in the field makes the score go down.</li>
-</ol>
-<p>In this case both of our matching documents contain the word <code>fox</code> once, so they’re tied there.
-The last document is shorter than the first document, so the last document gets a higher score.</p>
+              <p>Each document has a score which is inverse to the Euclidean distance with a theoretical Min of slightly more than 0
+and a Max of 1 (see our example when the vectors are identical).
+See <a href="https://en.wikipedia.org/wiki/Euclidean_distance">https://en.wikipedia.org/wiki/Euclidean_distance</a> for details on the Euclidean distance formula.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                    System.out.println(scoreDoc.score + <span class="hljs-string">&quot; - &quot;</span> + scoreDoc.doc + <span class="hljs-string">&quot; - &quot;</span> + storedText);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>                    System.out.println(scoreDoc.score + <span class="hljs-string">&quot; - &quot;</span> + scoreDoc.doc + <span class="hljs-string">&quot; - &quot;</span> + globalId);</pre></div></div>
             
         </li>
         
@@ -356,7 +354,8 @@ The last document is shorter than the first document, so the last document gets 
             </div>
             
             <div class="content"><div class='highlight'><pre>                }
-            }</pre></div></div>
+            }
+        } <span class="hljs-keyword">finally</span> {</pre></div></div>
             
         </li>
         
@@ -366,20 +365,6 @@ The last document is shorter than the first document, so the last document gets 
               
               <div class="sswrap ">
                 <a class="ss" href="#section-16">&#x00a7;</a>
-              </div>
-              
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        } <span class="hljs-keyword">finally</span> {</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-17">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-17">&#x00a7;</a>
               </div>
               <h2 id="clean-up">Clean up</h2>
 <p>Before we finish the program, we delete each of the files in the directory.</p>
@@ -393,17 +378,18 @@ The last document is shorter than the first document, so the last document gets 
         </li>
         
         
-        <li id="section-18">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="sswrap ">
-                <a class="ss" href="#section-18">&#x00a7;</a>
+                <a class="ss" href="#section-17">&#x00a7;</a>
               </div>
               <p>Then we delete the directory itself.</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>            Files.deleteIfExists(tmpDir);
+            System.out.println(<span class="hljs-string">&quot;cleanup completed&quot;</span>);
         }
     }
 }</pre></div></div>
