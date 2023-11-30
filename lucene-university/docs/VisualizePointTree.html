@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Single-valued points</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="AnalyzerBasics.html">
+                  AnalyzerBasics.java
+                </a>
+              
+                
+                <a class="source" href="FunctionQuerySearchExample.html">
+                  FunctionQuerySearchExample.java
+                </a>
+              
+                
+                <a class="source" href="KnnSearchExample.html">
+                  KnnSearchExample.java
+                </a>
+              
+                
+                <a class="source" href="SearchWithTermsEnum.html">
+                  SearchWithTermsEnum.java
+                </a>
+              
+                
+                <a class="source" href="SimpleSearch.html">
+                  SimpleSearch.java
+                </a>
+              
+                
+                <a class="source" href="VisualizePointTree.html">
+                  VisualizePointTree.java
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-1">&#x00a7;</a>
+              </div>
+              <h1 id="single-valued-points">Single-valued points</h1>
+<p>In this example, we will look at how Lucene indexes numeric fields using “points”. These points are stored
+in a structure called a binary K-d tree (see <a href="https://en.wikipedia.org/wiki/K-d_tree">https://en.wikipedia.org/wiki/K-d_tree</a> for more details). The  K-d tree
+makes range queries more efficient, as we are able to descend into the tree to find and visit the set of subtrees
+that share some overlap with the given range, while ignoring the rest of the tree.</p>
+<p>After indexing a few thousand documents with an integer field, we will call a helper function that prints the point
+tree for the integer field, including the number of documents associated with each node.</p>
+<p>We also suggest a couple of variations on the exercise:</p>
+<ol>
+<li>Split the documents across multiple segments by flushing a few times during the indexing step.</li>
+<li>Write the same point value for every document to see how that impacts the tree shape.</li>
+</ol>
+<p>Output for the original example and the variations can be found at the bottom of the file.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+<span class="hljs-keyword">package</span> example.points;
+
+<span class="hljs-keyword">import</span> example.basic.SimpleSearch;
+<span class="hljs-keyword">import</span> org.apache.lucene.document.Field;
+<span class="hljs-keyword">import</span> org.apache.lucene.document.IntField;
+<span class="hljs-keyword">import</span> org.apache.lucene.document.IntPoint;
+<span class="hljs-keyword">import</span> org.apache.lucene.document.KeywordField;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.DirectoryReader;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexReader;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexWriter;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexWriterConfig;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.LeafReader;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.LeafReaderContext;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.PointValues;
+<span class="hljs-keyword">import</span> org.apache.lucene.store.Directory;
+<span class="hljs-keyword">import</span> org.apache.lucene.store.FSDirectory;
+
+<span class="hljs-keyword">import</span> java.io.IOException;
+<span class="hljs-keyword">import</span> java.nio.file.Files;
+<span class="hljs-keyword">import</span> java.nio.file.Path;
+<span class="hljs-keyword">import</span> java.util.List;
+
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">VisualizePointTree</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-2">&#x00a7;</a>
+              </div>
+              <h2 id="helper-function-to-print-the-pointtree">Helper function to print the <code>PointTree</code></h2>
+<p>We will use this recursive helper function to print the current node, then recursively visit the node’s children
+and siblings.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">printTree</span><span class="hljs-params">(PointValues.PointTree pointTree, <span class="hljs-type">int</span> level)</span> <span class="hljs-keyword">throws</span> IOException {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-3">&#x00a7;</a>
+              </div>
+              <p>For each node, we’ll output the current level (indenting more as we go deeper), the min and max point
+values for the node, and the number of documents under the node.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-type">String</span> <span class="hljs-variable">indent</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot; &quot;</span>.repeat(level);
+        System.out.println(indent + level + indent +
+                <span class="hljs-string">&quot; [&quot;</span> + IntPoint.decodeDimension(pointTree.getMinPackedValue(), <span class="hljs-number">0</span>) + <span class="hljs-string">&quot;,&quot;</span> +
+                IntPoint.decodeDimension(pointTree.getMaxPackedValue(), <span class="hljs-number">0</span>) + <span class="hljs-string">&quot;] - &quot;</span> +
+                pointTree.size());</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-4">&#x00a7;</a>
+              </div>
+              <p>Next we recurse into the first child, if present. The recursive call will also visit the siblings (see a few
+lines below). After visiting the child we need to return to this node before visiting our own siblings.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (pointTree.moveToChild()) {
+            printTree(pointTree, level + <span class="hljs-number">1</span>);
+            pointTree.moveToParent();
+        }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-5">&#x00a7;</a>
+              </div>
+              <p>Visit the current node’s siblings.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">while</span> (pointTree.moveToSibling()) {
+            printTree(pointTree, level);
+        }
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-6">&#x00a7;</a>
+              </div>
+              <h2 id="the-worked-example">The worked example</h2>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> IOException {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-7">&#x00a7;</a>
+              </div>
+              <p>Create a temporary directory to hold the index, then create the Lucene Directory and IndexWriter.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-type">Path</span> <span class="hljs-variable">tmpDir</span> <span class="hljs-operator">=</span> Files.createTempDirectory(SimpleSearch.class.getSimpleName());
+        <span class="hljs-keyword">try</span> (<span class="hljs-type">Directory</span> <span class="hljs-variable">directory</span> <span class="hljs-operator">=</span> FSDirectory.open(tmpDir);
+             <span class="hljs-type">IndexWriter</span> <span class="hljs-variable">writer</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexWriter</span>(directory, <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexWriterConfig</span>())) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-8">&#x00a7;</a>
+              </div>
+              <h3 id="index-documents">Index documents</h3>
+<p>We will generate 20,000 documents, distributed over 10,000 integer point values.</p>
+<p>For the <code>val</code> field, we use type <code>IntField</code>. This is a convenient field type that tells Lucene to store
+the field as a doc value and as a point. Note that this field <strong>does not</strong> get indexed to terms.</p>
+<p><em>Optional exercise:</em> Try modifying these to output the same <code>val</code> value for every document.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10_000</span>; i++) {
+                writer.addDocument(List.of(<span class="hljs-keyword">new</span> <span class="hljs-title class_">KeywordField</span>(<span class="hljs-string">&quot;id&quot;</span>, <span class="hljs-string">&quot;first &quot;</span> + i, Field.Store.NO),
+                        <span class="hljs-keyword">new</span> <span class="hljs-title class_">IntField</span>(<span class="hljs-string">&quot;val&quot;</span>, <span class="hljs-number">1</span>, Field.Store.NO)));
+                writer.addDocument(List.of(<span class="hljs-keyword">new</span> <span class="hljs-title class_">KeywordField</span>(<span class="hljs-string">&quot;id&quot;</span>, <span class="hljs-string">&quot;second &quot;</span> + i, Field.Store.NO),
+                        <span class="hljs-keyword">new</span> <span class="hljs-title class_">IntField</span>(<span class="hljs-string">&quot;val&quot;</span>, <span class="hljs-number">1</span>, Field.Store.NO)));</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-9">&#x00a7;</a>
+              </div>
+              <p><em>Optional exercise:</em> Uncomment this flush block if you want to write the documents to 5 segments:</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>                <span class="hljs-comment">/*
+                if ((i + 1) % 2000 == 0) {
+                    writer.flush();
+                }
+                */</span>
+            }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-10">&#x00a7;</a>
+              </div>
+              <h3 id="reading-the-point-tree">Reading the point tree</h3>
+<p>Now we open a reader from the writer and iterate over the segments. (If the <code>flush</code> block above was left
+commented out, we have a single segment with all points. Otherwise, each segment has its own points.)</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">try</span> (<span class="hljs-type">IndexReader</span> <span class="hljs-variable">reader</span> <span class="hljs-operator">=</span> DirectoryReader.open(writer)) {
+                <span class="hljs-keyword">for</span> (LeafReaderContext lrc : reader.leaves()) {
+                    <span class="hljs-type">LeafReader</span> <span class="hljs-variable">lr</span> <span class="hljs-operator">=</span> lrc.reader();
+                    System.out.println(<span class="hljs-string">&quot;Tree for segment &quot;</span> + lrc.ord);
+                    PointValues.<span class="hljs-type">PointTree</span> <span class="hljs-variable">pointTree</span> <span class="hljs-operator">=</span> lr.getPointValues(<span class="hljs-string">&quot;val&quot;</span>).getPointTree();
+                    printTree(pointTree, <span class="hljs-number">0</span>);
+                }
+            }
+        } <span class="hljs-keyword">finally</span> {
+            <span class="hljs-keyword">for</span> (String indexFile : FSDirectory.listAll(tmpDir)) {
+                Files.deleteIfExists(tmpDir.resolve(indexFile));
+            }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-11">&#x00a7;</a>
+              </div>
+              <p>Then we delete the directory itself.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            Files.deleteIfExists(tmpDir);
+        }
+    }
+
+
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-12">&#x00a7;</a>
+              </div>
+              <h2 id="program-output">Program output</h2>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-comment">/*
+</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-13">&#x00a7;</a>
+              </div>
+              <p>This is the output of the program with a single segment. There are 20,000 documents across 10,000 distinct point
+values (0 to 9999).</p>
+<p>Note that the leaf nodes all correspond to blocks of (up to) 512 documents.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+Tree <span class="hljs-keyword">for</span> segment <span class="hljs-number">0</span>
+<span class="hljs-number">0</span> [<span class="hljs-number">0</span>,<span class="hljs-number">9999</span>] - <span class="hljs-number">20000</span>
+ <span class="hljs-number">1</span>  [<span class="hljs-number">0</span>,<span class="hljs-number">6144</span>] - <span class="hljs-number">12288</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">0</span>,<span class="hljs-number">4096</span>] - <span class="hljs-number">8192</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">0</span>,<span class="hljs-number">2048</span>] - <span class="hljs-number">4096</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">0</span>,<span class="hljs-number">1024</span>] - <span class="hljs-number">2048</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">0</span>,<span class="hljs-number">512</span>] - <span class="hljs-number">1024</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">0</span>,<span class="hljs-number">256</span>] - <span class="hljs-number">512</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">256</span>,<span class="hljs-number">512</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">512</span>,<span class="hljs-number">1024</span>] - <span class="hljs-number">1024</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">512</span>,<span class="hljs-number">768</span>] - <span class="hljs-number">512</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">768</span>,<span class="hljs-number">1024</span>] - <span class="hljs-number">512</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">1024</span>,<span class="hljs-number">2048</span>] - <span class="hljs-number">2048</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1024</span>,<span class="hljs-number">1536</span>] - <span class="hljs-number">1024</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">1024</span>,<span class="hljs-number">1280</span>] - <span class="hljs-number">512</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">1280</span>,<span class="hljs-number">1536</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1536</span>,<span class="hljs-number">2048</span>] - <span class="hljs-number">1024</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">1536</span>,<span class="hljs-number">1792</span>] - <span class="hljs-number">512</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">1792</span>,<span class="hljs-number">2048</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">2048</span>,<span class="hljs-number">4096</span>] - <span class="hljs-number">4096</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">2048</span>,<span class="hljs-number">3072</span>] - <span class="hljs-number">2048</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">2048</span>,<span class="hljs-number">2560</span>] - <span class="hljs-number">1024</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">2048</span>,<span class="hljs-number">2304</span>] - <span class="hljs-number">512</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">2304</span>,<span class="hljs-number">2560</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">2560</span>,<span class="hljs-number">3072</span>] - <span class="hljs-number">1024</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">2560</span>,<span class="hljs-number">2816</span>] - <span class="hljs-number">512</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">2816</span>,<span class="hljs-number">3072</span>] - <span class="hljs-number">512</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">3072</span>,<span class="hljs-number">4096</span>] - <span class="hljs-number">2048</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">3072</span>,<span class="hljs-number">3584</span>] - <span class="hljs-number">1024</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">3072</span>,<span class="hljs-number">3328</span>] - <span class="hljs-number">512</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">3328</span>,<span class="hljs-number">3584</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">3584</span>,<span class="hljs-number">4096</span>] - <span class="hljs-number">1024</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">3584</span>,<span class="hljs-number">3840</span>] - <span class="hljs-number">512</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">3840</span>,<span class="hljs-number">4096</span>] - <span class="hljs-number">512</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">4096</span>,<span class="hljs-number">6144</span>] - <span class="hljs-number">4096</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">4096</span>,<span class="hljs-number">5120</span>] - <span class="hljs-number">2048</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">4096</span>,<span class="hljs-number">4608</span>] - <span class="hljs-number">1024</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">4096</span>,<span class="hljs-number">4352</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">4352</span>,<span class="hljs-number">4608</span>] - <span class="hljs-number">512</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">4608</span>,<span class="hljs-number">5120</span>] - <span class="hljs-number">1024</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">4608</span>,<span class="hljs-number">4864</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">4864</span>,<span class="hljs-number">5120</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">5120</span>,<span class="hljs-number">6144</span>] - <span class="hljs-number">2048</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">5120</span>,<span class="hljs-number">5632</span>] - <span class="hljs-number">1024</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">5120</span>,<span class="hljs-number">5376</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">5376</span>,<span class="hljs-number">5632</span>] - <span class="hljs-number">512</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">5632</span>,<span class="hljs-number">6144</span>] - <span class="hljs-number">1024</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">5632</span>,<span class="hljs-number">5888</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">5888</span>,<span class="hljs-number">6144</span>] - <span class="hljs-number">512</span>
+ <span class="hljs-number">1</span>  [<span class="hljs-number">6144</span>,<span class="hljs-number">9999</span>] - <span class="hljs-number">7712</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">6144</span>,<span class="hljs-number">8192</span>] - <span class="hljs-number">4096</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">6144</span>,<span class="hljs-number">7168</span>] - <span class="hljs-number">2048</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">6144</span>,<span class="hljs-number">6656</span>] - <span class="hljs-number">1024</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">6144</span>,<span class="hljs-number">6400</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">6400</span>,<span class="hljs-number">6656</span>] - <span class="hljs-number">512</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">6656</span>,<span class="hljs-number">7168</span>] - <span class="hljs-number">1024</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">6656</span>,<span class="hljs-number">6912</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">6912</span>,<span class="hljs-number">7168</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">7168</span>,<span class="hljs-number">8192</span>] - <span class="hljs-number">2048</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">7168</span>,<span class="hljs-number">7680</span>] - <span class="hljs-number">1024</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">7168</span>,<span class="hljs-number">7424</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">7424</span>,<span class="hljs-number">7680</span>] - <span class="hljs-number">512</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">7680</span>,<span class="hljs-number">8192</span>] - <span class="hljs-number">1024</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">7680</span>,<span class="hljs-number">7936</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">7936</span>,<span class="hljs-number">8192</span>] - <span class="hljs-number">512</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">8192</span>,<span class="hljs-number">9999</span>] - <span class="hljs-number">3616</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">8192</span>,<span class="hljs-number">9216</span>] - <span class="hljs-number">2048</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">8192</span>,<span class="hljs-number">8704</span>] - <span class="hljs-number">1024</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">8192</span>,<span class="hljs-number">8448</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">8448</span>,<span class="hljs-number">8704</span>] - <span class="hljs-number">512</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">8704</span>,<span class="hljs-number">9216</span>] - <span class="hljs-number">1024</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">8704</span>,<span class="hljs-number">8960</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">8960</span>,<span class="hljs-number">9216</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">9216</span>,<span class="hljs-number">9999</span>] - <span class="hljs-number">1568</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">9216</span>,<span class="hljs-number">9728</span>] - <span class="hljs-number">1024</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">9216</span>,<span class="hljs-number">9472</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">9472</span>,<span class="hljs-number">9728</span>] - <span class="hljs-number">512</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">9728</span>,<span class="hljs-number">9999</span>] - <span class="hljs-number">544</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">9728</span>,<span class="hljs-number">9984</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">9984</span>,<span class="hljs-number">9999</span>] - <span class="hljs-number">32</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-14">&#x00a7;</a>
+              </div>
+              <p>This is the output with multiple segments (i.e. flush block uncommented). Each segment has 4000 documents distributed
+across 2000 point values.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+Tree <span class="hljs-keyword">for</span> segment <span class="hljs-number">0</span>
+<span class="hljs-number">0</span> [<span class="hljs-number">0</span>,<span class="hljs-number">1999</span>] - <span class="hljs-number">4000</span>
+ <span class="hljs-number">1</span>  [<span class="hljs-number">0</span>,<span class="hljs-number">1024</span>] - <span class="hljs-number">2048</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">0</span>,<span class="hljs-number">512</span>] - <span class="hljs-number">1024</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">0</span>,<span class="hljs-number">256</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">256</span>,<span class="hljs-number">512</span>] - <span class="hljs-number">512</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">512</span>,<span class="hljs-number">1024</span>] - <span class="hljs-number">1024</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">512</span>,<span class="hljs-number">768</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">768</span>,<span class="hljs-number">1024</span>] - <span class="hljs-number">512</span>
+ <span class="hljs-number">1</span>  [<span class="hljs-number">1024</span>,<span class="hljs-number">1999</span>] - <span class="hljs-number">1952</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">1024</span>,<span class="hljs-number">1536</span>] - <span class="hljs-number">1024</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">1024</span>,<span class="hljs-number">1280</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">1280</span>,<span class="hljs-number">1536</span>] - <span class="hljs-number">512</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">1536</span>,<span class="hljs-number">1999</span>] - <span class="hljs-number">928</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">1536</span>,<span class="hljs-number">1792</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">1792</span>,<span class="hljs-number">1999</span>] - <span class="hljs-number">416</span>
+Tree <span class="hljs-keyword">for</span> segment <span class="hljs-number">1</span>
+<span class="hljs-number">0</span> [<span class="hljs-number">2000</span>,<span class="hljs-number">3999</span>] - <span class="hljs-number">4000</span>
+ <span class="hljs-number">1</span>  [<span class="hljs-number">2000</span>,<span class="hljs-number">3024</span>] - <span class="hljs-number">2048</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">2000</span>,<span class="hljs-number">2512</span>] - <span class="hljs-number">1024</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">2000</span>,<span class="hljs-number">2256</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">2256</span>,<span class="hljs-number">2512</span>] - <span class="hljs-number">512</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">2512</span>,<span class="hljs-number">3024</span>] - <span class="hljs-number">1024</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">2512</span>,<span class="hljs-number">2768</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">2768</span>,<span class="hljs-number">3024</span>] - <span class="hljs-number">512</span>
+ <span class="hljs-number">1</span>  [<span class="hljs-number">3024</span>,<span class="hljs-number">3999</span>] - <span class="hljs-number">1952</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">3024</span>,<span class="hljs-number">3536</span>] - <span class="hljs-number">1024</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">3024</span>,<span class="hljs-number">3280</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">3280</span>,<span class="hljs-number">3536</span>] - <span class="hljs-number">512</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">3536</span>,<span class="hljs-number">3999</span>] - <span class="hljs-number">928</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">3536</span>,<span class="hljs-number">3792</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">3792</span>,<span class="hljs-number">3999</span>] - <span class="hljs-number">416</span>
+Tree <span class="hljs-keyword">for</span> segment <span class="hljs-number">2</span>
+<span class="hljs-number">0</span> [<span class="hljs-number">4000</span>,<span class="hljs-number">5999</span>] - <span class="hljs-number">4000</span>
+ <span class="hljs-number">1</span>  [<span class="hljs-number">4000</span>,<span class="hljs-number">5024</span>] - <span class="hljs-number">2048</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">4000</span>,<span class="hljs-number">4512</span>] - <span class="hljs-number">1024</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">4000</span>,<span class="hljs-number">4256</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">4256</span>,<span class="hljs-number">4512</span>] - <span class="hljs-number">512</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">4512</span>,<span class="hljs-number">5024</span>] - <span class="hljs-number">1024</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">4512</span>,<span class="hljs-number">4768</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">4768</span>,<span class="hljs-number">5024</span>] - <span class="hljs-number">512</span>
+ <span class="hljs-number">1</span>  [<span class="hljs-number">5024</span>,<span class="hljs-number">5999</span>] - <span class="hljs-number">1952</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">5024</span>,<span class="hljs-number">5536</span>] - <span class="hljs-number">1024</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">5024</span>,<span class="hljs-number">5280</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">5280</span>,<span class="hljs-number">5536</span>] - <span class="hljs-number">512</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">5536</span>,<span class="hljs-number">5999</span>] - <span class="hljs-number">928</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">5536</span>,<span class="hljs-number">5792</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">5792</span>,<span class="hljs-number">5999</span>] - <span class="hljs-number">416</span>
+Tree <span class="hljs-keyword">for</span> segment <span class="hljs-number">3</span>
+<span class="hljs-number">0</span> [<span class="hljs-number">6000</span>,<span class="hljs-number">7999</span>] - <span class="hljs-number">4000</span>
+ <span class="hljs-number">1</span>  [<span class="hljs-number">6000</span>,<span class="hljs-number">7024</span>] - <span class="hljs-number">2048</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">6000</span>,<span class="hljs-number">6512</span>] - <span class="hljs-number">1024</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">6000</span>,<span class="hljs-number">6256</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">6256</span>,<span class="hljs-number">6512</span>] - <span class="hljs-number">512</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">6512</span>,<span class="hljs-number">7024</span>] - <span class="hljs-number">1024</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">6512</span>,<span class="hljs-number">6768</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">6768</span>,<span class="hljs-number">7024</span>] - <span class="hljs-number">512</span>
+ <span class="hljs-number">1</span>  [<span class="hljs-number">7024</span>,<span class="hljs-number">7999</span>] - <span class="hljs-number">1952</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">7024</span>,<span class="hljs-number">7536</span>] - <span class="hljs-number">1024</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">7024</span>,<span class="hljs-number">7280</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">7280</span>,<span class="hljs-number">7536</span>] - <span class="hljs-number">512</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">7536</span>,<span class="hljs-number">7999</span>] - <span class="hljs-number">928</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">7536</span>,<span class="hljs-number">7792</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">7792</span>,<span class="hljs-number">7999</span>] - <span class="hljs-number">416</span>
+Tree <span class="hljs-keyword">for</span> segment <span class="hljs-number">4</span>
+<span class="hljs-number">0</span> [<span class="hljs-number">8000</span>,<span class="hljs-number">9999</span>] - <span class="hljs-number">4000</span>
+ <span class="hljs-number">1</span>  [<span class="hljs-number">8000</span>,<span class="hljs-number">9024</span>] - <span class="hljs-number">2048</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">8000</span>,<span class="hljs-number">8512</span>] - <span class="hljs-number">1024</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">8000</span>,<span class="hljs-number">8256</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">8256</span>,<span class="hljs-number">8512</span>] - <span class="hljs-number">512</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">8512</span>,<span class="hljs-number">9024</span>] - <span class="hljs-number">1024</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">8512</span>,<span class="hljs-number">8768</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">8768</span>,<span class="hljs-number">9024</span>] - <span class="hljs-number">512</span>
+ <span class="hljs-number">1</span>  [<span class="hljs-number">9024</span>,<span class="hljs-number">9999</span>] - <span class="hljs-number">1952</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">9024</span>,<span class="hljs-number">9536</span>] - <span class="hljs-number">1024</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">9024</span>,<span class="hljs-number">9280</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">9280</span>,<span class="hljs-number">9536</span>] - <span class="hljs-number">512</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">9536</span>,<span class="hljs-number">9999</span>] - <span class="hljs-number">928</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">9536</span>,<span class="hljs-number">9792</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">9792</span>,<span class="hljs-number">9999</span>] - <span class="hljs-number">416</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-15">&#x00a7;</a>
+              </div>
+              <p>Finally, here is the output if we modify the code to set <code>val</code> to 1 for every document. Notice that we still create
+the full binary tree structure with leaves of up to 512 documents, even though every node has the same bounds.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+Tree <span class="hljs-keyword">for</span> segment <span class="hljs-number">0</span>
+<span class="hljs-number">0</span> [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">20000</span>
+ <span class="hljs-number">1</span>  [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">12288</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">8192</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">4096</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">2048</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">1024</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">1024</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">2048</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">1024</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">1024</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">4096</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">2048</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">1024</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">1024</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">2048</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">1024</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">1024</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+      <span class="hljs-number">6</span>       [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">4096</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">2048</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">1024</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">1024</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">2048</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">1024</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">1024</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+ <span class="hljs-number">1</span>  [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">7712</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">4096</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">2048</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">1024</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">1024</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">2048</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">1024</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">1024</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+  <span class="hljs-number">2</span>   [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">3616</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">2048</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">1024</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">1024</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+   <span class="hljs-number">3</span>    [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">1568</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">1024</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+    <span class="hljs-number">4</span>     [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">544</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">512</span>
+     <span class="hljs-number">5</span>      [<span class="hljs-number">1</span>,<span class="hljs-number">1</span>] - <span class="hljs-number">32</span>
+ */</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
