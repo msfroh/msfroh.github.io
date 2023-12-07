@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>Single-valued points</title>
+  <title>Visualizing a point tree</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -35,6 +35,11 @@
                 </a>
               
                 
+                <a class="source" href="PointTreeRangeQuery.html">
+                  PointTreeRangeQuery.java
+                </a>
+              
+                
                 <a class="source" href="SearchWithTermsEnum.html">
                   SearchWithTermsEnum.java
                 </a>
@@ -64,7 +69,7 @@
               <div class="sswrap ">
                 <a class="ss" href="#section-1">&#x00a7;</a>
               </div>
-              <h1 id="single-valued-points">Single-valued points</h1>
+              <h1 id="visualizing-a-point-tree">Visualizing a point tree</h1>
 <p>In this example, we will look at how Lucene indexes numeric fields using “points”. These points are stored
 in a structure called a binary K-d tree (see <a href="https://en.wikipedia.org/wiki/K-d_tree">https://en.wikipedia.org/wiki/K-d_tree</a> for more details). The  K-d tree
 makes range queries more efficient, as we are able to descend into the tree to find and visit the set of subtrees
@@ -231,9 +236,9 @@ the field as a doc value and as a point. Note that this field <strong>does not</
             
             <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; <span class="hljs-number">10_000</span>; i++) {
                 writer.addDocument(List.of(<span class="hljs-keyword">new</span> <span class="hljs-title class_">KeywordField</span>(<span class="hljs-string">&quot;id&quot;</span>, <span class="hljs-string">&quot;first &quot;</span> + i, Field.Store.NO),
-                        <span class="hljs-keyword">new</span> <span class="hljs-title class_">IntField</span>(<span class="hljs-string">&quot;val&quot;</span>, <span class="hljs-number">1</span>, Field.Store.NO)));
+                        <span class="hljs-keyword">new</span> <span class="hljs-title class_">IntField</span>(<span class="hljs-string">&quot;val&quot;</span>, i, Field.Store.NO)));
                 writer.addDocument(List.of(<span class="hljs-keyword">new</span> <span class="hljs-title class_">KeywordField</span>(<span class="hljs-string">&quot;id&quot;</span>, <span class="hljs-string">&quot;second &quot;</span> + i, Field.Store.NO),
-                        <span class="hljs-keyword">new</span> <span class="hljs-title class_">IntField</span>(<span class="hljs-string">&quot;val&quot;</span>, <span class="hljs-number">1</span>, Field.Store.NO)));</pre></div></div>
+                        <span class="hljs-keyword">new</span> <span class="hljs-title class_">IntField</span>(<span class="hljs-string">&quot;val&quot;</span>, i, Field.Store.NO)));</pre></div></div>
             
         </li>
         
