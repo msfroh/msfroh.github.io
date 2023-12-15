@@ -1,6 +1,10 @@
 #!/bin/bash
 
-git clone https://github.com/msfroh/lucene-university.git tmp
+if [ -d ../lucene-university ]; then
+  cp -r ../lucene-university tmp
+else
+  git clone https://github.com/msfroh/lucene-university.git tmp
+fi
 cd tmp
 for f in $(find . -name '*.java'); do 
   mv $f .

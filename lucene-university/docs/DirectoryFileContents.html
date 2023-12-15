@@ -102,9 +102,7 @@ to add other field types, add more documents, etc.</p>
 <span class="hljs-keyword">import</span> java.nio.file.Files;
 <span class="hljs-keyword">import</span> java.nio.file.Path;
 <span class="hljs-keyword">import</span> java.util.ArrayList;
-<span class="hljs-keyword">import</span> java.util.List;
-
-<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">DirectoryFileContents</span> {</pre></div></div>
+<span class="hljs-keyword">import</span> java.util.List;</pre></div></div>
             
         </li>
         
@@ -115,7 +113,22 @@ to add other field types, add more documents, etc.</p>
               <div class="sswrap ">
                 <a class="ss" href="#section-2">&#x00a7;</a>
               </div>
-              <h2 id="creating-documents">Creating Documents</h2>
+              <h2 id="example-code">Example code</h2>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">DirectoryFileContents</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-3">&#x00a7;</a>
+              </div>
+              <h3 id="creating-documents">Creating Documents</h3>
 <p>We will mostly reuse the same documents from SimpleSearch, but we’ll also add a numeric <code>IntField</code> which will
 write both points and doc values. Points are covered in more detail by examples in the “points” package.</p>
 <p>To make the output mildly more interesting, let’s not add the numeric field to one of the documents.</p>
@@ -146,13 +159,13 @@ write both points and doc values. Points are covered in more detail by examples 
         </li>
         
         
-        <li id="section-3">
+        <li id="section-4">
             <div class="annotation">
               
               <div class="sswrap ">
-                <a class="ss" href="#section-3">&#x00a7;</a>
+                <a class="ss" href="#section-4">&#x00a7;</a>
               </div>
-              <h2 id="create-the-lucene-index-with-simpletextcodec">Create the Lucene index with SimpleTextCodec</h2>
+              <h3 id="create-the-lucene-index-with-simpletextcodec">Create the Lucene index with SimpleTextCodec</h3>
 
             </div>
             
@@ -162,11 +175,11 @@ write both points and doc values. Points are covered in more detail by examples 
         </li>
         
         
-        <li id="section-4">
+        <li id="section-5">
             <div class="annotation">
               
               <div class="sswrap ">
-                <a class="ss" href="#section-4">&#x00a7;</a>
+                <a class="ss" href="#section-5">&#x00a7;</a>
               </div>
               <p>In other examples, we have been using the default <code>IndexWriterConfig</code>. This time, we construct the
 IndexWriterConfig, but override the codec.</p>
@@ -183,13 +196,14 @@ to be human-readable. The JavaDoc for SimpleTextCodec (and its associated classe
         </li>
         
         
-        <li id="section-5">
+        <li id="section-6">
             <div class="annotation">
               
               <div class="sswrap ">
-                <a class="ss" href="#section-5">&#x00a7;</a>
+                <a class="ss" href="#section-6">&#x00a7;</a>
               </div>
-              <p>By default,</p>
+              <p>By default, Lucene writes small segments as a single “compound” file. To make the output easier to read,
+we disable that with <code>setUseCompoundFile(false)</code>.</p>
 
             </div>
             
@@ -204,13 +218,13 @@ to be human-readable. The JavaDoc for SimpleTextCodec (and its associated classe
         </li>
         
         
-        <li id="section-6">
+        <li id="section-7">
             <div class="annotation">
               
               <div class="sswrap ">
-                <a class="ss" href="#section-6">&#x00a7;</a>
+                <a class="ss" href="#section-7">&#x00a7;</a>
               </div>
-              <h2 id="dump-the-index-contents">Dump the index contents</h2>
+              <h3 id="dump-the-index-contents">Dump the index contents</h3>
 <p>Once we’ve closed the IndexWriter, before we delete each file, we print each file name and its size.</p>
 
             </div>
@@ -223,11 +237,11 @@ to be human-readable. The JavaDoc for SimpleTextCodec (and its associated classe
         </li>
         
         
-        <li id="section-7">
+        <li id="section-8">
             <div class="annotation">
               
               <div class="sswrap ">
-                <a class="ss" href="#section-7">&#x00a7;</a>
+                <a class="ss" href="#section-8">&#x00a7;</a>
               </div>
               <p>Don’t output the segmentinfos (.si) file yet, because it may contain non-UTF-8 bytes.
 (See <a href="https://github.com/apache/lucene/pull/12897">https://github.com/apache/lucene/pull/12897</a>.)
@@ -246,11 +260,11 @@ each segment.)</p>
         </li>
         
         
-        <li id="section-8">
+        <li id="section-9">
             <div class="annotation">
               
               <div class="sswrap ">
-                <a class="ss" href="#section-8">&#x00a7;</a>
+                <a class="ss" href="#section-9">&#x00a7;</a>
               </div>
               <p>Then we delete the directory itself.</p>
 
@@ -266,18 +280,30 @@ each segment.)</p>
         </li>
         
         
-        <li id="section-9">
+        <li id="section-10">
             <div class="annotation">
               
               <div class="sswrap ">
-                <a class="ss" href="#section-9">&#x00a7;</a>
+                <a class="ss" href="#section-10">&#x00a7;</a>
               </div>
               <h2 id="program-output">Program output</h2>
 <p>The program dumps the following files. Let’s explore the files one-by-one.</p>
 <p>Note that the SimpleTextCodec is an implementation that is conceptually similar to the real binary codecs, but
 certainly // not identical. There are compromises that SimpleTextCodec has made to implement a fully-functioning
 codec in plain text.</p>
-<h3 id="doc-values">Doc values</h3>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-11">&#x00a7;</a>
+              </div>
+              <h3 id="doc-values">Doc values</h3>
 <p>The <code>.dat</code> file stores the doc values for the <code>val</code> field.</p>
 <p>The <code>IntField</code> uses the “binary” doc values format. In this case, each value has a maximum length of 1 byte.
 The “maxlength” and “pattern” values let us efficiently seek to the start of a document’s values. Specifically,
@@ -313,11 +339,11 @@ checksum <span class="hljs-number">00000000001474172410</span></pre></div></div>
         </li>
         
         
-        <li id="section-10">
+        <li id="section-12">
             <div class="annotation">
               
               <div class="sswrap ">
-                <a class="ss" href="#section-10">&#x00a7;</a>
+                <a class="ss" href="#section-12">&#x00a7;</a>
               </div>
               <h3 id="points">Points</h3>
 <p>The <code>.dii</code> file stores an index to locate the point data for individual fields in the <code>.dim</code> file. In this case,
@@ -362,11 +388,11 @@ checksum 00000000000107327399</pre></div></div>
         </li>
         
         
-        <li id="section-11">
+        <li id="section-13">
             <div class="annotation">
               
               <div class="sswrap ">
-                <a class="ss" href="#section-11">&#x00a7;</a>
+                <a class="ss" href="#section-13">&#x00a7;</a>
               </div>
               <h3 id="stored-fields">Stored fields</h3>
 <p>The <code>.fld</code> file keep stored field, used to retrieve the original field values as sent to the index writer.</p>
@@ -415,11 +441,11 @@ checksum 00000000000213864262</pre></div></div>
         </li>
         
         
-        <li id="section-12">
+        <li id="section-14">
             <div class="annotation">
               
               <div class="sswrap ">
-                <a class="ss" href="#section-12">&#x00a7;</a>
+                <a class="ss" href="#section-14">&#x00a7;</a>
               </div>
               <h3 id="field-infos">Field infos</h3>
 <p>The <code>.inf</code> file stores information about each field.</p>
@@ -471,11 +497,11 @@ checksum 00000000000798287814</pre></div></div>
         </li>
         
         
-        <li id="section-13">
+        <li id="section-15">
             <div class="annotation">
               
               <div class="sswrap ">
-                <a class="ss" href="#section-13">&#x00a7;</a>
+                <a class="ss" href="#section-15">&#x00a7;</a>
               </div>
               <h3 id="norms">Norms</h3>
 <p>The <code>.len</code> file contains the norms for each text field in the index. The norms are the length (relative to term
@@ -506,11 +532,11 @@ checksum 00000000003850040528</pre></div></div>
         </li>
         
         
-        <li id="section-14">
+        <li id="section-16">
             <div class="annotation">
               
               <div class="sswrap ">
-                <a class="ss" href="#section-14">&#x00a7;</a>
+                <a class="ss" href="#section-16">&#x00a7;</a>
               </div>
               <h3 id="postings">Postings</h3>
 <p>The postings, stored in <code>.pst</code> files, are the key data structure used for efficient text search in Lucene.</p>
@@ -654,11 +680,11 @@ checksum 00000000001512782415</pre></div></div>
         </li>
         
         
-        <li id="section-15">
+        <li id="section-17">
             <div class="annotation">
               
               <div class="sswrap ">
-                <a class="ss" href="#section-15">&#x00a7;</a>
+                <a class="ss" href="#section-17">&#x00a7;</a>
               </div>
               <h3 id="segment-info">Segment info</h3>
 <p>The segment info file <code>.si</code> stores information about all the other files involved in a segment.</p>
@@ -673,11 +699,11 @@ See <a href="https://github.com/apache/lucene/pull/12897">https://github.com/apa
         </li>
         
         
-        <li id="section-16">
+        <li id="section-18">
             <div class="annotation">
               
               <div class="sswrap ">
-                <a class="ss" href="#section-16">&#x00a7;</a>
+                <a class="ss" href="#section-18">&#x00a7;</a>
               </div>
               <h3 id="commit-file">Commit file</h3>
 <p>Each commit increments the commit generation and writes a <code>segments_&lt;generation&gt;</code> file. When indexing from a single
@@ -686,8 +712,7 @@ counts up by one on each commit). If segments are flushed without committing or 
 the segment numbers will usually be higher than the commit generation.</p>
 <p>The commit file holds the “SegmentInfos” (plural). It is not managed by the codec, since it encodes the information
 about what segments are part of the given commit and which codecs were used to write each segment. Since the
-file was not written by SimpleTextCodec, it is a binary file, so we don’t output it here.
-/</p>
+file was not written by SimpleTextCodec, it is a binary file, so we don’t output it here.</p>
 
             </div>
             
@@ -696,11 +721,11 @@ file was not written by SimpleTextCodec, it is a binary file, so we don’t outp
         </li>
         
         
-        <li id="section-17">
+        <li id="section-19">
             <div class="annotation">
               
               <div class="sswrap ">
-                <a class="ss" href="#section-17">&#x00a7;</a>
+                <a class="ss" href="#section-19">&#x00a7;</a>
               </div>
               <h3 id="write-lock">Write lock</h3>
 <p>On creation of the <code>IndexWriter</code>, a <code>write.lock</code> file is created and locked. The lock implementation is configurable,
