@@ -25,6 +25,11 @@
                 </a>
               
                 
+                <a class="source" href="DirectoryFileContents.html">
+                  DirectoryFileContents.java
+                </a>
+              
+                
                 <a class="source" href="FunctionQuerySearchExample.html">
                   FunctionQuerySearchExample.java
                 </a>
@@ -171,7 +176,7 @@ create an <code>IndexWriter</code>. Then we’ll add each of the example documen
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-type">Path</span> <span class="hljs-variable">tmpDir</span> <span class="hljs-operator">=</span> Files.createTempDirectory(SimpleSearch.class.getSimpleName());
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-type">Path</span> <span class="hljs-variable">tmpDir</span> <span class="hljs-operator">=</span> Files.createTempDirectory(SearchWithTermsEnum.class.getSimpleName());
         <span class="hljs-keyword">try</span> (<span class="hljs-type">Directory</span> <span class="hljs-variable">directory</span> <span class="hljs-operator">=</span> FSDirectory.open(tmpDir);
              <span class="hljs-type">IndexWriter</span> <span class="hljs-variable">writer</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexWriter</span>(directory, <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexWriterConfig</span>())) {
             <span class="hljs-keyword">for</span> (List&lt;IndexableField&gt; doc : createDocuments()) {
