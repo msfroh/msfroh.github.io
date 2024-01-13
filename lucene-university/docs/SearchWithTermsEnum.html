@@ -25,6 +25,11 @@
                 </a>
               
                 
+                <a class="source" href="BottomUpIndexReader.html">
+                  BottomUpIndexReader.java
+                </a>
+              
+                
                 <a class="source" href="DirectoryFileContents.html">
                   DirectoryFileContents.java
                 </a>
@@ -98,6 +103,7 @@ help demystify some of what’s happening under the <code>IndexSearcher</code>.<
 <span class="hljs-keyword">import</span> org.apache.lucene.index.IndexWriter;
 <span class="hljs-keyword">import</span> org.apache.lucene.index.IndexWriterConfig;
 <span class="hljs-keyword">import</span> org.apache.lucene.index.IndexableField;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.LeafReader;
 <span class="hljs-keyword">import</span> org.apache.lucene.index.LeafReaderContext;
 <span class="hljs-keyword">import</span> org.apache.lucene.index.PostingsEnum;
 <span class="hljs-keyword">import</span> org.apache.lucene.index.StoredFields;
@@ -263,7 +269,8 @@ each segment has its own term dictionary.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                    <span class="hljs-type">Terms</span> <span class="hljs-variable">textTerms</span> <span class="hljs-operator">=</span> Terms.getTerms(leafReaderContext.reader(), <span class="hljs-string">&quot;text&quot;</span>);
+            <div class="content"><div class='highlight'><pre>                    <span class="hljs-type">LeafReader</span> <span class="hljs-variable">leafReader</span> <span class="hljs-operator">=</span> leafReaderContext.reader();
+                    <span class="hljs-type">Terms</span> <span class="hljs-variable">textTerms</span> <span class="hljs-operator">=</span> Terms.getTerms(leafReader, <span class="hljs-string">&quot;text&quot;</span>);
                     System.out.println(<span class="hljs-string">&quot;Segment &quot;</span> + leafReaderContext.ord + <span class="hljs-string">&quot; has &quot;</span> + textTerms.size() + <span class="hljs-string">&quot; terms&quot;</span>);</pre></div></div>
             
         </li>
@@ -372,7 +379,7 @@ starts counting doc IDs again from 0.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>                            <span class="hljs-type">StoredFields</span> <span class="hljs-variable">storedFields</span> <span class="hljs-operator">=</span> leafReaderContext.reader().storedFields();
+            <div class="content"><div class='highlight'><pre>                            <span class="hljs-type">StoredFields</span> <span class="hljs-variable">storedFields</span> <span class="hljs-operator">=</span> leafReader.storedFields();
                             System.out.println(storedFields.document(docId).get(<span class="hljs-string">&quot;text&quot;</span>));
                         }
                     } <span class="hljs-keyword">else</span> {</pre></div></div>

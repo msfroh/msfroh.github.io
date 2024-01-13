@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Bottom-up explanation of how Lucene reads index data</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
+              
+                
+                <a class="source" href="AnalyzerBasics.html">
+                  AnalyzerBasics.java
+                </a>
+              
+                
+                <a class="source" href="BottomUpIndexReader.html">
+                  BottomUpIndexReader.java
+                </a>
+              
+                
+                <a class="source" href="DirectoryFileContents.html">
+                  DirectoryFileContents.java
+                </a>
+              
+                
+                <a class="source" href="FunctionQuerySearchExample.html">
+                  FunctionQuerySearchExample.java
+                </a>
+              
+                
+                <a class="source" href="KnnSearchExample.html">
+                  KnnSearchExample.java
+                </a>
+              
+                
+                <a class="source" href="PointTreeRangeQuery.html">
+                  PointTreeRangeQuery.java
+                </a>
+              
+                
+                <a class="source" href="SearchWithTermsEnum.html">
+                  SearchWithTermsEnum.java
+                </a>
+              
+                
+                <a class="source" href="SimpleSearch.html">
+                  SimpleSearch.java
+                </a>
+              
+                
+                <a class="source" href="VisualizePointTree.html">
+                  VisualizePointTree.java
+                </a>
+              
+            </div>
+          </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
+        
+        
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-1">&#x00a7;</a>
+              </div>
+              <h1 id="bottom-up-explanation-of-how-lucene-reads-index-data">Bottom-up explanation of how Lucene reads index data</h1>
+<p>This example will more or less bridge the gap between DirectoryFileContents (which looks at the Lucene files on disk)
+and SearchWithTermsEnum (which looks at how a TermQuery runs against an IndexReader, the layer below IndexSearcher).</p>
+<p>The example will cover the following:</p>
+<ul>
+<li><strong>Directory</strong>: Models a (platform-independent) file system directory, with simple operations like listing available
+files, deleting files, and opening files for read/write.</li>
+<li><strong>IndexInput / IndexOutput</strong>: Abstraction for a file reading/writing, returned from a Directory. IndexInput
+supports “slicing”, where you can get an IndexInput corresponding to a byte range from another IndexInput. Note
+that IndexInput and IndexOutput also provide (via inheritance from DataInput/DataOutput) methods to read/write
+frequently-used primitives as bytes (e.g. VInt, ZInt, string maps, arrays of numeric types).</li>
+<li><strong>Codecs</strong>: Codecs are the (Lucene version-specific) accumulation of readers/writers for various data structures
+used by the higher-level query logic. Each data structure tends to have an associated “[Version][Type]Format”
+class that either directly implements reading/writing or can return readers and writers.</li>
+<li><strong>Tying it together</strong>: Many Lucene data structures are stored off-heap, which is achieved by making the reader
+implement the data structure’s interface, so navigating the data structure makes the (Codec-specific) reader move
+through the IndexInput, which is usually a memory-mapped file supplied by MMapDirectory.</li>
+</ul>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">package</span> example.basic;
+
+<span class="hljs-keyword">import</span> org.apache.lucene.codecs.Codec;
+<span class="hljs-keyword">import</span> org.apache.lucene.codecs.CodecUtil;
+<span class="hljs-keyword">import</span> org.apache.lucene.codecs.CompoundDirectory;
+<span class="hljs-keyword">import</span> org.apache.lucene.codecs.FieldsProducer;
+<span class="hljs-keyword">import</span> org.apache.lucene.document.Field;
+<span class="hljs-keyword">import</span> org.apache.lucene.document.IntField;
+<span class="hljs-keyword">import</span> org.apache.lucene.document.TextField;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.FieldInfos;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexWriter;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexWriterConfig;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexableField;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.SegmentCommitInfo;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.SegmentInfo;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.SegmentInfos;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.SegmentReadState;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.Terms;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.TermsEnum;
+<span class="hljs-keyword">import</span> org.apache.lucene.store.ChecksumIndexInput;
+<span class="hljs-keyword">import</span> org.apache.lucene.store.Directory;
+<span class="hljs-keyword">import</span> org.apache.lucene.store.FSDirectory;
+<span class="hljs-keyword">import</span> org.apache.lucene.store.IOContext;
+<span class="hljs-keyword">import</span> org.apache.lucene.store.Lock;
+<span class="hljs-keyword">import</span> org.apache.lucene.util.BytesRef;
+
+<span class="hljs-keyword">import</span> java.io.IOException;
+<span class="hljs-keyword">import</span> java.nio.file.Files;
+<span class="hljs-keyword">import</span> java.nio.file.Path;
+<span class="hljs-keyword">import</span> java.util.ArrayList;
+<span class="hljs-keyword">import</span> java.util.List;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">BottomUpIndexReader</span> {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-2">&#x00a7;</a>
+              </div>
+              <h2 id="index-setup">Index setup</h2>
+<p>We’ll create a similar index to DirectoryFileContents, but we’ll stick with the default codec, since we’re
+going to explore how the codec is used to decode the index files (since codec is short for “coder and decoder”).</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Path <span class="hljs-title function_">createLuceneIndex</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> IOException {
+        <span class="hljs-type">Path</span> <span class="hljs-variable">indexDir</span> <span class="hljs-operator">=</span> Files.createTempDirectory(DirectoryFileContents.class.getSimpleName());
+
+        <span class="hljs-keyword">try</span> (<span class="hljs-type">FSDirectory</span> <span class="hljs-variable">directory</span> <span class="hljs-operator">=</span> FSDirectory.open(indexDir);
+             <span class="hljs-type">IndexWriter</span> <span class="hljs-variable">indexWriter</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexWriter</span>(directory, <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexWriterConfig</span>())) {
+            List&lt;String&gt; texts = List.of(
+                    <span class="hljs-string">&quot;The quick fox jumped over the lazy, brown dog&quot;</span>,
+                    <span class="hljs-string">&quot;Lorem ipsum, dolor sit amet&quot;</span>,
+                    <span class="hljs-string">&quot;She left the web, she left the loom, she made three paces through the room&quot;</span>,
+                    <span class="hljs-string">&quot;The sly fox sneaks past the oblivious dog&quot;</span>
+            );
+            <span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+            <span class="hljs-keyword">for</span> (String text : texts) {
+                List&lt;IndexableField&gt; doc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+                doc.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TextField</span>(<span class="hljs-string">&quot;text&quot;</span>, text, Field.Store.YES));
+                doc.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">IntField</span>(<span class="hljs-string">&quot;val&quot;</span>, i++, Field.Store.YES));
+                indexWriter.addDocument(doc);
+            }
+        }
+        <span class="hljs-keyword">return</span> indexDir;
+    }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-3">&#x00a7;</a>
+              </div>
+              <h2 id="reading-the-directory-contents">Reading the directory contents</h2>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> IOException {
+        <span class="hljs-type">Path</span> <span class="hljs-variable">indexDir</span> <span class="hljs-operator">=</span> createLuceneIndex();
+        <span class="hljs-type">Lock</span> <span class="hljs-variable">lock</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-4">&#x00a7;</a>
+              </div>
+              <p>The Lucene <code>Directory</code> class provides an abstraction matching a filesystem directory (with no
+subdirectories). In our case, the Lucene directory really is a filesystem directory corresponding to the
+path of <code>indexDir</code>.</p>
+<p>Note that on most 64-bit Java runtime environments, <code>FSDirectory.open(path)</code> just calls
+<code>new MMapDirectory(path)</code>. Using <code>FSDirectory.open</code> is the more portable choice, though.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">try</span> (<span class="hljs-type">Directory</span> <span class="hljs-variable">dir</span> <span class="hljs-operator">=</span> FSDirectory.open(indexDir)) {</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-5">&#x00a7;</a>
+              </div>
+              <p>The following snippet outputs the files in the directory and their sizes:</p>
+<pre><code>Directory contents:
+_0.<span class="hljs-type">cfe</span>   <span class="hljs-variable">size</span> <span class="hljs-operator">=</span> <span class="hljs-number">479</span>
+_0.<span class="hljs-type">cfs</span>   <span class="hljs-variable">size</span> <span class="hljs-operator">=</span> <span class="hljs-number">2337</span>
+_0.<span class="hljs-type">si</span>   <span class="hljs-variable">size</span> <span class="hljs-operator">=</span> <span class="hljs-number">348</span>
+<span class="hljs-type">segments_1</span>   <span class="hljs-variable">size</span> <span class="hljs-operator">=</span> <span class="hljs-number">154</span>
+write.<span class="hljs-type">lock</span>   <span class="hljs-variable">size</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>
+</code></pre>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            System.out.println(<span class="hljs-string">&quot;Directory contents:&quot;</span>);
+            <span class="hljs-keyword">for</span> (String file : dir.listAll()) {
+                System.out.println(<span class="hljs-string">&quot; &quot;</span> + file + <span class="hljs-string">&quot;   size = &quot;</span> + dir.fileLength(file));
+            }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-6">&#x00a7;</a>
+              </div>
+              <p>The <code>write.lock</code> file is there to make sure that only one <code>IndexWriter</code> can operate on the directory
+at a time. For fun, let’s lock the directory, to make extra sure that another <code>IndexWriter</code> can’t mess
+with our files. We’ll release it in the <code>finally</code> block.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            lock = dir.obtainLock(<span class="hljs-string">&quot;write.lock&quot;</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-7">&#x00a7;</a>
+              </div>
+              <p>The next file of interest is <code>segments_1</code>. An <code>IndexWriter</code> or <code>IndexReader</code> looks at these <code>segments_N</code>
+files to determine the current “commit generation” and understand what segments are in the index.
+That is, each time we commit, this number is incremented by 1 and written (in base 36, so 0-9a-z) as a
+suffix to this “segment infos” file. We’re currently on generation 1.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            System.out.println(<span class="hljs-string">&quot;Commit generation is &quot;</span> + SegmentInfos.getLastCommitGeneration(dir.listAll()));</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-8">&#x00a7;</a>
+              </div>
+              <p>Unlike most Lucene files, the segment infos file needs a relatively stable format to be understood by
+different versions of Lucene. Instead of digging into the specific bytes in this file, we’ll use
+<code>SegmentInfos.readCommit</code> to load it and call some methods to output its contents. Note that the
+<code>SegmentInfos</code> instance maintains a list of <code>SegmentCommitInfo</code>.</p>
+<pre><code>Segment _0 has the following files:
+_0.cfe
+_0.si
+_0.cfs
+</code></pre>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-type">SegmentInfos</span> <span class="hljs-variable">segmentInfos</span> <span class="hljs-operator">=</span> SegmentInfos.readCommit(dir, <span class="hljs-string">&quot;segments_1&quot;</span>);
+            <span class="hljs-keyword">for</span> (SegmentCommitInfo sci : segmentInfos) {
+                <span class="hljs-type">SegmentInfo</span> <span class="hljs-variable">segmentInfo</span> <span class="hljs-operator">=</span> sci.info;
+                System.out.println(<span class="hljs-string">&quot;Segment &quot;</span> + segmentInfo.name + <span class="hljs-string">&quot; has the following files:&quot;</span>);
+                <span class="hljs-keyword">for</span> (String segmentfile : sci.files()) {
+                    System.out.println(segmentfile);
+                }
+            }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-9">&#x00a7;</a>
+              </div>
+              <h3 id="what-are-these-segmentcommitinfos">What are these SegmentCommitInfos?</h3>
+<p>Since Lucene segments are written once, documents are never “deleted” from a segment. Instead, a
+subsequent commit writes another file (with a suffix with the commit generation and a .liv extension,
+like <code>_0_9.liv</code>), which is a bit set indicating what documents are still “live” (i.e. not deleted).
+A <code>SegmentCommitInfo</code> holds a reference to the (written-once) <code>SegmentInfo</code> and a reference to the live
+docs for the current commit. If the index uses updatable doc values, it will also reference (per-commit)
+doc value updates.</p>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-10">&#x00a7;</a>
+              </div>
+              <h3 id="reading-a-single-segment">Reading a single segment</h3>
+<p>The files in each segment start with an underscore and the segment generation (also a base 36 counter,
+but separate from the commit generation). The file extensions indicate what they contain. In this case,
+the <code>_0.si</code> file contains the <code>SegmentInfo</code> for the segment. We already loaded this file when we called
+<code>SegmentInfos.readCommit</code>. Among other things, the <code>SegmentInfo</code> knows what <code>Codec</code> to use to read the
+other files in the segment. (Technically, the <code>Codec</code> class name is stored in the <code>segments_1</code> file,
+since<code>SegmentInfos.readCommit()</code> uses the <code>Codec</code> to read the <code>.si</code> file.)</p>
+<p>At the time of writing (and subject to change with new versions), this outputs:</p>
+<pre><code>Segment _0 was written with the Lucene99 codec
+</code></pre>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>
+            <span class="hljs-type">SegmentCommitInfo</span> <span class="hljs-variable">seg0commitInfo</span> <span class="hljs-operator">=</span> segmentInfos.info(<span class="hljs-number">0</span>);
+            <span class="hljs-type">SegmentInfo</span> <span class="hljs-variable">seg0info</span> <span class="hljs-operator">=</span> seg0commitInfo.info;
+            <span class="hljs-type">Codec</span> <span class="hljs-variable">codec</span> <span class="hljs-operator">=</span> seg0info.getCodec();
+            System.out.println(<span class="hljs-string">&quot;Segment _0 was written with the &quot;</span> + codec.getName() + <span class="hljs-string">&quot; codec.&quot;</span>);</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-11">&#x00a7;</a>
+              </div>
+              <h3 id="compound-file-segments">Compound file segments</h3>
+<p>Since our single segment is small, Lucene chose to stick all the individual files into the file <code>_0.cfs</code>,
+to avoid consuming many operating system file handles for a bunch of even smaller files. (It’s not a
+problem with a single small segment, but can become a problem with many small segments or many small
+Lucene indices open on the same machine.) The <code>_0.cfe</code> file holds the “compound file entries”, which
+store the start and end offsets for each file stored within the <code>.cfs</code> file.</p>
+<p>The compound file segment is modeled as a directory itself.</p>
+<pre><code>Compound file segment _0.cfs has the following contents:
+_0_Lucene99_0.tip
+_0.nvm
+_0.fnm
+_0_Lucene99_0.doc
+_0_Lucene99_0.tim
+_0_Lucene99_0.pos
+_0_Lucene90_0.dvd
+_0.kdd
+_0.kdm
+_0_Lucene99_0.tmd
+_0_Lucene90_0.dvm
+_0.kdi
+_0.fdm
+_0.nvd
+_0.fdx
+_0.fdt
+</code></pre>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-type">CompoundDirectory</span> <span class="hljs-variable">seg0dir</span> <span class="hljs-operator">=</span> codec.compoundFormat().getCompoundReader(dir, seg0info, IOContext.READ);
+            System.out.println(<span class="hljs-string">&quot;Compound file segment _0.cfs has the following contents:&quot;</span>);
+            <span class="hljs-keyword">for</span> (String innerFile : seg0dir.listAll()) {
+                System.out.println(<span class="hljs-string">&quot; &quot;</span> + innerFile);
+            }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-12">&#x00a7;</a>
+              </div>
+              <h3 id="compound-file-internals">Compound file internals</h3>
+<p>Let’s decode that <code>.cfe</code> file ourselves.</p>
+<p>DON’T TRY THIS AT HOME. (Or at least don’t ever do this in a real application.)</p>
+<p>Reading the Lucene90CompoundFormat source code, we see that the <code>.cfe</code> file has the following format:</p>
+<pre><code>&lt;header: validates file integrity&gt;
+&lt;numfiles: VInt&gt;
+&lt;file <span class="hljs-number">0</span> suffix: string&gt; &lt;file <span class="hljs-number">0</span> start offset: <span class="hljs-type">long</span>&gt; &lt;file <span class="hljs-number">0</span> end offset: <span class="hljs-type">long</span>&gt;
+&lt;file <span class="hljs-number">1</span> suffix: string&gt; &lt;file <span class="hljs-number">1</span> start offset: <span class="hljs-type">long</span>&gt; &lt;file <span class="hljs-number">1</span> end offset: <span class="hljs-type">long</span>&gt;
+...
+&lt;file N suffix: string&gt; &lt;file N start offset: <span class="hljs-type">long</span>&gt; &lt;file N end offset: <span class="hljs-type">long</span>&gt;
+&lt;footer: validates file integrity&gt;
+</code></pre>
+<p>This assumes we wrote the index using the Lucene90CompoundFormat. If it doesn’t work for you,
+you can delete or comment out this code. The higher-level APIs should continue to compile and work,
+but low-level details are subject to changes.</p>
+<pre><code>File with suffix .nvd starts at offset <span class="hljs-number">48</span> and has length <span class="hljs-number">63</span>
+File with suffix .fdx starts at offset <span class="hljs-number">112</span> and has length <span class="hljs-number">64</span>
+File with suffix .kdi starts at offset <span class="hljs-number">176</span> and has length <span class="hljs-number">68</span>
+File with suffix _Lucene99_0.tip starts at offset <span class="hljs-number">248</span> and has length <span class="hljs-number">72</span>
+File with suffix _Lucene90_0.dvd starts at offset <span class="hljs-number">320</span> and has length <span class="hljs-number">74</span>
+File with suffix .kdd starts at offset <span class="hljs-number">400</span> and has length <span class="hljs-number">82</span>
+File with suffix _Lucene99_0.doc starts at offset <span class="hljs-number">488</span> and has length <span class="hljs-number">87</span>
+File with suffix .nvm starts at offset <span class="hljs-number">576</span> and has length <span class="hljs-number">103</span>
+File with suffix _Lucene99_0.pos starts at offset <span class="hljs-number">680</span> and has length <span class="hljs-number">114</span>
+File with suffix .kdm starts at offset <span class="hljs-number">800</span> and has length <span class="hljs-number">135</span>
+File with suffix .fdm starts at offset <span class="hljs-number">936</span> and has length <span class="hljs-number">157</span>
+File with suffix _Lucene90_0.dvm starts at offset <span class="hljs-number">1096</span> and has length <span class="hljs-number">162</span>
+File with suffix _Lucene99_0.tmd starts at offset <span class="hljs-number">1264</span> and has length <span class="hljs-number">190</span>
+File with suffix .fnm starts at offset <span class="hljs-number">1456</span> and has length <span class="hljs-number">250</span>
+File with suffix _Lucene99_0.tim starts at offset <span class="hljs-number">1712</span> and has length <span class="hljs-number">290</span>
+File with suffix .fdt starts at offset <span class="hljs-number">2008</span> and has length <span class="hljs-number">313</span>
+These should be equal: <span class="hljs-number">479</span> == <span class="hljs-number">479</span>
+</code></pre>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">try</span> (<span class="hljs-type">ChecksumIndexInput</span> <span class="hljs-variable">cfeInput</span> <span class="hljs-operator">=</span> dir.openChecksumInput(<span class="hljs-string">&quot;_0.cfe&quot;</span>)) {
+                <span class="hljs-comment">/* If/when Lucene changes this file format, this header check should fail. */</span>
+                CodecUtil.checkIndexHeader(cfeInput, <span class="hljs-string">&quot;Lucene90CompoundEntries&quot;</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, seg0info.getId(), <span class="hljs-string">&quot;&quot;</span>);
+                <span class="hljs-type">int</span> <span class="hljs-variable">numFiles</span> <span class="hljs-operator">=</span> cfeInput.readVInt();
+                <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span> ; i &lt; numFiles; i++) {
+                    <span class="hljs-type">String</span> <span class="hljs-variable">fileSuffix</span> <span class="hljs-operator">=</span> cfeInput.readString();
+                    <span class="hljs-type">long</span> <span class="hljs-variable">start</span> <span class="hljs-operator">=</span> cfeInput.readLong();
+                    <span class="hljs-type">long</span> <span class="hljs-variable">end</span> <span class="hljs-operator">=</span> cfeInput.readLong();
+                    System.out.printf(<span class="hljs-string">&quot;File with suffix %s starts at offset %d and has length %d%n&quot;</span>, fileSuffix, start, end);
+                }
+                CodecUtil.checkFooter(cfeInput);
+                <span class="hljs-comment">/* Check that we actually reached the end of the file */</span>
+                System.out.println(<span class="hljs-string">&quot;These should be equal: &quot;</span> + cfeInput.getFilePointer() + <span class="hljs-string">&quot; == &quot;</span> + dir.fileLength(<span class="hljs-string">&quot;_0.cfe&quot;</span>));
+            }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-13">&#x00a7;</a>
+              </div>
+              <h3 id="reading-terms-from-the-index">Reading terms from the index</h3>
+<p>We’ve previously covered term queries from a high level in SimpleSearch, then a slightly lower level in
+SearchWithTermsEnum. Let’s close the gap by reading the terms directly from this segment (essentially
+what the LeafReader did for us in SearchWithTermsEnum).</p>
+<p>First we need the information about the fields in the index, available via FieldInfos, which we read from
+the <code>.fnm</code> file in our compound file segment. Then we get a <code>FieldsProducer</code> using the codec’s postings
+format. That lets us load the <code>Terms</code> (and therefore <code>TermsEnum</code>) for a given field.</p>
+<p>The code outputs the following terms:</p>
+<pre><code>The field <span class="hljs-string">&#x27;text&#x27;</span> has the following terms:
+amet brown dog dolor fox ipsum jumped lazy left loom lorem made oblivious over paces past quick room
+she sit sly sneaks the three through web
+</code></pre>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>            <span class="hljs-type">FieldInfos</span> <span class="hljs-variable">fieldInfos</span> <span class="hljs-operator">=</span> codec.fieldInfosFormat().read(seg0dir, seg0info, <span class="hljs-string">&quot;&quot;</span>, IOContext.READ);
+            <span class="hljs-type">SegmentReadState</span> <span class="hljs-variable">segmentReadState</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">SegmentReadState</span>(seg0dir, seg0info, fieldInfos, IOContext.READ);
+            <span class="hljs-keyword">try</span> (<span class="hljs-type">FieldsProducer</span> <span class="hljs-variable">fieldsProducer</span> <span class="hljs-operator">=</span> codec.postingsFormat().fieldsProducer(segmentReadState)) {
+                <span class="hljs-type">Terms</span> <span class="hljs-variable">terms</span> <span class="hljs-operator">=</span> fieldsProducer.terms(<span class="hljs-string">&quot;text&quot;</span>);
+                <span class="hljs-type">TermsEnum</span> <span class="hljs-variable">termsEnum</span> <span class="hljs-operator">=</span> terms.iterator();
+                BytesRef termBytesRef;
+                System.out.println(<span class="hljs-string">&quot;The field &#x27;text&#x27; has the following terms:&quot;</span>);
+                <span class="hljs-type">StringBuilder</span> <span class="hljs-variable">builder</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuilder</span>();
+                <span class="hljs-type">int</span> <span class="hljs-variable">lineLength</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+                <span class="hljs-keyword">while</span> ((termBytesRef = termsEnum.next()) != <span class="hljs-literal">null</span>) {
+                    <span class="hljs-type">String</span> <span class="hljs-variable">termString</span> <span class="hljs-operator">=</span> termBytesRef.utf8ToString();
+                    builder.append(termString).append(<span class="hljs-string">&#x27; &#x27;</span>);
+                    lineLength += termString.length();
+                    <span class="hljs-keyword">if</span> (lineLength &gt; <span class="hljs-number">80</span>) {
+                        builder.append(<span class="hljs-string">&#x27;\n&#x27;</span>);
+                        lineLength = <span class="hljs-number">0</span>;
+                    }
+                }
+                System.out.println(builder);
+            }</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-14">&#x00a7;</a>
+              </div>
+              <h3 id="memory-mapped-files">Memory-mapped files</h3>
+<p>In the above example, we initialized a <code>FieldsProducer</code>, which first opened an <code>IndexInput</code> “slice” of the
+<code>_0.cfs</code> <code>IndexInput</code> corresponding to the <code>_0_Lucene99_0.doc</code> file (for the postings – the doc ids for
+each term). Then it opened another <code>IndexInput</code> slice in the CFS file for <code>_0_Lucene99_0.tim</code> (the terms),
+as well as slices for <code>_0_Lucene99_0.tip</code> (the terms index), and <code>_0_Lucene99_0.tmd</code> (the term metadata).</p>
+<p>For each indexed field in the index (in this case, just the <code>text</code> field), the postings reader
+(technically the Lucene90BlockTreeTermsReader) allocated a <code>FieldReader</code>. Each <code>FieldReader</code> holds some
+field metadata (e.g. first/last term, sum of doc frequencies and term frequencies across all terms for
+the field), but otherwise it’s a lazy data structure that reads from the files opened above when asked
+(but not the<code>.tmd</code> file – we’re done with that) when asked. It’s also the <code>Terms</code> variable that we
+retrieved above.</p>
+<p>Similarly, each time we call <code>termsEnum.next()</code>, we’re just advancing a pointer into a memory-mapped
+file. The file is probably fully paged into memory (since the whole <code>_0.cfs</code> file is only 2337
+bytes), so it’s really not much worse than reading values out of objects in the JVM heap.</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        } <span class="hljs-keyword">finally</span> {
+            <span class="hljs-keyword">for</span> (String indexFile : FSDirectory.listAll(indexDir)) {
+                Files.deleteIfExists(indexDir.resolve(indexFile));
+            }
+            Files.delete(indexDir);
+            <span class="hljs-keyword">if</span> (lock != <span class="hljs-literal">null</span>) {
+                lock.close();
+            }
+        }
+
+
+    }
+
+}</pre></div></div>
+            
+        </li>
+        
+    </ul>
+  </div>
+</body>
+</html>
