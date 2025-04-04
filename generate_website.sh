@@ -6,10 +6,11 @@ else
   git clone https://github.com/msfroh/lucene-university.git tmp
 fi
 cd tmp
+mkdir docs
 for f in $(find . -name '*.java'); do 
   mv $f .
 done
-docco *.java
+docco -l parallel *.java
 cd ..
 cp -r tmp/docs lucene-university
 rm -rf tmp

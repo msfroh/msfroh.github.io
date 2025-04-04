@@ -4,142 +4,121 @@
 <head>
   <title>Analyzer basics</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
 </head>
 <body>
-  <div class="container">
-    <div class="main">
-
-      <div class="header">
-        <h1>Analyzer basics</h1>
-
-        
-          <div class="toc">
-            <h3>Table of Contents</h3>
-            <ol>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
               
                 
-                <li>
-                  <a class="source" href="AnalyzerBasics.html">
-                    AnalyzerBasics.java
-                  </a>
-                </li>
+                <a class="source" href="AnalyzerBasics.html">
+                  AnalyzerBasics.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="BooleanQueryANDInternals.html">
-                    BooleanQueryANDInternals.java
-                  </a>
-                </li>
+                <a class="source" href="BooleanQueryANDInternals.html">
+                  BooleanQueryANDInternals.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="BooleanQueryIntro.html">
-                    BooleanQueryIntro.java
-                  </a>
-                </li>
+                <a class="source" href="BooleanQueryIntro.html">
+                  BooleanQueryIntro.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="BottomUpIndexReader.html">
-                    BottomUpIndexReader.java
-                  </a>
-                </li>
+                <a class="source" href="BottomUpIndexReader.html">
+                  BottomUpIndexReader.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="BytesRefHashExample.html">
-                    BytesRefHashExample.java
-                  </a>
-                </li>
+                <a class="source" href="BytesRefHashExample.html">
+                  BytesRefHashExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="CombinedFieldQueryExample.html">
-                    CombinedFieldQueryExample.java
-                  </a>
-                </li>
+                <a class="source" href="CombinedFieldQueryExample.html">
+                  CombinedFieldQueryExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="DirectoryFileContents.html">
-                    DirectoryFileContents.java
-                  </a>
-                </li>
+                <a class="source" href="DirectoryFileContents.html">
+                  DirectoryFileContents.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="DocValuesSearchExample.html">
-                    DocValuesSearchExample.java
-                  </a>
-                </li>
+                <a class="source" href="DocValuesSearchExample.html">
+                  DocValuesSearchExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="FunctionQuerySearchExample.html">
-                    FunctionQuerySearchExample.java
-                  </a>
-                </li>
+                <a class="source" href="FunctionQuerySearchExample.html">
+                  FunctionQuerySearchExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="KnnSearchExample.html">
-                    KnnSearchExample.java
-                  </a>
-                </li>
+                <a class="source" href="KnnSearchExample.html">
+                  KnnSearchExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="PointTreeRangeQuery.html">
-                    PointTreeRangeQuery.java
-                  </a>
-                </li>
+                <a class="source" href="PointTreeRangeQuery.html">
+                  PointTreeRangeQuery.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="PrimitivesRef.html">
-                    PrimitivesRef.java
-                  </a>
-                </li>
+                <a class="source" href="PrimitivesRef.html">
+                  PrimitivesRef.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="SearchWithTermsEnum.html">
-                    SearchWithTermsEnum.java
-                  </a>
-                </li>
+                <a class="source" href="SearchWithTermsEnum.html">
+                  SearchWithTermsEnum.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="SimpleSearch.html">
-                    SimpleSearch.java
-                  </a>
-                </li>
+                <a class="source" href="SimpleSearch.html">
+                  SimpleSearch.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="TextVectorSearchExample.html">
-                    TextVectorSearchExample.java
-                  </a>
-                </li>
+                <a class="source" href="TextVectorSearchExample.html">
+                  TextVectorSearchExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="VisualizePointTree.html">
-                    VisualizePointTree.java
-                  </a>
-                </li>
+                <a class="source" href="VisualizePointTree.html">
+                  VisualizePointTree.java
+                </a>
               
-            </ol>
+            </div>
           </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
         
-      </div>
-      
         
-        <p>This example will cover the basics of how Lucene converts text into a stream of “terms” using Analyzers.</p>
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-1">&#x00a7;</a>
+              </div>
+              <p>This example will cover the basics of how Lucene converts text into a stream of “terms” using Analyzers.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 5;"><span class="line" id="L5"><span style="color: #D32F2F">package</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">basic</span><span style="color: #24292EFF">;</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 5;"><span class="line" id="L5"><span style="color: #D32F2F">package</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">basic</span><span style="color: #24292EFF">;</span></span>
 <span class="line empty-line" id="L6"></span>
 <span class="line" id="L7"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">analysis</span><span style="color: #212121">.</span><span style="color: #D32F2F">CharArraySet</span><span style="color: #24292EFF">;</span></span>
 <span class="line" id="L8"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">analysis</span><span style="color: #212121">.</span><span style="color: #D32F2F">TokenStream</span><span style="color: #24292EFF">;</span></span>
@@ -154,25 +133,51 @@
 <span class="line" id="L17"><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">AnalyzerBasics</span><span style="color: #24292EFF"> {</span></span>
 <span class="line empty-line" id="L18"></span>
 <span class="line" id="L19"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">main</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF">[] args) </span><span style="color: #D32F2F">throws</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">IOException</span><span style="color: #24292EFF"> {</span></span>
-<span class="line empty-line" id="L20"></span></code></pre>
-      
+<span class="line empty-line" id="L20"></span></code></pre></div>
+            
+        </li>
         
-        <h2 id="standard-analyzer">Standard Analyzer</h2>
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-2">&#x00a7;</a>
+              </div>
+              <h2 id="standard-analyzer">Standard Analyzer</h2>
 
+            </div>
+            
+        </li>
         
-      
         
-        <p>In the previous examples, we created an <code>IndexWriter</code> by passing in <code>new IndexWriterConfig()</code>.
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-3">&#x00a7;</a>
+              </div>
+              <p>In the previous examples, we created an <code>IndexWriter</code> by passing in <code>new IndexWriterConfig()</code>.
 The no-args <code>IndexWriterConfig()</code> constructor delegates to the <code>IndexWriterConfig(Analyzer)</code> constructor,
 passing <code>new StandardAnalyzer()</code>. So, in those examples, we implicitly used <code>StandardAnalyzer</code> to turn text
 into a stream of tokens.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 27;"><span class="line" id="L27"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">StandardAnalyzer</span><span style="color: #24292EFF"> standardAnalyzer </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">StandardAnalyzer()</span><span style="color: #24292EFF">) {</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 27;"><span class="line" id="L27"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">StandardAnalyzer</span><span style="color: #24292EFF"> standardAnalyzer </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">StandardAnalyzer()</span><span style="color: #24292EFF">) {</span></span>
 <span class="line empty-line" id="L28"></span>
-<span class="line empty-line" id="L29"></span></code></pre>
-      
+<span class="line empty-line" id="L29"></span></code></pre></div>
+            
+        </li>
         
-        <p>The analyzer for a field is made up of a <code>Tokenizer</code> followed by zero or more <code>TokenFilter</code> instances.
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-4">&#x00a7;</a>
+              </div>
+              <p>The analyzer for a field is made up of a <code>Tokenizer</code> followed by zero or more <code>TokenFilter</code> instances.
 We get these components via one of the <code>tokenStream</code> methods – one takes a <code>String</code>, while the other
 takes a <code>Reader</code>. The <code>Reader</code> implementation streams tokens without loading the full string into memory,
 but the <code>String</code> implementation is fine for our simple examples.</p>
@@ -182,33 +187,63 @@ for any field. The field name <code>text</code> here could have been anything.</
 Since we didn’t pass any stop words to the StandardAnalyzer constructor, the StopFilter doesn’t remove any
 tokens.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 41;"><span class="line" id="L41"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">TokenStream</span><span style="color: #24292EFF"> tokenStream </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">standardAnalyzer</span><span style="color: #212121">.</span><span style="color: #6F42C1">tokenStream</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 41;"><span class="line" id="L41"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">TokenStream</span><span style="color: #24292EFF"> tokenStream </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">standardAnalyzer</span><span style="color: #212121">.</span><span style="color: #6F42C1">tokenStream</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span></span>
 <span class="line" id="L42"><span style="color: #24292EFF">                    </span><span style="color: #22863A">&quot;The quick fox jumped over the lazy, brown dog&quot;</span><span style="color: #24292EFF">)) {</span></span>
 <span class="line empty-line" id="L43"></span>
-<span class="line empty-line" id="L44"></span></code></pre>
-      
+<span class="line empty-line" id="L44"></span></code></pre></div>
+            
+        </li>
         
-        <p>A token stream reuses as much as possible across inputs and across tokens. Instead of returning a new object
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-5">&#x00a7;</a>
+              </div>
+              <p>A token stream reuses as much as possible across inputs and across tokens. Instead of returning a new object
 for each token, the stream updates “attributes” associated with each token. To read the attribute values,
 we need a reference to each available attribute.</p>
 <p>The following attributes get set by StandardTokenizer. The CharTermAttribute is modified by LowerCaseFilter.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 50;"><span class="line" id="L50"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">CharTermAttribute</span><span style="color: #24292EFF"> charTermAttribute </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">tokenStream</span><span style="color: #212121">.</span><span style="color: #6F42C1">getAttribute</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">CharTermAttribute</span><span style="color: #212121">.</span><span style="color: #1976D2">class</span><span style="color: #24292EFF">);</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 50;"><span class="line" id="L50"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">CharTermAttribute</span><span style="color: #24292EFF"> charTermAttribute </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">tokenStream</span><span style="color: #212121">.</span><span style="color: #6F42C1">getAttribute</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">CharTermAttribute</span><span style="color: #212121">.</span><span style="color: #1976D2">class</span><span style="color: #24292EFF">);</span></span>
 <span class="line" id="L51"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">PositionIncrementAttribute</span><span style="color: #24292EFF"> posIncAttribute </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">tokenStream</span><span style="color: #212121">.</span><span style="color: #6F42C1">getAttribute</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">PositionIncrementAttribute</span><span style="color: #212121">.</span><span style="color: #1976D2">class</span><span style="color: #24292EFF">);</span></span>
 <span class="line" id="L52"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">OffsetAttribute</span><span style="color: #24292EFF"> offsetAttribute </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">tokenStream</span><span style="color: #212121">.</span><span style="color: #6F42C1">getAttribute</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">OffsetAttribute</span><span style="color: #212121">.</span><span style="color: #1976D2">class</span><span style="color: #24292EFF">);</span></span>
 <span class="line" id="L53"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">TypeAttribute</span><span style="color: #24292EFF"> typeAttribute </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">tokenStream</span><span style="color: #212121">.</span><span style="color: #6F42C1">getAttribute</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">TypeAttribute</span><span style="color: #212121">.</span><span style="color: #1976D2">class</span><span style="color: #24292EFF">);</span></span>
 <span class="line empty-line" id="L54"></span>
-<span class="line empty-line" id="L55"></span></code></pre>
-      
+<span class="line empty-line" id="L55"></span></code></pre></div>
+            
+        </li>
         
-        <p>Before you can read tokens off the token stream, you must <code>reset</code> it.</p>
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-6">&#x00a7;</a>
+              </div>
+              <p>Before you can read tokens off the token stream, you must <code>reset</code> it.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 57;"><span class="line" id="L57"><span style="color: #24292EFF">                </span><span style="color: #1976D2">tokenStream</span><span style="color: #212121">.</span><span style="color: #6F42C1">reset</span><span style="color: #24292EFF">();</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 57;"><span class="line" id="L57"><span style="color: #24292EFF">                </span><span style="color: #1976D2">tokenStream</span><span style="color: #212121">.</span><span style="color: #6F42C1">reset</span><span style="color: #24292EFF">();</span></span>
 <span class="line empty-line" id="L58"></span>
-<span class="line empty-line" id="L59"></span></code></pre>
-      
+<span class="line empty-line" id="L59"></span></code></pre></div>
+            
+        </li>
         
-        <p>Each call to <code>incrementToken</code> advances the stream to the next token, updating the internal values of each
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-7">&#x00a7;</a>
+              </div>
+              <p>Each call to <code>incrementToken</code> advances the stream to the next token, updating the internal values of each
 of the attributes.</p>
 <p>This block outputs:</p>
 <pre><code><pre class="shiki" style="background-color: transparent"><code ><span class="line"><span style="color: #24292EFF">Term</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> the</span><span style="color: #212121">,</span><span style="color: #24292EFF"> posInc</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">1</span><span style="color: #212121">,</span><span style="color: #24292EFF"> startOffset</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #212121">,</span><span style="color: #24292EFF"> endOffset</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">3</span><span style="color: #212121">,</span><span style="color: #24292EFF"> type</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF">ALPHANUM</span><span style="color: #D32F2F">&gt;</span></span>
@@ -226,7 +261,9 @@ that it directly follows the preceding word, useful for phrase queries. The offs
 in order to highlight matching words. All of these terms are of type ALPHANUM. We’ll produce tokens
 of other types below.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 80;"><span class="line" id="L80"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">while</span><span style="color: #24292EFF"> (</span><span style="color: #1976D2">tokenStream</span><span style="color: #212121">.</span><span style="color: #6F42C1">incrementToken</span><span style="color: #24292EFF">()) {</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 80;"><span class="line" id="L80"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">while</span><span style="color: #24292EFF"> (</span><span style="color: #1976D2">tokenStream</span><span style="color: #212121">.</span><span style="color: #6F42C1">incrementToken</span><span style="color: #24292EFF">()) {</span></span>
 <span class="line" id="L81"><span style="color: #24292EFF">                    </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;Term: &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">String(</span><span style="color: #1976D2">charTermAttribute</span><span style="color: #212121">.</span><span style="color: #6F42C1">buffer()</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">0</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">charTermAttribute</span><span style="color: #212121">.</span><span style="color: #6F42C1">length())</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span></span>
 <span class="line" id="L82"><span style="color: #24292EFF">                            </span><span style="color: #22863A">&quot;, posInc: &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">posIncAttribute</span><span style="color: #212121">.</span><span style="color: #6F42C1">getPositionIncrement</span><span style="color: #24292EFF">() </span><span style="color: #D32F2F">+</span></span>
 <span class="line" id="L83"><span style="color: #24292EFF">                            </span><span style="color: #22863A">&quot;, startOffset: &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">offsetAttribute</span><span style="color: #212121">.</span><span style="color: #6F42C1">startOffset</span><span style="color: #24292EFF">() </span><span style="color: #D32F2F">+</span></span>
@@ -236,32 +273,68 @@ of other types below.</p>
 <span class="line" id="L87"><span style="color: #24292EFF">            }</span></span>
 <span class="line" id="L88"><span style="color: #24292EFF">        }</span></span>
 <span class="line empty-line" id="L89"></span>
-<span class="line empty-line" id="L90"></span></code></pre>
-      
+<span class="line empty-line" id="L90"></span></code></pre></div>
+            
+        </li>
         
-        <h2 id="stop-words">Stop words</h2>
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-8">&#x00a7;</a>
+              </div>
+              <h2 id="stop-words">Stop words</h2>
 
+            </div>
+            
+        </li>
         
-      
         
-        <p>Let’s repeat the above example, but this time, we’re going to exclude the word “the” as a stop word.
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-9">&#x00a7;</a>
+              </div>
+              <p>Let’s repeat the above example, but this time, we’re going to exclude the word “the” as a stop word.
 We can do that by passing it to the <code>StandardAnalyzer</code> constructor.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 95;"><span class="line" id="L95"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">CharArraySet</span><span style="color: #24292EFF"> stopWords </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">CharArraySet(</span><span style="color: #1976D2">1</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">true</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 95;"><span class="line" id="L95"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">CharArraySet</span><span style="color: #24292EFF"> stopWords </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">CharArraySet(</span><span style="color: #1976D2">1</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">true</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
 <span class="line" id="L96"><span style="color: #24292EFF">        </span><span style="color: #1976D2">stopWords</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;the&quot;</span><span style="color: #24292EFF">);</span></span>
 <span class="line" id="L97"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">StandardAnalyzer</span><span style="color: #24292EFF"> standardAnalyzer </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">StandardAnalyzer(stopWords)</span><span style="color: #24292EFF">) {</span></span>
-<span class="line empty-line" id="L98"></span></code></pre>
-      
+<span class="line empty-line" id="L98"></span></code></pre></div>
+            
+        </li>
         
-        <p>Let’s make the answer a little more interesting by adding some new token types.</p>
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-10">&#x00a7;</a>
+              </div>
+              <p>Let’s make the answer a little more interesting by adding some new token types.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 100;"><span class="line" id="L100"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">TokenStream</span><span style="color: #24292EFF"> tokenStream </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">standardAnalyzer</span><span style="color: #212121">.</span><span style="color: #6F42C1">tokenStream</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 100;"><span class="line" id="L100"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">TokenStream</span><span style="color: #24292EFF"> tokenStream </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">standardAnalyzer</span><span style="color: #212121">.</span><span style="color: #6F42C1">tokenStream</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span></span>
 <span class="line" id="L101"><span style="color: #24292EFF">                    </span><span style="color: #22863A">&quot;The quick fox jumped over the lazy, brown dog. 867-5309. マイクルと言います ☺&quot;</span><span style="color: #24292EFF">)) {</span></span>
 <span class="line empty-line" id="L102"></span>
-<span class="line empty-line" id="L103"></span></code></pre>
-      
+<span class="line empty-line" id="L103"></span></code></pre></div>
+            
+        </li>
         
-        <p>This block outputs:</p>
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-11">&#x00a7;</a>
+              </div>
+              <p>This block outputs:</p>
 <pre><code><pre class="shiki" style="background-color: transparent"><code ><span class="line"><span style="color: #24292EFF">Term</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> quick</span><span style="color: #212121">,</span><span style="color: #24292EFF"> posInc</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">2</span><span style="color: #212121">,</span><span style="color: #24292EFF"> startOffset</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">4</span><span style="color: #212121">,</span><span style="color: #24292EFF"> endOffset</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">9</span><span style="color: #212121">,</span><span style="color: #24292EFF"> type</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF">ALPHANUM</span><span style="color: #D32F2F">&gt;</span></span>
 <span class="line"><span style="color: #24292EFF">Term</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> fox</span><span style="color: #212121">,</span><span style="color: #24292EFF"> posInc</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">1</span><span style="color: #212121">,</span><span style="color: #24292EFF"> startOffset</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">10</span><span style="color: #212121">,</span><span style="color: #24292EFF"> endOffset</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">13</span><span style="color: #212121">,</span><span style="color: #24292EFF"> type</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF">ALPHANUM</span><span style="color: #D32F2F">&gt;</span></span>
 <span class="line"><span style="color: #24292EFF">Term</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> jumped</span><span style="color: #212121">,</span><span style="color: #24292EFF"> posInc</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">1</span><span style="color: #212121">,</span><span style="color: #24292EFF"> startOffset</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">14</span><span style="color: #212121">,</span><span style="color: #24292EFF"> endOffset</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">20</span><span style="color: #212121">,</span><span style="color: #24292EFF"> type</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF">ALPHANUM</span><span style="color: #D32F2F">&gt;</span></span>
@@ -280,7 +353,9 @@ We can do that by passing it to the <code>StandardAnalyzer</code> constructor.</
 <span class="line"><span style="color: #24292EFF">Term</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> ☺</span><span style="color: #212121">,</span><span style="color: #24292EFF"> posInc</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">1</span><span style="color: #212121">,</span><span style="color: #24292EFF"> startOffset</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">67</span><span style="color: #212121">,</span><span style="color: #24292EFF"> endOffset</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">68</span><span style="color: #212121">,</span><span style="color: #24292EFF"> type</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF">EMOJI</span><span style="color: #D32F2F">&gt;</span></span></code></pre>
 </code></pre>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 123;"><span class="line" id="L123"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">CharTermAttribute</span><span style="color: #24292EFF"> charTermAttribute </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">tokenStream</span><span style="color: #212121">.</span><span style="color: #6F42C1">getAttribute</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">CharTermAttribute</span><span style="color: #212121">.</span><span style="color: #1976D2">class</span><span style="color: #24292EFF">);</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 123;"><span class="line" id="L123"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">CharTermAttribute</span><span style="color: #24292EFF"> charTermAttribute </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">tokenStream</span><span style="color: #212121">.</span><span style="color: #6F42C1">getAttribute</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">CharTermAttribute</span><span style="color: #212121">.</span><span style="color: #1976D2">class</span><span style="color: #24292EFF">);</span></span>
 <span class="line" id="L124"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">PositionIncrementAttribute</span><span style="color: #24292EFF"> posIncAttribute </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">tokenStream</span><span style="color: #212121">.</span><span style="color: #6F42C1">getAttribute</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">PositionIncrementAttribute</span><span style="color: #212121">.</span><span style="color: #1976D2">class</span><span style="color: #24292EFF">);</span></span>
 <span class="line" id="L125"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">OffsetAttribute</span><span style="color: #24292EFF"> offsetAttribute </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">tokenStream</span><span style="color: #212121">.</span><span style="color: #6F42C1">getAttribute</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">OffsetAttribute</span><span style="color: #212121">.</span><span style="color: #1976D2">class</span><span style="color: #24292EFF">);</span></span>
 <span class="line" id="L126"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">TypeAttribute</span><span style="color: #24292EFF"> typeAttribute </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">tokenStream</span><span style="color: #212121">.</span><span style="color: #6F42C1">getAttribute</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">TypeAttribute</span><span style="color: #212121">.</span><span style="color: #1976D2">class</span><span style="color: #24292EFF">);</span></span>
@@ -298,14 +373,11 @@ We can do that by passing it to the <code>StandardAnalyzer</code> constructor.</
 <span class="line" id="L138"><span style="color: #24292EFF">    }</span></span>
 <span class="line" id="L139"><span style="color: #24292EFF">}</span></span>
 <span class="line empty-line" id="L140"></span>
-<span class="line empty-line" id="L141"></span></code></pre>
-      
-    </div>
-    <footer>
-      <div>
-        Generated by <a href="https://github.com/mercmobily/docco">Docco</a>
-      </div>
-    </footer>
+<span class="line empty-line" id="L141"></span></code></pre></div>
+            
+        </li>
+        
+    </ul>
   </div>
 </body>
 </html>

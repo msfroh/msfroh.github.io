@@ -4,141 +4,126 @@
 <head>
   <title>KnnSearchExample.java</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
 </head>
 <body>
-  <div class="container">
-    <div class="main">
-
-      <div class="header">
-        <h1>KnnSearchExample.java</h1>
-
-        
-          <div class="toc">
-            <h3>Table of Contents</h3>
-            <ol>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
               
                 
-                <li>
-                  <a class="source" href="AnalyzerBasics.html">
-                    AnalyzerBasics.java
-                  </a>
-                </li>
+                <a class="source" href="AnalyzerBasics.html">
+                  AnalyzerBasics.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="BooleanQueryANDInternals.html">
-                    BooleanQueryANDInternals.java
-                  </a>
-                </li>
+                <a class="source" href="BooleanQueryANDInternals.html">
+                  BooleanQueryANDInternals.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="BooleanQueryIntro.html">
-                    BooleanQueryIntro.java
-                  </a>
-                </li>
+                <a class="source" href="BooleanQueryIntro.html">
+                  BooleanQueryIntro.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="BottomUpIndexReader.html">
-                    BottomUpIndexReader.java
-                  </a>
-                </li>
+                <a class="source" href="BottomUpIndexReader.html">
+                  BottomUpIndexReader.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="BytesRefHashExample.html">
-                    BytesRefHashExample.java
-                  </a>
-                </li>
+                <a class="source" href="BytesRefHashExample.html">
+                  BytesRefHashExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="CombinedFieldQueryExample.html">
-                    CombinedFieldQueryExample.java
-                  </a>
-                </li>
+                <a class="source" href="CombinedFieldQueryExample.html">
+                  CombinedFieldQueryExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="DirectoryFileContents.html">
-                    DirectoryFileContents.java
-                  </a>
-                </li>
+                <a class="source" href="DirectoryFileContents.html">
+                  DirectoryFileContents.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="DocValuesSearchExample.html">
-                    DocValuesSearchExample.java
-                  </a>
-                </li>
+                <a class="source" href="DocValuesSearchExample.html">
+                  DocValuesSearchExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="FunctionQuerySearchExample.html">
-                    FunctionQuerySearchExample.java
-                  </a>
-                </li>
+                <a class="source" href="FunctionQuerySearchExample.html">
+                  FunctionQuerySearchExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="KnnSearchExample.html">
-                    KnnSearchExample.java
-                  </a>
-                </li>
+                <a class="source" href="KnnSearchExample.html">
+                  KnnSearchExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="PointTreeRangeQuery.html">
-                    PointTreeRangeQuery.java
-                  </a>
-                </li>
+                <a class="source" href="PointTreeRangeQuery.html">
+                  PointTreeRangeQuery.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="PrimitivesRef.html">
-                    PrimitivesRef.java
-                  </a>
-                </li>
+                <a class="source" href="PrimitivesRef.html">
+                  PrimitivesRef.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="SearchWithTermsEnum.html">
-                    SearchWithTermsEnum.java
-                  </a>
-                </li>
+                <a class="source" href="SearchWithTermsEnum.html">
+                  SearchWithTermsEnum.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="SimpleSearch.html">
-                    SimpleSearch.java
-                  </a>
-                </li>
+                <a class="source" href="SimpleSearch.html">
+                  SimpleSearch.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="TextVectorSearchExample.html">
-                    TextVectorSearchExample.java
-                  </a>
-                </li>
+                <a class="source" href="TextVectorSearchExample.html">
+                  TextVectorSearchExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="VisualizePointTree.html">
-                    VisualizePointTree.java
-                  </a>
-                </li>
+                <a class="source" href="VisualizePointTree.html">
+                  VisualizePointTree.java
+                </a>
               
-            </ol>
+            </div>
           </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
         
-      </div>
-      
+          <li id="title">
+              <div class="annotation">
+                  <h1>KnnSearchExample.java</h1>
+              </div>
+          </li>
         
         
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 1;"><span class="line" id="L1"><span style="color: #D32F2F">package</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">advanced</span><span style="color: #24292EFF">;</span></span>
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-1">&#x00a7;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 1;"><span class="line" id="L1"><span style="color: #D32F2F">package</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">advanced</span><span style="color: #24292EFF">;</span></span>
 <span class="line empty-line" id="L2"></span>
 <span class="line" id="L3"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">basic</span><span style="color: #212121">.</span><span style="color: #D32F2F">SimpleSearch</span><span style="color: #24292EFF">;</span></span>
 <span class="line" id="L4"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">Field</span><span style="color: #24292EFF">;</span></span>
@@ -157,21 +142,39 @@
 <span class="line empty-line" id="L17"></span>
 <span class="line" id="L18"><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">KnnSearchExample</span><span style="color: #24292EFF"> {</span></span>
 <span class="line empty-line" id="L19"></span>
-<span class="line empty-line" id="L20"></span></code></pre>
-      
+<span class="line empty-line" id="L20"></span></code></pre></div>
+            
+        </li>
         
-        <h2 id="creating-documents">Creating Documents</h2>
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-2">&#x00a7;</a>
+              </div>
+              <h2 id="creating-documents">Creating Documents</h2>
 
+            </div>
+            
+        </li>
         
-      
         
-        <p>We will create a list of documents, where each document has a single field, <code>text</code>.</p>
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-3">&#x00a7;</a>
+              </div>
+              <p>We will create a list of documents, where each document has a single field, <code>text</code>.</p>
 <p>We use the <code>TextField</code> type to indicate that it’s a “full text” field, to be split into individual tokens
 during indexing.</p>
 <p>In order to retrieve the original field value in our search results, we indicate that we want the field value
 stored using <code>Field.Store.YES</code>.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 29;"><span class="line" id="L29"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">List&lt;List&lt;</span><span style="color: #24292EFF">IndexableField</span><span style="color: #D32F2F">&gt;&gt;</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createDocuments()</span><span style="color: #24292EFF"> {</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 29;"><span class="line" id="L29"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">List&lt;List&lt;</span><span style="color: #24292EFF">IndexableField</span><span style="color: #D32F2F">&gt;&gt;</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createDocuments()</span><span style="color: #24292EFF"> {</span></span>
 <span class="line" id="L30"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">float</span><span style="color: #24292EFF">[]&gt; vectors </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">List</span><span style="color: #212121">.</span><span style="color: #6F42C1">of</span><span style="color: #24292EFF">(</span></span>
 <span class="line" id="L31"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">float</span><span style="color: #24292EFF">[] {</span><span style="color: #1976D2">1</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">2</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">3</span><span style="color: #24292EFF">}</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #C2C3C5">// id 0</span></span>
 <span class="line" id="L32"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">float</span><span style="color: #24292EFF">[] {</span><span style="color: #1976D2">4</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">5</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">6</span><span style="color: #24292EFF">}</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #C2C3C5">// id 1</span></span>
@@ -184,12 +187,22 @@ stored using <code>Field.Store.YES</code>.</p>
 <span class="line" id="L39"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">float</span><span style="color: #24292EFF">[] vector </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> vectors) {</span></span>
 <span class="line" id="L40"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">IndexableField</span><span style="color: #24292EFF">&gt; doc </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">ArrayList</span><span style="color: #24292EFF">&lt;&gt;();</span></span>
 <span class="line" id="L41"><span style="color: #24292EFF">            </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">StringField(</span><span style="color: #22863A">&quot;id&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">Integer</span><span style="color: #212121">.</span><span style="color: #6F42C1">toString(i)</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">Field</span><span style="color: #212121">.</span><span style="color: #1976D2">Store</span><span style="color: #212121">.</span><span style="color: #1976D2">YES</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">);</span></span>
-<span class="line empty-line" id="L42"></span></code></pre>
-      
+<span class="line empty-line" id="L42"></span></code></pre></div>
+            
+        </li>
         
-        <p>we are going to use Euclidean distance for our vector fields</p>
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-4">&#x00a7;</a>
+              </div>
+              <p>we are going to use Euclidean distance for our vector fields</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 43;"><span class="line" id="L43"><span style="color: #24292EFF">            </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">KnnFloatVectorField(</span><span style="color: #22863A">&quot;knnFloatField&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> vector</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">VectorSimilarityFunction</span><span style="color: #212121">.</span><span style="color: #1976D2">EUCLIDEAN</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">);</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 43;"><span class="line" id="L43"><span style="color: #24292EFF">            </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">KnnFloatVectorField(</span><span style="color: #22863A">&quot;knnFloatField&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> vector</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">VectorSimilarityFunction</span><span style="color: #212121">.</span><span style="color: #1976D2">EUCLIDEAN</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">);</span></span>
 <span class="line" id="L44"><span style="color: #24292EFF">            </span><span style="color: #1976D2">docs</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(doc);</span></span>
 <span class="line" id="L45"><span style="color: #24292EFF">            i</span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">;</span></span>
 <span class="line" id="L46"><span style="color: #24292EFF">        }</span></span>
@@ -198,54 +211,112 @@ stored using <code>Field.Store.YES</code>.</p>
 <span class="line" id="L49"><span style="color: #24292EFF">    }</span></span>
 <span class="line empty-line" id="L50"></span>
 <span class="line" id="L51"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">main(</span><span style="color: #D32F2F">String</span><span style="color: #6F42C1">[] args)</span><span style="color: #24292EFF"> throws IOException {</span></span>
-<span class="line empty-line" id="L52"></span></code></pre>
-      
+<span class="line empty-line" id="L52"></span></code></pre></div>
+            
+        </li>
         
-        <p>We start by creating a temporary directory, wherever your JVM specifies its default <code>java.io.tmpdir</code>.
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-5">&#x00a7;</a>
+              </div>
+              <p>We start by creating a temporary directory, wherever your JVM specifies its default <code>java.io.tmpdir</code>.
 This will hold the index files.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 54;"><span class="line" id="L54"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF"> tmpDir </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">createTempDirectory</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">SimpleSearch</span><span style="color: #212121">.</span><span style="color: #1976D2">class</span><span style="color: #212121">.</span><span style="color: #6F42C1">getSimpleName</span><span style="color: #24292EFF">());</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 54;"><span class="line" id="L54"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF"> tmpDir </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">createTempDirectory</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">SimpleSearch</span><span style="color: #212121">.</span><span style="color: #1976D2">class</span><span style="color: #212121">.</span><span style="color: #6F42C1">getSimpleName</span><span style="color: #24292EFF">());</span></span>
 <span class="line empty-line" id="L55"></span>
-<span class="line empty-line" id="L56"></span></code></pre>
-      
+<span class="line empty-line" id="L56"></span></code></pre></div>
+            
+        </li>
         
-        <p>We “open” the file system directory as a Lucene <code>Directory</code>, then open an <code>IndexWriter</code> able to write to
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-6">&#x00a7;</a>
+              </div>
+              <p>We “open” the file system directory as a Lucene <code>Directory</code>, then open an <code>IndexWriter</code> able to write to
 that directory.</p>
 <p>Lucene places and locks a <code>write.lock</code> file in the directory to make sure that other processes are not able
 to write to the directory while we hold the lock (as long as those other processes try to obtain the lock).</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 61;"><span class="line" id="L61"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">Directory</span><span style="color: #24292EFF"> directory </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(tmpDir);</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 61;"><span class="line" id="L61"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">Directory</span><span style="color: #24292EFF"> directory </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(tmpDir);</span></span>
 <span class="line" id="L62"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">IndexWriter</span><span style="color: #24292EFF"> writer </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexWriter(directory</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> IndexWriterConfig())</span><span style="color: #24292EFF">) {</span></span>
-<span class="line empty-line" id="L63"></span></code></pre>
-      
+<span class="line empty-line" id="L63"></span></code></pre></div>
+            
+        </li>
         
-        <p>Use our <code>createDocuments</code> helper function to create the documents and write them to the index.
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-7">&#x00a7;</a>
+              </div>
+              <p>Use our <code>createDocuments</code> helper function to create the documents and write them to the index.
 Since they are all written at once without calling <code>writer.flush()</code> in between, they get written
 contiguously in a single segment. We’ll cover segments in another lesson.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 66;"><span class="line" id="L66"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">IndexableField</span><span style="color: #24292EFF">&gt; doc </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createDocuments()</span><span style="color: #24292EFF">) {</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 66;"><span class="line" id="L66"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">IndexableField</span><span style="color: #24292EFF">&gt; doc </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createDocuments()</span><span style="color: #24292EFF">) {</span></span>
 <span class="line" id="L67"><span style="color: #24292EFF">                </span><span style="color: #1976D2">writer</span><span style="color: #212121">.</span><span style="color: #6F42C1">addDocument</span><span style="color: #24292EFF">(doc);</span></span>
 <span class="line" id="L68"><span style="color: #24292EFF">            }</span></span>
 <span class="line empty-line" id="L69"></span>
-<span class="line empty-line" id="L70"></span></code></pre>
-      
+<span class="line empty-line" id="L70"></span></code></pre></div>
+            
+        </li>
         
-        <p>Open an <code>IndexReader</code> based on the <code>writer</code>. This causes <code>writer</code> to flush pending documents, so they
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-8">&#x00a7;</a>
+              </div>
+              <p>Open an <code>IndexReader</code> based on the <code>writer</code>. This causes <code>writer</code> to flush pending documents, so they
 can be read. Note that <code>reader</code> has a view of the index at this point in time.
 If we were to write more documents with <code>writer</code>, they would not be visible to <code>reader</code>.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 73;"><span class="line" id="L73"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">IndexReader</span><span style="color: #24292EFF"> reader </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">DirectoryReader</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(writer)) {</span></span>
-<span class="line empty-line" id="L74"></span></code></pre>
-      
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 73;"><span class="line" id="L73"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">IndexReader</span><span style="color: #24292EFF"> reader </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">DirectoryReader</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(writer)) {</span></span>
+<span class="line empty-line" id="L74"></span></code></pre></div>
+            
+        </li>
         
-        <p>An <code>IndexReader</code> is able to read the underlying structure of the index, but high-level searching
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-9">&#x00a7;</a>
+              </div>
+              <p>An <code>IndexReader</code> is able to read the underlying structure of the index, but high-level searching
 requires an <code>IndexSearcher</code>. We’ll explore the low-level <code>IndexReader</code> operations in a later lesson.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 76;"><span class="line" id="L76"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">IndexSearcher</span><span style="color: #24292EFF"> searcher </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexSearcher(reader)</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L77"></span></code></pre>
-      
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 76;"><span class="line" id="L76"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">IndexSearcher</span><span style="color: #24292EFF"> searcher </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexSearcher(reader)</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L77"></span></code></pre></div>
+            
+        </li>
         
-        <p>A <code>KnnFloatVectorQuery</code> is the most basic KNN query supported by Lucene. It is able to search for a single
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-10">&#x00a7;</a>
+              </div>
+              <p>A <code>KnnFloatVectorQuery</code> is the most basic KNN query supported by Lucene. It is able to search for a single
 vector in a field and retrieve the first K closest neighbours. In this case, we’re going to search for the
 vector [1, 2, 3] in the <code>knnFloatField</code> field and search for the 3 (k = 3) nearest neighbours.
 Meaning we are going to search for the 3 “closest” vectors.
@@ -255,11 +326,21 @@ However, remember that for scoring purposes we want the most similar/matching do
 while Euclidean distance is <em>lower</em> for more “similar” vectors…
 Therefore, the score will be the <em>inverse</em> of the Euclidean distance with the formula score = 1 / (1 + distance(v1, v2)).</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 86;"><span class="line" id="L86"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">KnnFloatVectorQuery</span><span style="color: #24292EFF"> knnFloatVectorQuery </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">KnnFloatVectorQuery(</span><span style="color: #22863A">&quot;knnFloatField&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">float</span><span style="color: #6F42C1">[] {</span><span style="color: #1976D2">1</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">2</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">3</span><span style="color: #6F42C1">}</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">3</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L87"></span></code></pre>
-      
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 86;"><span class="line" id="L86"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">KnnFloatVectorQuery</span><span style="color: #24292EFF"> knnFloatVectorQuery </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">KnnFloatVectorQuery(</span><span style="color: #22863A">&quot;knnFloatField&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">float</span><span style="color: #6F42C1">[] {</span><span style="color: #1976D2">1</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">2</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">3</span><span style="color: #6F42C1">}</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">3</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L87"></span></code></pre></div>
+            
+        </li>
         
-        <p>We ask <code>searcher</code> to run our <code>knnFloatVectorQuery</code> and return the top 10 documents.
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-11">&#x00a7;</a>
+              </div>
+              <p>We ask <code>searcher</code> to run our <code>knnFloatVectorQuery</code> and return the top 10 documents.
 Since vector distance can be measured to all 4 documents we created that contained vector field,
 we would expect to get 4 results sorted from the closest to the furthest.
 However, we already defined the <code>knnFloatVectorQuery</code> to only return k = 3, meaning that we will only
@@ -268,77 +349,154 @@ In our case we will expect the vector [1, 2, 3] that to be the “closest” res
 it’s exactly similar to the vector we are searching for and therefore the Euclidean distance between them is 0
 and the score would be score = 1 / (1 + 0)</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 95;"><span class="line" id="L95"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">TopDocs</span><span style="color: #24292EFF"> topDocs </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">searcher</span><span style="color: #212121">.</span><span style="color: #6F42C1">search</span><span style="color: #24292EFF">(knnFloatVectorQuery</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">10</span><span style="color: #24292EFF">);</span></span>
-<span class="line empty-line" id="L96"></span></code></pre>
-      
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 95;"><span class="line" id="L95"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">TopDocs</span><span style="color: #24292EFF"> topDocs </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">searcher</span><span style="color: #212121">.</span><span style="color: #6F42C1">search</span><span style="color: #24292EFF">(knnFloatVectorQuery</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">10</span><span style="color: #24292EFF">);</span></span>
+<span class="line empty-line" id="L96"></span></code></pre></div>
+            
+        </li>
         
-        <p>If our query had matched more than 10 documents, then <code>topDocs</code> would contain the top 10 documents,
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-12">&#x00a7;</a>
+              </div>
+              <p>If our query had matched more than 10 documents, then <code>topDocs</code> would contain the top 10 documents,
 while <code>topDocs.totalHits</code> would have the total number of matching documents (or a lower bound on the
 total number of matching documents, if more than 1000 documents match).</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 99;"><span class="line" id="L99"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;Query &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> knnFloatVectorQuery </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; matched &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">topDocs</span><span style="color: #212121">.</span><span style="color: #1976D2">totalHits</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; documents:&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line empty-line" id="L100"></span></code></pre>
-      
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 99;"><span class="line" id="L99"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;Query &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> knnFloatVectorQuery </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; matched &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">topDocs</span><span style="color: #212121">.</span><span style="color: #1976D2">totalHits</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; documents:&quot;</span><span style="color: #24292EFF">);</span></span>
+<span class="line empty-line" id="L100"></span></code></pre></div>
+            
+        </li>
         
-        <p>The <code>topDocs</code> contains a list of <code>ScoreDoc</code>, which just have scores and Lucene-generated doc IDs.
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-13">&#x00a7;</a>
+              </div>
+              <p>The <code>topDocs</code> contains a list of <code>ScoreDoc</code>, which just have scores and Lucene-generated doc IDs.
 Since these doc IDs are likely meaningless to us as users, we ask the reader for a <code>StoredFields</code>
 instance able to retrieve stored field values based on the doc IDs.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 103;"><span class="line" id="L103"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">StoredFields</span><span style="color: #24292EFF"> storedFields </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">reader</span><span style="color: #212121">.</span><span style="color: #6F42C1">storedFields</span><span style="color: #24292EFF">();</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 103;"><span class="line" id="L103"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">StoredFields</span><span style="color: #24292EFF"> storedFields </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">reader</span><span style="color: #212121">.</span><span style="color: #6F42C1">storedFields</span><span style="color: #24292EFF">();</span></span>
 <span class="line" id="L104"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">ScoreDoc</span><span style="color: #24292EFF"> scoreDoc </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">topDocs</span><span style="color: #212121">.</span><span style="color: #1976D2">scoreDocs</span><span style="color: #24292EFF">) {</span></span>
-<span class="line empty-line" id="L105"></span></code></pre>
-      
+<span class="line empty-line" id="L105"></span></code></pre></div>
+            
+        </li>
         
-        <p>Using the doc’s ID, we load a <code>Document</code>, and load the <code>id</code> <code>String</code> field (the field that defines global UUID).</p>
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-14">&#x00a7;</a>
+              </div>
+              <p>Using the doc’s ID, we load a <code>Document</code>, and load the <code>id</code> <code>String</code> field (the field that defines global UUID).</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 106;"><span class="line" id="L106"><span style="color: #24292EFF">                    </span><span style="color: #D32F2F">final</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> globalId </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">storedFields</span><span style="color: #212121">.</span><span style="color: #6F42C1">document</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">scoreDoc</span><span style="color: #212121">.</span><span style="color: #1976D2">doc</span><span style="color: #24292EFF">)</span><span style="color: #212121">.</span><span style="color: #6F42C1">get</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;id&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line empty-line" id="L107"></span></code></pre>
-      
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 106;"><span class="line" id="L106"><span style="color: #24292EFF">                    </span><span style="color: #D32F2F">final</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> globalId </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">storedFields</span><span style="color: #212121">.</span><span style="color: #6F42C1">document</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">scoreDoc</span><span style="color: #212121">.</span><span style="color: #1976D2">doc</span><span style="color: #24292EFF">)</span><span style="color: #212121">.</span><span style="color: #6F42C1">get</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;id&quot;</span><span style="color: #24292EFF">);</span></span>
+<span class="line empty-line" id="L107"></span></code></pre></div>
+            
+        </li>
         
-        <p>Each document has a score which is inverse to the Euclidean distance with a theoretical Min of slightly more than 0
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-15">&#x00a7;</a>
+              </div>
+              <p>Each document has a score which is inverse to the Euclidean distance with a theoretical Min of slightly more than 0
 and a Max of 1 (see our example when the vectors are identical).
 See <a href="https://en.wikipedia.org/wiki/Euclidean_distance">https://en.wikipedia.org/wiki/Euclidean_distance</a> for details on the Euclidean distance formula.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 110;"><span class="line" id="L110"><span style="color: #24292EFF">                    </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">scoreDoc</span><span style="color: #212121">.</span><span style="color: #1976D2">score</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; - &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">scoreDoc</span><span style="color: #212121">.</span><span style="color: #1976D2">doc</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; - &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> globalId);</span></span>
-<span class="line empty-line" id="L111"></span></code></pre>
-      
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 110;"><span class="line" id="L110"><span style="color: #24292EFF">                    </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">scoreDoc</span><span style="color: #212121">.</span><span style="color: #1976D2">score</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; - &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">scoreDoc</span><span style="color: #212121">.</span><span style="color: #1976D2">doc</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; - &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> globalId);</span></span>
+<span class="line empty-line" id="L111"></span></code></pre></div>
+            
+        </li>
         
         
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 112;"><span class="line" id="L112"><span style="color: #24292EFF">                }</span></span>
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-16">&#x00a7;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 112;"><span class="line" id="L112"><span style="color: #24292EFF">                }</span></span>
 <span class="line" id="L113"><span style="color: #24292EFF">            }</span></span>
 <span class="line" id="L114"><span style="color: #24292EFF">        } </span><span style="color: #D32F2F">finally</span><span style="color: #24292EFF"> {</span></span>
-<span class="line empty-line" id="L115"></span></code></pre>
-      
+<span class="line empty-line" id="L115"></span></code></pre></div>
+            
+        </li>
         
-        <h2 id="clean-up">Clean up</h2>
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-17">&#x00a7;</a>
+              </div>
+              <h2 id="clean-up">Clean up</h2>
 
+            </div>
+            
+        </li>
         
-      
         
-        <p>Before we finish the program, we delete each of the files in the directory.</p>
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-18">&#x00a7;</a>
+              </div>
+              <p>Before we finish the program, we delete each of the files in the directory.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 119;"><span class="line" id="L119"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> indexFile </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">listAll</span><span style="color: #24292EFF">(tmpDir)) {</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 119;"><span class="line" id="L119"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> indexFile </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">listAll</span><span style="color: #24292EFF">(tmpDir)) {</span></span>
 <span class="line" id="L120"><span style="color: #24292EFF">                </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">deleteIfExists</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">tmpDir</span><span style="color: #212121">.</span><span style="color: #6F42C1">resolve</span><span style="color: #24292EFF">(indexFile));</span></span>
 <span class="line" id="L121"><span style="color: #24292EFF">            }</span></span>
-<span class="line empty-line" id="L122"></span></code></pre>
-      
+<span class="line empty-line" id="L122"></span></code></pre></div>
+            
+        </li>
         
-        <p>Then we delete the directory itself.</p>
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-19">&#x00a7;</a>
+              </div>
+              <p>Then we delete the directory itself.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 123;"><span class="line" id="L123"><span style="color: #24292EFF">            </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">deleteIfExists</span><span style="color: #24292EFF">(tmpDir);</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 123;"><span class="line" id="L123"><span style="color: #24292EFF">            </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">deleteIfExists</span><span style="color: #24292EFF">(tmpDir);</span></span>
 <span class="line" id="L124"><span style="color: #24292EFF">            </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;cleanup completed&quot;</span><span style="color: #24292EFF">);</span></span>
 <span class="line" id="L125"><span style="color: #24292EFF">        }</span></span>
 <span class="line" id="L126"><span style="color: #24292EFF">    }</span></span>
 <span class="line" id="L127"><span style="color: #24292EFF">}</span></span>
 <span class="line empty-line" id="L128"></span>
-<span class="line empty-line" id="L129"></span></code></pre>
-      
-    </div>
-    <footer>
-      <div>
-        Generated by <a href="https://github.com/mercmobily/docco">Docco</a>
-      </div>
-    </footer>
+<span class="line empty-line" id="L129"></span></code></pre></div>
+            
+        </li>
+        
+    </ul>
   </div>
 </body>
 </html>

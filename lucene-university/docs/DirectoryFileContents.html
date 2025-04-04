@@ -4,140 +4,117 @@
 <head>
   <title>Lucene file content (with SimpleTextCodec)</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
 </head>
 <body>
-  <div class="container">
-    <div class="main">
-
-      <div class="header">
-        <h1>Lucene file content (with SimpleTextCodec)</h1>
-
-        
-          <div class="toc">
-            <h3>Table of Contents</h3>
-            <ol>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
               
                 
-                <li>
-                  <a class="source" href="AnalyzerBasics.html">
-                    AnalyzerBasics.java
-                  </a>
-                </li>
+                <a class="source" href="AnalyzerBasics.html">
+                  AnalyzerBasics.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="BooleanQueryANDInternals.html">
-                    BooleanQueryANDInternals.java
-                  </a>
-                </li>
+                <a class="source" href="BooleanQueryANDInternals.html">
+                  BooleanQueryANDInternals.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="BooleanQueryIntro.html">
-                    BooleanQueryIntro.java
-                  </a>
-                </li>
+                <a class="source" href="BooleanQueryIntro.html">
+                  BooleanQueryIntro.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="BottomUpIndexReader.html">
-                    BottomUpIndexReader.java
-                  </a>
-                </li>
+                <a class="source" href="BottomUpIndexReader.html">
+                  BottomUpIndexReader.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="BytesRefHashExample.html">
-                    BytesRefHashExample.java
-                  </a>
-                </li>
+                <a class="source" href="BytesRefHashExample.html">
+                  BytesRefHashExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="CombinedFieldQueryExample.html">
-                    CombinedFieldQueryExample.java
-                  </a>
-                </li>
+                <a class="source" href="CombinedFieldQueryExample.html">
+                  CombinedFieldQueryExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="DirectoryFileContents.html">
-                    DirectoryFileContents.java
-                  </a>
-                </li>
+                <a class="source" href="DirectoryFileContents.html">
+                  DirectoryFileContents.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="DocValuesSearchExample.html">
-                    DocValuesSearchExample.java
-                  </a>
-                </li>
+                <a class="source" href="DocValuesSearchExample.html">
+                  DocValuesSearchExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="FunctionQuerySearchExample.html">
-                    FunctionQuerySearchExample.java
-                  </a>
-                </li>
+                <a class="source" href="FunctionQuerySearchExample.html">
+                  FunctionQuerySearchExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="KnnSearchExample.html">
-                    KnnSearchExample.java
-                  </a>
-                </li>
+                <a class="source" href="KnnSearchExample.html">
+                  KnnSearchExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="PointTreeRangeQuery.html">
-                    PointTreeRangeQuery.java
-                  </a>
-                </li>
+                <a class="source" href="PointTreeRangeQuery.html">
+                  PointTreeRangeQuery.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="PrimitivesRef.html">
-                    PrimitivesRef.java
-                  </a>
-                </li>
+                <a class="source" href="PrimitivesRef.html">
+                  PrimitivesRef.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="SearchWithTermsEnum.html">
-                    SearchWithTermsEnum.java
-                  </a>
-                </li>
+                <a class="source" href="SearchWithTermsEnum.html">
+                  SearchWithTermsEnum.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="SimpleSearch.html">
-                    SimpleSearch.java
-                  </a>
-                </li>
+                <a class="source" href="SimpleSearch.html">
+                  SimpleSearch.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="TextVectorSearchExample.html">
-                    TextVectorSearchExample.java
-                  </a>
-                </li>
+                <a class="source" href="TextVectorSearchExample.html">
+                  TextVectorSearchExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="VisualizePointTree.html">
-                    VisualizePointTree.java
-                  </a>
-                </li>
+                <a class="source" href="VisualizePointTree.html">
+                  VisualizePointTree.java
+                </a>
               
-            </ol>
+            </div>
           </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
         
-      </div>
-      
         
-        <p>This worked example helps explain what data structures exist in a Lucene index and how they are stored (albeit with
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-1">&#x00a7;</a>
+              </div>
+              <p>This worked example helps explain what data structures exist in a Lucene index and how they are stored (albeit with
 a text representation – the real implementations use very compact binary files).</p>
 <p>Unlike some other examples, the interesting part is not the code, but rather the output, which is included below
 the <code>DirectoryFileContents</code> class.</p>
@@ -145,7 +122,9 @@ the <code>DirectoryFileContents</code> class.</p>
 producing files too large to walk through here). Readers are encouraged to modify the <code>createDocuments</code> method
 to add other field types, add more documents, etc.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 14;"><span class="line" id="L14"><span style="color: #D32F2F">package</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">basic</span><span style="color: #24292EFF">;</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 14;"><span class="line" id="L14"><span style="color: #D32F2F">package</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">basic</span><span style="color: #24292EFF">;</span></span>
 <span class="line empty-line" id="L15"></span>
 <span class="line" id="L16"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">codecs</span><span style="color: #212121">.</span><span style="color: #D32F2F">simpletext</span><span style="color: #212121">.</span><span style="color: #D32F2F">SimpleTextCodec</span><span style="color: #24292EFF">;</span></span>
 <span class="line" id="L17"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">Field</span><span style="color: #24292EFF">;</span></span>
@@ -163,30 +142,66 @@ to add other field types, add more documents, etc.</p>
 <span class="line" id="L29"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">ArrayList</span><span style="color: #24292EFF">;</span></span>
 <span class="line" id="L30"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">;</span></span>
 <span class="line empty-line" id="L31"></span>
-<span class="line empty-line" id="L32"></span></code></pre>
-      
+<span class="line empty-line" id="L32"></span></code></pre></div>
+            
+        </li>
         
-        <h2 id="example-code">Example code</h2>
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-2">&#x00a7;</a>
+              </div>
+              <h2 id="example-code">Example code</h2>
 
+            </div>
+            
+        </li>
         
-      
         
-        
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 33;"><span class="line" id="L33"><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">DirectoryFileContents</span><span style="color: #24292EFF"> {</span></span>
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-3">&#x00a7;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 33;"><span class="line" id="L33"><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">DirectoryFileContents</span><span style="color: #24292EFF"> {</span></span>
 <span class="line empty-line" id="L34"></span>
-<span class="line empty-line" id="L35"></span></code></pre>
-      
+<span class="line empty-line" id="L35"></span></code></pre></div>
+            
+        </li>
         
-        <h3 id="creating-documents">Creating Documents</h3>
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-4">&#x00a7;</a>
+              </div>
+              <h3 id="creating-documents">Creating Documents</h3>
 
+            </div>
+            
+        </li>
         
-      
         
-        <p>We will mostly reuse the same documents from SimpleSearch, but we’ll also add a numeric <code>IntField</code> which will
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-5">&#x00a7;</a>
+              </div>
+              <p>We will mostly reuse the same documents from SimpleSearch, but we’ll also add a numeric <code>IntField</code> which will
 write both points and doc values. Points are covered in more detail by examples in the “points” package.</p>
 <p>To make the output mildly more interesting, let’s not add the numeric field to one of the documents.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 41;"><span class="line" id="L41"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">List&lt;List&lt;</span><span style="color: #24292EFF">IndexableField</span><span style="color: #D32F2F">&gt;&gt;</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createDocuments()</span><span style="color: #24292EFF"> {</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 41;"><span class="line" id="L41"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">List&lt;List&lt;</span><span style="color: #24292EFF">IndexableField</span><span style="color: #D32F2F">&gt;&gt;</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createDocuments()</span><span style="color: #24292EFF"> {</span></span>
 <span class="line" id="L42"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF">&gt; texts </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">List</span><span style="color: #212121">.</span><span style="color: #6F42C1">of</span><span style="color: #24292EFF">(</span></span>
 <span class="line" id="L43"><span style="color: #24292EFF">                </span><span style="color: #22863A">&quot;The quick fox jumped over the lazy, brown dog&quot;</span><span style="color: #212121">,</span></span>
 <span class="line" id="L44"><span style="color: #24292EFF">                </span><span style="color: #22863A">&quot;Lorem ipsum, dolor sit amet&quot;</span><span style="color: #212121">,</span></span>
@@ -207,99 +222,199 @@ write both points and doc values. Points are covered in more detail by examples 
 <span class="line" id="L59"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> docs;</span></span>
 <span class="line" id="L60"><span style="color: #24292EFF">    }</span></span>
 <span class="line empty-line" id="L61"></span>
-<span class="line empty-line" id="L62"></span></code></pre>
-      
+<span class="line empty-line" id="L62"></span></code></pre></div>
+            
+        </li>
         
-        <h3 id="create-the-lucene-index-with-simpletextcodec">Create the Lucene index with SimpleTextCodec</h3>
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-6">&#x00a7;</a>
+              </div>
+              <h3 id="create-the-lucene-index-with-simpletextcodec">Create the Lucene index with SimpleTextCodec</h3>
 
+            </div>
+            
+        </li>
         
-      
         
-        
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 64;"><span class="line" id="L64"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">main(</span><span style="color: #D32F2F">String</span><span style="color: #6F42C1">[] args)</span><span style="color: #24292EFF"> throws IOException {</span></span>
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-7">&#x00a7;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 64;"><span class="line" id="L64"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">main(</span><span style="color: #D32F2F">String</span><span style="color: #6F42C1">[] args)</span><span style="color: #24292EFF"> throws IOException {</span></span>
 <span class="line" id="L65"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF"> tmpDir </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">createTempDirectory</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">DirectoryFileContents</span><span style="color: #212121">.</span><span style="color: #1976D2">class</span><span style="color: #212121">.</span><span style="color: #6F42C1">getSimpleName</span><span style="color: #24292EFF">());</span></span>
 <span class="line empty-line" id="L66"></span>
-<span class="line empty-line" id="L67"></span></code></pre>
-      
+<span class="line empty-line" id="L67"></span></code></pre></div>
+            
+        </li>
         
-        <p>In other examples, we have been using the default <code>IndexWriterConfig</code>. This time, we construct the
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-8">&#x00a7;</a>
+              </div>
+              <p>In other examples, we have been using the default <code>IndexWriterConfig</code>. This time, we construct the
 IndexWriterConfig, but override the codec.</p>
 <p>Codecs are Lucene’s abstraction that define how low-level constructs are written as files. The default
 codecs are highly-tuned for compact size and good read/write performance, while SimpleTextCodec is designed
 to be human-readable. The JavaDoc for SimpleTextCodec (and its associated classes) says
 <strong>FOR RECREATIONAL USE ONLY</strong>.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 75;"><span class="line" id="L75"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">IndexWriterConfig</span><span style="color: #24292EFF"> conf </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexWriterConfig()</span><span style="color: #24292EFF">;</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 75;"><span class="line" id="L75"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">IndexWriterConfig</span><span style="color: #24292EFF"> conf </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexWriterConfig()</span><span style="color: #24292EFF">;</span></span>
 <span class="line" id="L76"><span style="color: #24292EFF">        </span><span style="color: #1976D2">conf</span><span style="color: #212121">.</span><span style="color: #6F42C1">setCodec</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">SimpleTextCodec()</span><span style="color: #24292EFF">);</span></span>
-<span class="line empty-line" id="L77"></span></code></pre>
-      
+<span class="line empty-line" id="L77"></span></code></pre></div>
+            
+        </li>
         
-        <p>By default, Lucene writes small segments as a single “compound” file. To make the output easier to read,
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-9">&#x00a7;</a>
+              </div>
+              <p>By default, Lucene writes small segments as a single “compound” file. To make the output easier to read,
 we disable that with <code>setUseCompoundFile(false)</code>.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 79;"><span class="line" id="L79"><span style="color: #24292EFF">        </span><span style="color: #1976D2">conf</span><span style="color: #212121">.</span><span style="color: #6F42C1">setUseCompoundFile</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">false</span><span style="color: #24292EFF">);</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 79;"><span class="line" id="L79"><span style="color: #24292EFF">        </span><span style="color: #1976D2">conf</span><span style="color: #212121">.</span><span style="color: #6F42C1">setUseCompoundFile</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">false</span><span style="color: #24292EFF">);</span></span>
 <span class="line" id="L80"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">Directory</span><span style="color: #24292EFF"> directory </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(tmpDir);</span></span>
 <span class="line" id="L81"><span style="color: #24292EFF">             </span><span style="color: #D32F2F">IndexWriter</span><span style="color: #24292EFF"> writer </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexWriter(directory</span><span style="color: #212121">,</span><span style="color: #6F42C1"> conf)</span><span style="color: #24292EFF">) {</span></span>
 <span class="line" id="L82"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">IndexableField</span><span style="color: #24292EFF">&gt; doc </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createDocuments()</span><span style="color: #24292EFF">) {</span></span>
 <span class="line" id="L83"><span style="color: #24292EFF">                </span><span style="color: #1976D2">writer</span><span style="color: #212121">.</span><span style="color: #6F42C1">addDocument</span><span style="color: #24292EFF">(doc);</span></span>
 <span class="line" id="L84"><span style="color: #24292EFF">            }</span></span>
 <span class="line" id="L85"><span style="color: #24292EFF">        } </span><span style="color: #D32F2F">finally</span><span style="color: #24292EFF"> {</span></span>
-<span class="line empty-line" id="L86"></span></code></pre>
-      
+<span class="line empty-line" id="L86"></span></code></pre></div>
+            
+        </li>
         
-        <h3 id="dump-the-index-contents">Dump the index contents</h3>
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-10">&#x00a7;</a>
+              </div>
+              <h3 id="dump-the-index-contents">Dump the index contents</h3>
 
+            </div>
+            
+        </li>
         
-      
         
-        <p>Once we’ve closed the IndexWriter, before we delete each file, we print each file name and its size.</p>
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-11">&#x00a7;</a>
+              </div>
+              <p>Once we’ve closed the IndexWriter, before we delete each file, we print each file name and its size.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 90;"><span class="line" id="L90"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> indexFile </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">listAll</span><span style="color: #24292EFF">(tmpDir)) {</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 90;"><span class="line" id="L90"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> indexFile </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">listAll</span><span style="color: #24292EFF">(tmpDir)) {</span></span>
 <span class="line" id="L91"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF"> path </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">tmpDir</span><span style="color: #212121">.</span><span style="color: #6F42C1">resolve</span><span style="color: #24292EFF">(indexFile);</span></span>
 <span class="line" id="L92"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">long</span><span style="color: #24292EFF"> size </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">size</span><span style="color: #24292EFF">(path);</span></span>
 <span class="line" id="L93"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;File &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> indexFile </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; has size &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> size);</span></span>
-<span class="line empty-line" id="L94"></span></code></pre>
-      
+<span class="line empty-line" id="L94"></span></code></pre></div>
+            
+        </li>
         
-        <p>Don’t output the segmentinfos (.si) file yet, because it may contain non-UTF-8 bytes.
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-12">&#x00a7;</a>
+              </div>
+              <p>Don’t output the segmentinfos (.si) file yet, because it may contain non-UTF-8 bytes.
 (See <a href="https://github.com/apache/lucene/pull/12897">https://github.com/apache/lucene/pull/12897</a>.)
 Also, don’t output the “segments_1” file, because it is always a binary file, independent of the
 codec. (The <code>IndexReader</code> opens the last “segments_*”, which explains what codec was used to write
 each segment.)</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 99;"><span class="line" id="L99"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">!</span><span style="color: #1976D2">indexFile</span><span style="color: #212121">.</span><span style="color: #6F42C1">endsWith</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;.si&quot;</span><span style="color: #24292EFF">) </span><span style="color: #D32F2F">&amp;&amp;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">!</span><span style="color: #1976D2">indexFile</span><span style="color: #212121">.</span><span style="color: #6F42C1">startsWith</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;segments_&quot;</span><span style="color: #24292EFF">)) {</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 99;"><span class="line" id="L99"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">!</span><span style="color: #1976D2">indexFile</span><span style="color: #212121">.</span><span style="color: #6F42C1">endsWith</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;.si&quot;</span><span style="color: #24292EFF">) </span><span style="color: #D32F2F">&amp;&amp;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">!</span><span style="color: #1976D2">indexFile</span><span style="color: #212121">.</span><span style="color: #6F42C1">startsWith</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;segments_&quot;</span><span style="color: #24292EFF">)) {</span></span>
 <span class="line" id="L100"><span style="color: #24292EFF">                    </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">readString</span><span style="color: #24292EFF">(path));</span></span>
 <span class="line" id="L101"><span style="color: #24292EFF">                }</span></span>
 <span class="line" id="L102"><span style="color: #24292EFF">                </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">deleteIfExists</span><span style="color: #24292EFF">(path);</span></span>
 <span class="line" id="L103"><span style="color: #24292EFF">            }</span></span>
-<span class="line empty-line" id="L104"></span></code></pre>
-      
+<span class="line empty-line" id="L104"></span></code></pre></div>
+            
+        </li>
         
-        <p>Then we delete the directory itself.</p>
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-13">&#x00a7;</a>
+              </div>
+              <p>Then we delete the directory itself.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 105;"><span class="line" id="L105"><span style="color: #24292EFF">            </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">deleteIfExists</span><span style="color: #24292EFF">(tmpDir);</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 105;"><span class="line" id="L105"><span style="color: #24292EFF">            </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">deleteIfExists</span><span style="color: #24292EFF">(tmpDir);</span></span>
 <span class="line" id="L106"><span style="color: #24292EFF">        }</span></span>
 <span class="line" id="L107"><span style="color: #24292EFF">    }</span></span>
 <span class="line" id="L108"><span style="color: #24292EFF">}</span></span>
 <span class="line" id="L109"><span style="color: #C2C3C5">/*</span></span>
-<span class="line empty-line" id="L110"></span></code></pre>
-      
+<span class="line empty-line" id="L110"></span></code></pre></div>
+            
+        </li>
         
-        <h2 id="program-output">Program output</h2>
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-14">&#x00a7;</a>
+              </div>
+              <h2 id="program-output">Program output</h2>
 
+            </div>
+            
+        </li>
         
-      
         
-        <p>The program dumps the following files. Let’s explore the files one-by-one.</p>
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-15">&#x00a7;</a>
+              </div>
+              <p>The program dumps the following files. Let’s explore the files one-by-one.</p>
 <p>Note that the SimpleTextCodec is an implementation that is conceptually similar to the real binary codecs, but
 certainly // not identical. There are compromises that SimpleTextCodec has made to implement a fully-functioning
 codec in plain text.</p>
 <h3 id="doc-values">Doc values</h3>
 
+            </div>
+            
+        </li>
         
-      
         
-        <p>The <code>.dat</code> file stores the doc values for the <code>val</code> field.</p>
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-16">&#x00a7;</a>
+              </div>
+              <p>The <code>.dat</code> file stores the doc values for the <code>val</code> field.</p>
 <p>The <code>IntField</code> uses the “binary” doc values format. In this case, each value has a maximum length of 1 byte.
 The “maxlength” and “pattern” values let us efficiently seek to the start of a document’s values. Specifically,
 relative to the start of the ddc values (i.e. the byte following the newline after <code>pattern 0</code>), a given document’s
@@ -309,7 +424,9 @@ values start at <code>startOffset + (9 + pattern.length + maxlength + 2) * docNu
 each document has a single value for <code>val</code>, except the second document, which has none.</p>
 <p>Each Lucene file has a trailing <code>checksum</code> used to verify the file integrity and protect against flipped bits.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 133;"><span class="line" id="L133"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">dat</span><span style="color: #24292EFF"> has size </span><span style="color: #1976D2">136</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 133;"><span class="line" id="L133"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">dat</span><span style="color: #24292EFF"> has size </span><span style="color: #1976D2">136</span></span>
 <span class="line" id="L134"><span style="color: #24292EFF">field val</span></span>
 <span class="line" id="L135"><span style="color: #24292EFF">  type </span><span style="color: #D32F2F">BINARY</span></span>
 <span class="line" id="L136"><span style="color: #24292EFF">  maxlength </span><span style="color: #1976D2">1</span></span>
@@ -329,22 +446,40 @@ each document has a single value for <code>val</code>, except the second documen
 <span class="line" id="L150"><span style="color: #D32F2F">END</span></span>
 <span class="line" id="L151"><span style="color: #24292EFF">checksum </span><span style="color: #1976D2">00000000001474172410</span></span>
 <span class="line empty-line" id="L152"></span>
-<span class="line empty-line" id="L153"></span></code></pre>
-      
+<span class="line empty-line" id="L153"></span></code></pre></div>
+            
+        </li>
         
-        <h3 id="points">Points</h3>
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-17">&#x00a7;</a>
+              </div>
+              <h3 id="points">Points</h3>
 
+            </div>
+            
+        </li>
         
-      
         
-        <p>The <code>.dii</code> file stores an index to locate the point data for individual fields in the <code>.dim</code> file. In this case,
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-18">&#x00a7;</a>
+              </div>
+              <p>The <code>.dii</code> file stores an index to locate the point data for individual fields in the <code>.dim</code> file. In this case,
 the point tree for the field <code>val</code> starts at byte 113 in the <code>.dim</code> file.</p>
 <p>That byte corresponds to the line <code>num data dims 1</code>. The contents of the file before that are the “blocks” in the
 “block K-d” tree, corresponding to leaves of the tree. In this case, since we only have 3 documents with points,
 they all fit in a single block. The offset of this leaf is specified as part of the tree definition, in the line
 <code>block fp 0</code> (i.e. the block starts at byte 0 of the file).</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 162;"><span class="line" id="L162"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">dii</span><span style="color: #24292EFF"> has size </span><span style="color: #1976D2">79</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 162;"><span class="line" id="L162"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">dii</span><span style="color: #24292EFF"> has size </span><span style="color: #1976D2">79</span></span>
 <span class="line" id="L163"><span style="color: #24292EFF">field count </span><span style="color: #1976D2">1</span></span>
 <span class="line" id="L164"><span style="color: #24292EFF">  field fp name val</span></span>
 <span class="line" id="L165"><span style="color: #24292EFF">  field fp </span><span style="color: #1976D2">113</span></span>
@@ -374,20 +509,38 @@ they all fit in a single block. The offset of this leaf is specified as part of 
 <span class="line" id="L189"><span style="color: #D32F2F">END</span></span>
 <span class="line" id="L190"><span style="color: #24292EFF">checksum 00000000000107327399</span></span>
 <span class="line empty-line" id="L191"></span>
-<span class="line empty-line" id="L192"></span></code></pre>
-      
+<span class="line empty-line" id="L192"></span></code></pre></div>
+            
+        </li>
         
-        <h3 id="stored-fields">Stored fields</h3>
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-19">&#x00a7;</a>
+              </div>
+              <h3 id="stored-fields">Stored fields</h3>
 
+            </div>
+            
+        </li>
         
-      
         
-        <p>The <code>.fld</code> file keep stored field, used to retrieve the original field values as sent to the index writer.</p>
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-20">&#x00a7;</a>
+              </div>
+              <p>The <code>.fld</code> file keep stored field, used to retrieve the original field values as sent to the index writer.</p>
 <p>Stored fields are organized into a hierarchy of Document -&gt; Field ordinal -&gt; Field value. A multi-valued field
 (not to be confused with a multi-dimensional point) is just the same field added to the document multiple times,
 and will be assigned multiple stored field ordinals based on the order that the fields were added.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 200;"><span class="line" id="L200"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">fld</span><span style="color: #24292EFF"> has size </span><span style="color: #1976D2">593</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 200;"><span class="line" id="L200"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">fld</span><span style="color: #24292EFF"> has size </span><span style="color: #1976D2">593</span></span>
 <span class="line" id="L201"><span style="color: #24292EFF">doc </span><span style="color: #1976D2">0</span></span>
 <span class="line" id="L202"><span style="color: #24292EFF">  field </span><span style="color: #1976D2">0</span></span>
 <span class="line" id="L203"><span style="color: #24292EFF">    name text</span></span>
@@ -423,15 +576,31 @@ and will be assigned multiple stored field ordinals based on the order that the 
 <span class="line" id="L233"><span style="color: #D32F2F">END</span></span>
 <span class="line" id="L234"><span style="color: #24292EFF">checksum 00000000000213864262</span></span>
 <span class="line empty-line" id="L235"></span>
-<span class="line empty-line" id="L236"></span></code></pre>
-      
+<span class="line empty-line" id="L236"></span></code></pre></div>
+            
+        </li>
         
-        <h3 id="field-infos">Field infos</h3>
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-21">&#x00a7;</a>
+              </div>
+              <h3 id="field-infos">Field infos</h3>
 
+            </div>
+            
+        </li>
         
-      
         
-        <p>The <code>.inf</code> file stores information about each field.</p>
+        <li id="section-22">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-22">&#x00a7;</a>
+              </div>
+              <p>The <code>.inf</code> file stores information about each field.</p>
 <p>Note that many of the properties (e.g. <code>vector encoding</code> and <code>vector similarity</code>) are not applicable to the fields
 that we added. The values shown here are the field defaults. Several of the data structures are only created
 for a field if some property is set. For example, vectors are only written for fields where the
@@ -439,7 +608,9 @@ for a field if some property is set. For example, vectors are only written for f
 is not <code>NONE</code>. See the <code>IndexingChain.processField</code> method to see exactly how field type values decide what
 structures get written to an index for a field based on the field type properties.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 247;"><span class="line" id="L247"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">inf</span><span style="color: #24292EFF"> has size </span><span style="color: #1976D2">758</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 247;"><span class="line" id="L247"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">inf</span><span style="color: #24292EFF"> has size </span><span style="color: #1976D2">758</span></span>
 <span class="line" id="L248"><span style="color: #24292EFF">number of fields </span><span style="color: #1976D2">2</span></span>
 <span class="line" id="L249"><span style="color: #24292EFF">  name text</span></span>
 <span class="line" id="L250"><span style="color: #24292EFF">  number </span><span style="color: #1976D2">0</span></span>
@@ -475,22 +646,40 @@ structures get written to an index for a field based on the field type propertie
 <span class="line" id="L280"><span style="color: #24292EFF">  soft</span><span style="color: #D32F2F">-</span><span style="color: #24292EFF">deletes </span><span style="color: #1976D2">false</span></span>
 <span class="line" id="L281"><span style="color: #24292EFF">checksum 00000000000798287814</span></span>
 <span class="line empty-line" id="L282"></span>
-<span class="line empty-line" id="L283"></span></code></pre>
-      
+<span class="line empty-line" id="L283"></span></code></pre></div>
+            
+        </li>
         
-        <h3 id="norms">Norms</h3>
+        
+        <li id="section-23">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-23">&#x00a7;</a>
+              </div>
+              <h3 id="norms">Norms</h3>
 
+            </div>
+            
+        </li>
         
-      
         
-        <p>The <code>.len</code> file contains the norms for each text field in the index. The norms are the length (relative to term
+        <li id="section-24">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-24">&#x00a7;</a>
+              </div>
+              <p>The <code>.len</code> file contains the norms for each text field in the index. The norms are the length (relative to term
 positions) of a text field in each document containing that field.</p>
 <p>In this case, we have a single text field called <code>text</code>. The norms are encoded as a “delta” from the shortest
 document in the segment. In this case, our shortest document is the second one with length 5 (represented as 00
 more than the <code>minvalue</code>). The longest document is the third one with length 15 (i.e. 10 more than <code>minValue</code>).</p>
 <p>Field length per document is an important value used in the tf-idf and BM25 scoring formulae.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 294;"><span class="line" id="L294"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">len</span><span style="color: #24292EFF"> has size </span><span style="color: #1976D2">106</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 294;"><span class="line" id="L294"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">len</span><span style="color: #24292EFF"> has size </span><span style="color: #1976D2">106</span></span>
 <span class="line" id="L295"><span style="color: #24292EFF">field text</span></span>
 <span class="line" id="L296"><span style="color: #24292EFF">  type </span><span style="color: #D32F2F">NUMERIC</span></span>
 <span class="line" id="L297"><span style="color: #24292EFF">  minvalue </span><span style="color: #1976D2">5</span></span>
@@ -506,15 +695,31 @@ more than the <code>minvalue</code>). The longest document is the third one with
 <span class="line" id="L307"><span style="color: #D32F2F">END</span></span>
 <span class="line" id="L308"><span style="color: #24292EFF">checksum 00000000003850040528</span></span>
 <span class="line empty-line" id="L309"></span>
-<span class="line empty-line" id="L310"></span></code></pre>
-      
+<span class="line empty-line" id="L310"></span></code></pre></div>
+            
+        </li>
         
-        <h3 id="postings">Postings</h3>
+        
+        <li id="section-25">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-25">&#x00a7;</a>
+              </div>
+              <h3 id="postings">Postings</h3>
 
+            </div>
+            
+        </li>
         
-      
         
-        <p>The postings, stored in <code>.pst</code> files, are the key data structure used for efficient text search in Lucene.</p>
+        <li id="section-26">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-26">&#x00a7;</a>
+              </div>
+              <p>The postings, stored in <code>.pst</code> files, are the key data structure used for efficient text search in Lucene.</p>
 <p>Postings are organized from field to term to matching documents. In this case, since the <code>text</code> field was indexed
 with <code>DOCS_AND_FREQS_AND_POSITIONS</code> (see the “Field infos” section above), each document entry for a term encodes
 the frequency of the term in the document (used in scoring calculations), as well as the positions at which the
@@ -522,7 +727,9 @@ term can be found in the document (used for phrase and span queries).</p>
 <p>While many of the terms in our example occur in a single position in a single document, look at the postings for
 the term <code>the</code>, which appears in 3 documents, in multiple positions for each.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 322;"><span class="line" id="L322"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">pst</span><span style="color: #24292EFF"> has size </span><span style="color: #1976D2">1508</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 322;"><span class="line" id="L322"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">pst</span><span style="color: #24292EFF"> has size </span><span style="color: #1976D2">1508</span></span>
 <span class="line" id="L323"><span style="color: #24292EFF">field text</span></span>
 <span class="line" id="L324"><span style="color: #24292EFF">  term amet</span></span>
 <span class="line" id="L325"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">1</span></span>
@@ -650,30 +857,64 @@ the term <code>the</code>, which appears in 3 documents, in multiple positions f
 <span class="line" id="L447"><span style="color: #D32F2F">END</span></span>
 <span class="line" id="L448"><span style="color: #24292EFF">checksum 00000000001512782415</span></span>
 <span class="line empty-line" id="L449"></span>
-<span class="line empty-line" id="L450"></span></code></pre>
-      
+<span class="line empty-line" id="L450"></span></code></pre></div>
+            
+        </li>
         
-        <h3 id="segment-info">Segment info</h3>
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-27">&#x00a7;</a>
+              </div>
+              <h3 id="segment-info">Segment info</h3>
 
+            </div>
+            
+        </li>
         
-      
         
-        <p>The segment info file <code>.si</code> stores information about all the other files involved in a segment.</p>
+        <li id="section-28">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-28">&#x00a7;</a>
+              </div>
+              <p>The segment info file <code>.si</code> stores information about all the other files involved in a segment.</p>
 <p>While the segment info file is managed by the codec, the SimpleTextSegmentInfoFormat implementation currently
 outputs the raw bytes for the segment’s unique ID, so it is not a valid UTF-8 encoding.
 See <a href="https://github.com/apache/lucene/pull/12897">https://github.com/apache/lucene/pull/12897</a>.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 457;"><span class="line" id="L457"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">si</span><span style="color: #24292EFF"> has size </span><span style="color: #1976D2">739</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 457;"><span class="line" id="L457"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">si</span><span style="color: #24292EFF"> has size </span><span style="color: #1976D2">739</span></span>
 <span class="line empty-line" id="L458"></span>
-<span class="line empty-line" id="L459"></span></code></pre>
-      
+<span class="line empty-line" id="L459"></span></code></pre></div>
+            
+        </li>
         
-        <h3 id="commit-file">Commit file</h3>
+        
+        <li id="section-29">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-29">&#x00a7;</a>
+              </div>
+              <h3 id="commit-file">Commit file</h3>
 
+            </div>
+            
+        </li>
         
-      
         
-        <p>Each commit increments the commit generation and writes a <code>segments_&lt;generation&gt;</code> file. When indexing from a single
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-30">&#x00a7;</a>
+              </div>
+              <p>Each commit increments the commit generation and writes a <code>segments_&lt;generation&gt;</code> file. When indexing from a single
 thread with regular commits, the commit generation will often match the ordinal of the last segment (since each
 counts up by one on each commit). If segments are flushed without committing or flushed from multiple threads,
 the segment numbers will usually be higher than the commit generation.</p>
@@ -681,32 +922,49 @@ the segment numbers will usually be higher than the commit generation.</p>
 about what segments are part of the given commit and which codecs were used to write each segment. Since the
 file was not written by SimpleTextCodec, it is a binary file, so we don’t output it here.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 469;"><span class="line" id="L469"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> segments_1 has size </span><span style="color: #1976D2">156</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 469;"><span class="line" id="L469"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> segments_1 has size </span><span style="color: #1976D2">156</span></span>
 <span class="line empty-line" id="L470"></span>
-<span class="line empty-line" id="L471"></span></code></pre>
-      
+<span class="line empty-line" id="L471"></span></code></pre></div>
+            
+        </li>
         
-        <h3 id="write-lock">Write lock</h3>
+        
+        <li id="section-31">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-31">&#x00a7;</a>
+              </div>
+              <h3 id="write-lock">Write lock</h3>
 
+            </div>
+            
+        </li>
         
-      
         
-        <p>On creation of the <code>IndexWriter</code>, a <code>write.lock</code> file is created and locked. The lock implementation is configurable,
+        <li id="section-32">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-32">&#x00a7;</a>
+              </div>
+              <p>On creation of the <code>IndexWriter</code>, a <code>write.lock</code> file is created and locked. The lock implementation is configurable,
 but is usually based on a <code>java.nio.channels.FileLock</code>.</p>
 <p>The write lock ensures that no more than one IndexWriter is ever writing to the same directory.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 477;"><span class="line" id="L477"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">write</span><span style="color: #212121">.</span><span style="color: #1976D2">lock</span><span style="color: #24292EFF"> has size </span><span style="color: #1976D2">0</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 477;"><span class="line" id="L477"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">write</span><span style="color: #212121">.</span><span style="color: #1976D2">lock</span><span style="color: #24292EFF"> has size </span><span style="color: #1976D2">0</span></span>
 <span class="line empty-line" id="L478"></span>
 <span class="line" id="L479"><span style="color: #24292EFF"> </span><span style="color: #D32F2F">*/</span></span>
 <span class="line empty-line" id="L480"></span>
-<span class="line empty-line" id="L481"></span></code></pre>
-      
-    </div>
-    <footer>
-      <div>
-        Generated by <a href="https://github.com/mercmobily/docco">Docco</a>
-      </div>
-    </footer>
+<span class="line empty-line" id="L481"></span></code></pre></div>
+            
+        </li>
+        
+    </ul>
   </div>
 </body>
 </html>

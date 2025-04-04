@@ -4,140 +4,117 @@
 <head>
   <title>Simple search example</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
 </head>
 <body>
-  <div class="container">
-    <div class="main">
-
-      <div class="header">
-        <h1>Simple search example</h1>
-
-        
-          <div class="toc">
-            <h3>Table of Contents</h3>
-            <ol>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
               
                 
-                <li>
-                  <a class="source" href="AnalyzerBasics.html">
-                    AnalyzerBasics.java
-                  </a>
-                </li>
+                <a class="source" href="AnalyzerBasics.html">
+                  AnalyzerBasics.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="BooleanQueryANDInternals.html">
-                    BooleanQueryANDInternals.java
-                  </a>
-                </li>
+                <a class="source" href="BooleanQueryANDInternals.html">
+                  BooleanQueryANDInternals.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="BooleanQueryIntro.html">
-                    BooleanQueryIntro.java
-                  </a>
-                </li>
+                <a class="source" href="BooleanQueryIntro.html">
+                  BooleanQueryIntro.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="BottomUpIndexReader.html">
-                    BottomUpIndexReader.java
-                  </a>
-                </li>
+                <a class="source" href="BottomUpIndexReader.html">
+                  BottomUpIndexReader.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="BytesRefHashExample.html">
-                    BytesRefHashExample.java
-                  </a>
-                </li>
+                <a class="source" href="BytesRefHashExample.html">
+                  BytesRefHashExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="CombinedFieldQueryExample.html">
-                    CombinedFieldQueryExample.java
-                  </a>
-                </li>
+                <a class="source" href="CombinedFieldQueryExample.html">
+                  CombinedFieldQueryExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="DirectoryFileContents.html">
-                    DirectoryFileContents.java
-                  </a>
-                </li>
+                <a class="source" href="DirectoryFileContents.html">
+                  DirectoryFileContents.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="DocValuesSearchExample.html">
-                    DocValuesSearchExample.java
-                  </a>
-                </li>
+                <a class="source" href="DocValuesSearchExample.html">
+                  DocValuesSearchExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="FunctionQuerySearchExample.html">
-                    FunctionQuerySearchExample.java
-                  </a>
-                </li>
+                <a class="source" href="FunctionQuerySearchExample.html">
+                  FunctionQuerySearchExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="KnnSearchExample.html">
-                    KnnSearchExample.java
-                  </a>
-                </li>
+                <a class="source" href="KnnSearchExample.html">
+                  KnnSearchExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="PointTreeRangeQuery.html">
-                    PointTreeRangeQuery.java
-                  </a>
-                </li>
+                <a class="source" href="PointTreeRangeQuery.html">
+                  PointTreeRangeQuery.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="PrimitivesRef.html">
-                    PrimitivesRef.java
-                  </a>
-                </li>
+                <a class="source" href="PrimitivesRef.html">
+                  PrimitivesRef.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="SearchWithTermsEnum.html">
-                    SearchWithTermsEnum.java
-                  </a>
-                </li>
+                <a class="source" href="SearchWithTermsEnum.html">
+                  SearchWithTermsEnum.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="SimpleSearch.html">
-                    SimpleSearch.java
-                  </a>
-                </li>
+                <a class="source" href="SimpleSearch.html">
+                  SimpleSearch.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="TextVectorSearchExample.html">
-                    TextVectorSearchExample.java
-                  </a>
-                </li>
+                <a class="source" href="TextVectorSearchExample.html">
+                  TextVectorSearchExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="VisualizePointTree.html">
-                    VisualizePointTree.java
-                  </a>
-                </li>
+                <a class="source" href="VisualizePointTree.html">
+                  VisualizePointTree.java
+                </a>
               
-            </ol>
+            </div>
           </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
         
-      </div>
-      
         
-        <p>This will walk through a very simple search example with Lucene.</p>
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-1">&#x00a7;</a>
+              </div>
+              <p>This will walk through a very simple search example with Lucene.</p>
 <p>The example has the following steps:</p>
 <ol>
 <li>Create documents. Documents are iterable collections of <code>IndexableField</code>.</li>
@@ -149,7 +126,9 @@
 <li>Iterate through the returned documents to output their score, ID, and stored <code>text</code> value.</li>
 </ol>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 14;"><span class="line" id="L14"><span style="color: #D32F2F">package</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">basic</span><span style="color: #24292EFF">;</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 14;"><span class="line" id="L14"><span style="color: #D32F2F">package</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">basic</span><span style="color: #24292EFF">;</span></span>
 <span class="line empty-line" id="L15"></span>
 <span class="line" id="L16"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">Field</span><span style="color: #24292EFF">;</span></span>
 <span class="line" id="L17"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">TextField</span><span style="color: #24292EFF">;</span></span>
@@ -175,21 +154,39 @@
 <span class="line empty-line" id="L37"></span>
 <span class="line" id="L38"><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">SimpleSearch</span><span style="color: #24292EFF"> {</span></span>
 <span class="line empty-line" id="L39"></span>
-<span class="line empty-line" id="L40"></span></code></pre>
-      
+<span class="line empty-line" id="L40"></span></code></pre></div>
+            
+        </li>
         
-        <h2 id="creating-documents">Creating Documents</h2>
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-2">&#x00a7;</a>
+              </div>
+              <h2 id="creating-documents">Creating Documents</h2>
 
+            </div>
+            
+        </li>
         
-      
         
-        <p>We will create a list of documents, where each document has a single field, <code>text</code>.</p>
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-3">&#x00a7;</a>
+              </div>
+              <p>We will create a list of documents, where each document has a single field, <code>text</code>.</p>
 <p>We use the <code>TextField</code> type to indicate that it’s a “full text” field, to be split into individual tokens
 during indexing.</p>
 <p>In order to retrieve the original field value in our search results, we indicate that we want the field value
 stored using <code>Field.Store.YES</code>.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 49;"><span class="line" id="L49"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">List&lt;List&lt;</span><span style="color: #24292EFF">IndexableField</span><span style="color: #D32F2F">&gt;&gt;</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createDocuments()</span><span style="color: #24292EFF"> {</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 49;"><span class="line" id="L49"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">List&lt;List&lt;</span><span style="color: #24292EFF">IndexableField</span><span style="color: #D32F2F">&gt;&gt;</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createDocuments()</span><span style="color: #24292EFF"> {</span></span>
 <span class="line" id="L50"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF">&gt; texts </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">List</span><span style="color: #212121">.</span><span style="color: #6F42C1">of</span><span style="color: #24292EFF">(</span></span>
 <span class="line" id="L51"><span style="color: #24292EFF">                </span><span style="color: #22863A">&quot;The quick fox jumped over the lazy, brown dog&quot;</span><span style="color: #212121">,</span></span>
 <span class="line" id="L52"><span style="color: #24292EFF">                </span><span style="color: #22863A">&quot;Lorem ipsum, dolor sit amet&quot;</span><span style="color: #212121">,</span></span>
@@ -205,100 +202,226 @@ stored using <code>Field.Store.YES</code>.</p>
 <span class="line" id="L62"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> docs;</span></span>
 <span class="line" id="L63"><span style="color: #24292EFF">    }</span></span>
 <span class="line empty-line" id="L64"></span>
-<span class="line empty-line" id="L65"></span></code></pre>
-      
+<span class="line empty-line" id="L65"></span></code></pre></div>
+            
+        </li>
         
-        <h2 id="the-example-code">The example code</h2>
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-4">&#x00a7;</a>
+              </div>
+              <h2 id="the-example-code">The example code</h2>
 
+            </div>
+            
+        </li>
         
-      
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-5">&#x00a7;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 67;"><span class="line" id="L67"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">main(</span><span style="color: #D32F2F">String</span><span style="color: #6F42C1">[] args)</span><span style="color: #24292EFF"> throws IOException {</span></span>
+<span class="line empty-line" id="L68"></span></code></pre></div>
+            
+        </li>
         
         
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 67;"><span class="line" id="L67"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">main(</span><span style="color: #D32F2F">String</span><span style="color: #6F42C1">[] args)</span><span style="color: #24292EFF"> throws IOException {</span></span>
-<span class="line empty-line" id="L68"></span></code></pre>
-      
-        
-        <p>We start by creating a temporary directory, wherever your JVM specifies its default <code>java.io.tmpdir</code>.
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-6">&#x00a7;</a>
+              </div>
+              <p>We start by creating a temporary directory, wherever your JVM specifies its default <code>java.io.tmpdir</code>.
 This will hold the index files.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 70;"><span class="line" id="L70"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF"> tmpDir </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">createTempDirectory</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">SimpleSearch</span><span style="color: #212121">.</span><span style="color: #1976D2">class</span><span style="color: #212121">.</span><span style="color: #6F42C1">getSimpleName</span><span style="color: #24292EFF">());</span></span>
-<span class="line empty-line" id="L71"></span></code></pre>
-      
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 70;"><span class="line" id="L70"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF"> tmpDir </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">createTempDirectory</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">SimpleSearch</span><span style="color: #212121">.</span><span style="color: #1976D2">class</span><span style="color: #212121">.</span><span style="color: #6F42C1">getSimpleName</span><span style="color: #24292EFF">());</span></span>
+<span class="line empty-line" id="L71"></span></code></pre></div>
+            
+        </li>
         
-        <p>We “open” the file system directory as a Lucene <code>Directory</code>, then open an <code>IndexWriter</code> able to write to
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-7">&#x00a7;</a>
+              </div>
+              <p>We “open” the file system directory as a Lucene <code>Directory</code>, then open an <code>IndexWriter</code> able to write to
 that directory.</p>
 <p>Lucene places and locks a <code>write.lock</code> file in the directory to make sure that other processes are not able
 to write to the directory while we hold the lock (as long as those other processes try to obtain the lock).</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 76;"><span class="line" id="L76"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">Directory</span><span style="color: #24292EFF"> directory </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(tmpDir);</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 76;"><span class="line" id="L76"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">Directory</span><span style="color: #24292EFF"> directory </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(tmpDir);</span></span>
 <span class="line" id="L77"><span style="color: #24292EFF">             </span><span style="color: #D32F2F">IndexWriter</span><span style="color: #24292EFF"> writer </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexWriter(directory</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> IndexWriterConfig())</span><span style="color: #24292EFF">) {</span></span>
-<span class="line empty-line" id="L78"></span></code></pre>
-      
+<span class="line empty-line" id="L78"></span></code></pre></div>
+            
+        </li>
         
-        <p>Use our <code>createDocuments</code> helper function to create the documents and write them to the index.
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-8">&#x00a7;</a>
+              </div>
+              <p>Use our <code>createDocuments</code> helper function to create the documents and write them to the index.
 Since they are all written at once without calling <code>writer.flush()</code> in between, they get written
 contiguously in a single segment. We’ll cover segments in another lesson.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 81;"><span class="line" id="L81"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">IndexableField</span><span style="color: #24292EFF">&gt; doc </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createDocuments()</span><span style="color: #24292EFF">) {</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 81;"><span class="line" id="L81"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">IndexableField</span><span style="color: #24292EFF">&gt; doc </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createDocuments()</span><span style="color: #24292EFF">) {</span></span>
 <span class="line" id="L82"><span style="color: #24292EFF">                </span><span style="color: #1976D2">writer</span><span style="color: #212121">.</span><span style="color: #6F42C1">addDocument</span><span style="color: #24292EFF">(doc);</span></span>
 <span class="line" id="L83"><span style="color: #24292EFF">            }</span></span>
-<span class="line empty-line" id="L84"></span></code></pre>
-      
+<span class="line empty-line" id="L84"></span></code></pre></div>
+            
+        </li>
         
-        <p>Open an <code>IndexReader</code> based on the <code>writer</code>. This causes <code>writer</code> to flush pending documents, so they
+        
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-9">&#x00a7;</a>
+              </div>
+              <p>Open an <code>IndexReader</code> based on the <code>writer</code>. This causes <code>writer</code> to flush pending documents, so they
 can be read. Note that <code>reader</code> has a view of the index at this point in time.
 If we were to write more documents with <code>writer</code>, they would not be visible to <code>reader</code>.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 87;"><span class="line" id="L87"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">IndexReader</span><span style="color: #24292EFF"> reader </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">DirectoryReader</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(writer)) {</span></span>
-<span class="line empty-line" id="L88"></span></code></pre>
-      
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 87;"><span class="line" id="L87"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">IndexReader</span><span style="color: #24292EFF"> reader </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">DirectoryReader</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(writer)) {</span></span>
+<span class="line empty-line" id="L88"></span></code></pre></div>
+            
+        </li>
         
-        <p>An <code>IndexReader</code> is able to read the underlying structure of the index, but high-level searching
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-10">&#x00a7;</a>
+              </div>
+              <p>An <code>IndexReader</code> is able to read the underlying structure of the index, but high-level searching
 requires an <code>IndexSearcher</code>. We’ll explore the low-level <code>IndexReader</code> operations in a later lesson.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 90;"><span class="line" id="L90"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">IndexSearcher</span><span style="color: #24292EFF"> searcher </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexSearcher(reader)</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L91"></span></code></pre>
-      
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 90;"><span class="line" id="L90"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">IndexSearcher</span><span style="color: #24292EFF"> searcher </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexSearcher(reader)</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L91"></span></code></pre></div>
+            
+        </li>
         
-        <p>A <code>TermQuery</code> is one of the simpler query types supported by Lucene. It is able to search for a single
+        
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-11">&#x00a7;</a>
+              </div>
+              <p>A <code>TermQuery</code> is one of the simpler query types supported by Lucene. It is able to search for a single
 “term” (usually a word, but not necessarily) in a field. In this case, we’re going to search for the
 term <code>fox</code> in the <code>text</code> field.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 94;"><span class="line" id="L94"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">TermQuery</span><span style="color: #24292EFF"> termQuery </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;fox&quot;</span><span style="color: #6F42C1">))</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L95"></span></code></pre>
-      
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 94;"><span class="line" id="L94"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">TermQuery</span><span style="color: #24292EFF"> termQuery </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;fox&quot;</span><span style="color: #6F42C1">))</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L95"></span></code></pre></div>
+            
+        </li>
         
-        <p>We ask <code>searcher</code> to run our <code>termQuery</code> and return the top 10 documents. There are only 2 documents
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-12">&#x00a7;</a>
+              </div>
+              <p>We ask <code>searcher</code> to run our <code>termQuery</code> and return the top 10 documents. There are only 2 documents
 in our index with the term <code>fox</code>, so it will only return those 2.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 97;"><span class="line" id="L97"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">TopDocs</span><span style="color: #24292EFF"> topDocs </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">searcher</span><span style="color: #212121">.</span><span style="color: #6F42C1">search</span><span style="color: #24292EFF">(termQuery</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">10</span><span style="color: #24292EFF">);</span></span>
-<span class="line empty-line" id="L98"></span></code></pre>
-      
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 97;"><span class="line" id="L97"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">TopDocs</span><span style="color: #24292EFF"> topDocs </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">searcher</span><span style="color: #212121">.</span><span style="color: #6F42C1">search</span><span style="color: #24292EFF">(termQuery</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">10</span><span style="color: #24292EFF">);</span></span>
+<span class="line empty-line" id="L98"></span></code></pre></div>
+            
+        </li>
         
-        <p>If our query had matched more than 10 documents, then <code>topDocs</code> would contain the top 10 documents,
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-13">&#x00a7;</a>
+              </div>
+              <p>If our query had matched more than 10 documents, then <code>topDocs</code> would contain the top 10 documents,
 while <code>topDocs.totalHits</code> would have the total number of matching documents (or a lower bound on the
 total number of matching documents, if more than 1000 documents match).</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 101;"><span class="line" id="L101"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;Query &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> termQuery </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; matched &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">topDocs</span><span style="color: #212121">.</span><span style="color: #1976D2">totalHits</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; documents:&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line empty-line" id="L102"></span></code></pre>
-      
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 101;"><span class="line" id="L101"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;Query &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> termQuery </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; matched &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">topDocs</span><span style="color: #212121">.</span><span style="color: #1976D2">totalHits</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; documents:&quot;</span><span style="color: #24292EFF">);</span></span>
+<span class="line empty-line" id="L102"></span></code></pre></div>
+            
+        </li>
         
-        <p>The <code>topDocs</code> contains a list of <code>ScoreDoc</code>, which just have scores and Lucene-generated doc IDs.
+        
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-14">&#x00a7;</a>
+              </div>
+              <p>The <code>topDocs</code> contains a list of <code>ScoreDoc</code>, which just have scores and Lucene-generated doc IDs.
 Since these doc IDs are likely meaningless to us as users, we ask the reader for a <code>StoredFields</code>
 instance able to retrieve stored field values based on the doc IDs.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 105;"><span class="line" id="L105"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">StoredFields</span><span style="color: #24292EFF"> storedFields </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">reader</span><span style="color: #212121">.</span><span style="color: #6F42C1">storedFields</span><span style="color: #24292EFF">();</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 105;"><span class="line" id="L105"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">StoredFields</span><span style="color: #24292EFF"> storedFields </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">reader</span><span style="color: #212121">.</span><span style="color: #6F42C1">storedFields</span><span style="color: #24292EFF">();</span></span>
 <span class="line" id="L106"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">ScoreDoc</span><span style="color: #24292EFF"> scoreDoc </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">topDocs</span><span style="color: #212121">.</span><span style="color: #1976D2">scoreDocs</span><span style="color: #24292EFF">) {</span></span>
-<span class="line empty-line" id="L107"></span></code></pre>
-      
+<span class="line empty-line" id="L107"></span></code></pre></div>
+            
+        </li>
         
-        <p>Using the doc’s ID, we load a <code>Document</code>, and load the <code>text</code> field (the only field).</p>
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-15">&#x00a7;</a>
+              </div>
+              <p>Using the doc’s ID, we load a <code>Document</code>, and load the <code>text</code> field (the only field).</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 108;"><span class="line" id="L108"><span style="color: #24292EFF">                    </span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> storedText </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">storedFields</span><span style="color: #212121">.</span><span style="color: #6F42C1">document</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">scoreDoc</span><span style="color: #212121">.</span><span style="color: #1976D2">doc</span><span style="color: #24292EFF">)</span><span style="color: #212121">.</span><span style="color: #6F42C1">get</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line empty-line" id="L109"></span></code></pre>
-      
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 108;"><span class="line" id="L108"><span style="color: #24292EFF">                    </span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> storedText </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">storedFields</span><span style="color: #212121">.</span><span style="color: #6F42C1">document</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">scoreDoc</span><span style="color: #212121">.</span><span style="color: #1976D2">doc</span><span style="color: #24292EFF">)</span><span style="color: #212121">.</span><span style="color: #6F42C1">get</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #24292EFF">);</span></span>
+<span class="line empty-line" id="L109"></span></code></pre></div>
+            
+        </li>
         
-        <p>Each document has a BM25 score based on their relevance to the query.
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-16">&#x00a7;</a>
+              </div>
+              <p>Each document has a BM25 score based on their relevance to the query.
 See <a href="https://en.wikipedia.org/wiki/Okapi_BM25">https://en.wikipedia.org/wiki/Okapi_BM25</a> for details on the BM25 formula.</p>
 <p>The parts of the formula relevant to this example are:</p>
 <ol>
@@ -308,49 +431,96 @@ See <a href="https://en.wikipedia.org/wiki/Okapi_BM25">https://en.wikipedia.org/
 <p>In this case both of our matching documents contain the word <code>fox</code> once, so they’re tied there.
 The last document is shorter than the first document, so the last document gets a higher score.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 118;"><span class="line" id="L118"><span style="color: #24292EFF">                    </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">scoreDoc</span><span style="color: #212121">.</span><span style="color: #1976D2">score</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; - &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">scoreDoc</span><span style="color: #212121">.</span><span style="color: #1976D2">doc</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; - &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> storedText);</span></span>
-<span class="line empty-line" id="L119"></span></code></pre>
-      
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 118;"><span class="line" id="L118"><span style="color: #24292EFF">                    </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">scoreDoc</span><span style="color: #212121">.</span><span style="color: #1976D2">score</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; - &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">scoreDoc</span><span style="color: #212121">.</span><span style="color: #1976D2">doc</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; - &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> storedText);</span></span>
+<span class="line empty-line" id="L119"></span></code></pre></div>
+            
+        </li>
         
         
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 120;"><span class="line" id="L120"><span style="color: #24292EFF">                }</span></span>
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-17">&#x00a7;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 120;"><span class="line" id="L120"><span style="color: #24292EFF">                }</span></span>
 <span class="line" id="L121"><span style="color: #24292EFF">            }</span></span>
-<span class="line empty-line" id="L122"></span></code></pre>
-      
+<span class="line empty-line" id="L122"></span></code></pre></div>
+            
+        </li>
         
         
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 123;"><span class="line" id="L123"><span style="color: #24292EFF">        } </span><span style="color: #D32F2F">finally</span><span style="color: #24292EFF"> {</span></span>
-<span class="line empty-line" id="L124"></span></code></pre>
-      
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-18">&#x00a7;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 123;"><span class="line" id="L123"><span style="color: #24292EFF">        } </span><span style="color: #D32F2F">finally</span><span style="color: #24292EFF"> {</span></span>
+<span class="line empty-line" id="L124"></span></code></pre></div>
+            
+        </li>
         
-        <h2 id="clean-up">Clean up</h2>
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-19">&#x00a7;</a>
+              </div>
+              <h2 id="clean-up">Clean up</h2>
 
+            </div>
+            
+        </li>
         
-      
         
-        <p>Before we finish the program, we delete each of the files in the directory.</p>
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-20">&#x00a7;</a>
+              </div>
+              <p>Before we finish the program, we delete each of the files in the directory.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 128;"><span class="line" id="L128"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> indexFile </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">listAll</span><span style="color: #24292EFF">(tmpDir)) {</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 128;"><span class="line" id="L128"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> indexFile </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">listAll</span><span style="color: #24292EFF">(tmpDir)) {</span></span>
 <span class="line" id="L129"><span style="color: #24292EFF">                </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">deleteIfExists</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">tmpDir</span><span style="color: #212121">.</span><span style="color: #6F42C1">resolve</span><span style="color: #24292EFF">(indexFile));</span></span>
 <span class="line" id="L130"><span style="color: #24292EFF">            }</span></span>
-<span class="line empty-line" id="L131"></span></code></pre>
-      
+<span class="line empty-line" id="L131"></span></code></pre></div>
+            
+        </li>
         
-        <p>Then we delete the directory itself.</p>
+        
+        <li id="section-21">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-21">&#x00a7;</a>
+              </div>
+              <p>Then we delete the directory itself.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 132;"><span class="line" id="L132"><span style="color: #24292EFF">            </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">deleteIfExists</span><span style="color: #24292EFF">(tmpDir);</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 132;"><span class="line" id="L132"><span style="color: #24292EFF">            </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">deleteIfExists</span><span style="color: #24292EFF">(tmpDir);</span></span>
 <span class="line" id="L133"><span style="color: #24292EFF">        }</span></span>
 <span class="line" id="L134"><span style="color: #24292EFF">    }</span></span>
 <span class="line" id="L135"><span style="color: #24292EFF">}</span></span>
 <span class="line empty-line" id="L136"></span>
-<span class="line empty-line" id="L137"></span></code></pre>
-      
-    </div>
-    <footer>
-      <div>
-        Generated by <a href="https://github.com/mercmobily/docco">Docco</a>
-      </div>
-    </footer>
+<span class="line empty-line" id="L137"></span></code></pre></div>
+            
+        </li>
+        
+    </ul>
   </div>
 </body>
 </html>

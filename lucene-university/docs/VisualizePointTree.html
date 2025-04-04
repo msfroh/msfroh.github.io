@@ -4,140 +4,117 @@
 <head>
   <title>Visualizing a point tree</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
+  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
 </head>
 <body>
-  <div class="container">
-    <div class="main">
-
-      <div class="header">
-        <h1>Visualizing a point tree</h1>
-
-        
-          <div class="toc">
-            <h3>Table of Contents</h3>
-            <ol>
+  <div id="container">
+    <div id="background"></div>
+    
+      <ul id="jump_to">
+        <li>
+          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
+          <a class="small" href="javascript:void(0);">+</a>
+          <div id="jump_wrapper">
+          <div id="jump_page_wrapper">
+            <div id="jump_page">
               
                 
-                <li>
-                  <a class="source" href="AnalyzerBasics.html">
-                    AnalyzerBasics.java
-                  </a>
-                </li>
+                <a class="source" href="AnalyzerBasics.html">
+                  AnalyzerBasics.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="BooleanQueryANDInternals.html">
-                    BooleanQueryANDInternals.java
-                  </a>
-                </li>
+                <a class="source" href="BooleanQueryANDInternals.html">
+                  BooleanQueryANDInternals.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="BooleanQueryIntro.html">
-                    BooleanQueryIntro.java
-                  </a>
-                </li>
+                <a class="source" href="BooleanQueryIntro.html">
+                  BooleanQueryIntro.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="BottomUpIndexReader.html">
-                    BottomUpIndexReader.java
-                  </a>
-                </li>
+                <a class="source" href="BottomUpIndexReader.html">
+                  BottomUpIndexReader.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="BytesRefHashExample.html">
-                    BytesRefHashExample.java
-                  </a>
-                </li>
+                <a class="source" href="BytesRefHashExample.html">
+                  BytesRefHashExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="CombinedFieldQueryExample.html">
-                    CombinedFieldQueryExample.java
-                  </a>
-                </li>
+                <a class="source" href="CombinedFieldQueryExample.html">
+                  CombinedFieldQueryExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="DirectoryFileContents.html">
-                    DirectoryFileContents.java
-                  </a>
-                </li>
+                <a class="source" href="DirectoryFileContents.html">
+                  DirectoryFileContents.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="DocValuesSearchExample.html">
-                    DocValuesSearchExample.java
-                  </a>
-                </li>
+                <a class="source" href="DocValuesSearchExample.html">
+                  DocValuesSearchExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="FunctionQuerySearchExample.html">
-                    FunctionQuerySearchExample.java
-                  </a>
-                </li>
+                <a class="source" href="FunctionQuerySearchExample.html">
+                  FunctionQuerySearchExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="KnnSearchExample.html">
-                    KnnSearchExample.java
-                  </a>
-                </li>
+                <a class="source" href="KnnSearchExample.html">
+                  KnnSearchExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="PointTreeRangeQuery.html">
-                    PointTreeRangeQuery.java
-                  </a>
-                </li>
+                <a class="source" href="PointTreeRangeQuery.html">
+                  PointTreeRangeQuery.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="PrimitivesRef.html">
-                    PrimitivesRef.java
-                  </a>
-                </li>
+                <a class="source" href="PrimitivesRef.html">
+                  PrimitivesRef.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="SearchWithTermsEnum.html">
-                    SearchWithTermsEnum.java
-                  </a>
-                </li>
+                <a class="source" href="SearchWithTermsEnum.html">
+                  SearchWithTermsEnum.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="SimpleSearch.html">
-                    SimpleSearch.java
-                  </a>
-                </li>
+                <a class="source" href="SimpleSearch.html">
+                  SimpleSearch.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="TextVectorSearchExample.html">
-                    TextVectorSearchExample.java
-                  </a>
-                </li>
+                <a class="source" href="TextVectorSearchExample.html">
+                  TextVectorSearchExample.java
+                </a>
               
                 
-                <li>
-                  <a class="source" href="VisualizePointTree.html">
-                    VisualizePointTree.java
-                  </a>
-                </li>
+                <a class="source" href="VisualizePointTree.html">
+                  VisualizePointTree.java
+                </a>
               
-            </ol>
+            </div>
           </div>
+        </li>
+      </ul>
+    
+    <ul class="sections">
         
-      </div>
-      
         
-        <p>In this example, we will look at how Lucene indexes numeric fields using “points”. These points are stored
+        
+        <li id="section-1">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-1">&#x00a7;</a>
+              </div>
+              <p>In this example, we will look at how Lucene indexes numeric fields using “points”. These points are stored
 in a structure called a binary K-d tree (see <a href="https://en.wikipedia.org/wiki/K-d_tree">https://en.wikipedia.org/wiki/K-d_tree</a> for more details). The  K-d tree
 makes range queries more efficient, as we are able to descend into the tree to find and visit the set of subtrees
 that share some overlap with the given range, while ignoring the rest of the tree.</p>
@@ -150,7 +127,9 @@ tree for the integer field, including the number of documents associated with ea
 </ol>
 <p>Output for the original example and the variations can be found at the bottom of the file.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 18;"><span class="line" id="L18"><span style="color: #D32F2F">package</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">points</span><span style="color: #24292EFF">;</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 18;"><span class="line" id="L18"><span style="color: #D32F2F">package</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">points</span><span style="color: #24292EFF">;</span></span>
 <span class="line empty-line" id="L19"></span>
 <span class="line" id="L20"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">basic</span><span style="color: #212121">.</span><span style="color: #D32F2F">SimpleSearch</span><span style="color: #24292EFF">;</span></span>
 <span class="line" id="L21"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">Field</span><span style="color: #24292EFF">;</span></span>
@@ -176,110 +155,232 @@ tree for the integer field, including the number of documents associated with ea
 <span class="line" id="L41"><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">VisualizePointTree</span><span style="color: #24292EFF"> {</span></span>
 <span class="line empty-line" id="L42"></span>
 <span class="line empty-line" id="L43"></span>
-<span class="line empty-line" id="L44"></span></code></pre>
-      
+<span class="line empty-line" id="L44"></span></code></pre></div>
+            
+        </li>
         
-        <h2 id="helper-function-to-print-the-pointtree">Helper function to print the <code>PointTree</code></h2>
+        
+        <li id="section-2">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-2">&#x00a7;</a>
+              </div>
+              <h2 id="helper-function-to-print-the-pointtree">Helper function to print the <code>PointTree</code></h2>
 
+            </div>
+            
+        </li>
         
-      
         
-        <p>We will use this recursive helper function to print the current node, then recursively visit the node’s children
+        <li id="section-3">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-3">&#x00a7;</a>
+              </div>
+              <p>We will use this recursive helper function to print the current node, then recursively visit the node’s children
 and siblings.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 49;"><span class="line" id="L49"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">printTree(</span><span style="color: #1976D2">PointValues</span><span style="color: #212121">.</span><span style="color: #1976D2">PointTree</span><span style="color: #6F42C1"> pointTree</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">int</span><span style="color: #6F42C1"> level)</span><span style="color: #24292EFF"> throws IOException {</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 49;"><span class="line" id="L49"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">printTree(</span><span style="color: #1976D2">PointValues</span><span style="color: #212121">.</span><span style="color: #1976D2">PointTree</span><span style="color: #6F42C1"> pointTree</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">int</span><span style="color: #6F42C1"> level)</span><span style="color: #24292EFF"> throws IOException {</span></span>
 <span class="line empty-line" id="L50"></span>
-<span class="line empty-line" id="L51"></span></code></pre>
-      
+<span class="line empty-line" id="L51"></span></code></pre></div>
+            
+        </li>
         
-        <p>For each node, we’ll output the current level (indenting more as we go deeper), the min and max point
+        
+        <li id="section-4">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-4">&#x00a7;</a>
+              </div>
+              <p>For each node, we’ll output the current level (indenting more as we go deeper), the min and max point
 values for the node, and the number of documents under the node.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 54;"><span class="line" id="L54"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> indent </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; &quot;</span><span style="color: #212121">.</span><span style="color: #6F42C1">repeat</span><span style="color: #24292EFF">(level);</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 54;"><span class="line" id="L54"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> indent </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; &quot;</span><span style="color: #212121">.</span><span style="color: #6F42C1">repeat</span><span style="color: #24292EFF">(level);</span></span>
 <span class="line" id="L55"><span style="color: #24292EFF">        </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(indent </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> level </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> indent </span><span style="color: #D32F2F">+</span></span>
 <span class="line" id="L56"><span style="color: #24292EFF">                </span><span style="color: #22863A">&quot; [&quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">IntPoint</span><span style="color: #212121">.</span><span style="color: #6F42C1">decodeDimension</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">pointTree</span><span style="color: #212121">.</span><span style="color: #6F42C1">getMinPackedValue</span><span style="color: #24292EFF">()</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">) </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;,&quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span></span>
 <span class="line" id="L57"><span style="color: #24292EFF">                </span><span style="color: #1976D2">IntPoint</span><span style="color: #212121">.</span><span style="color: #6F42C1">decodeDimension</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">pointTree</span><span style="color: #212121">.</span><span style="color: #6F42C1">getMaxPackedValue</span><span style="color: #24292EFF">()</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">) </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;] - &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span></span>
 <span class="line" id="L58"><span style="color: #24292EFF">                </span><span style="color: #1976D2">pointTree</span><span style="color: #212121">.</span><span style="color: #6F42C1">size</span><span style="color: #24292EFF">());</span></span>
-<span class="line empty-line" id="L59"></span></code></pre>
-      
+<span class="line empty-line" id="L59"></span></code></pre></div>
+            
+        </li>
         
-        <p>Next we recurse into the first child, if present. The recursive call will also visit the siblings (see a few
+        
+        <li id="section-5">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-5">&#x00a7;</a>
+              </div>
+              <p>Next we recurse into the first child, if present. The recursive call will also visit the siblings (see a few
 lines below). After visiting the child we need to return to this node before visiting our own siblings.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 62;"><span class="line" id="L62"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (</span><span style="color: #1976D2">pointTree</span><span style="color: #212121">.</span><span style="color: #6F42C1">moveToChild</span><span style="color: #24292EFF">()) {</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 62;"><span class="line" id="L62"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (</span><span style="color: #1976D2">pointTree</span><span style="color: #212121">.</span><span style="color: #6F42C1">moveToChild</span><span style="color: #24292EFF">()) {</span></span>
 <span class="line" id="L63"><span style="color: #24292EFF">            </span><span style="color: #6F42C1">printTree(pointTree</span><span style="color: #212121">,</span><span style="color: #6F42C1"> level </span><span style="color: #D32F2F">+</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">1</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
 <span class="line" id="L64"><span style="color: #24292EFF">            </span><span style="color: #1976D2">pointTree</span><span style="color: #212121">.</span><span style="color: #6F42C1">moveToParent</span><span style="color: #24292EFF">();</span></span>
 <span class="line" id="L65"><span style="color: #24292EFF">        }</span></span>
-<span class="line empty-line" id="L66"></span></code></pre>
-      
+<span class="line empty-line" id="L66"></span></code></pre></div>
+            
+        </li>
         
-        <p>Visit the current node’s siblings.</p>
+        
+        <li id="section-6">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-6">&#x00a7;</a>
+              </div>
+              <p>Visit the current node’s siblings.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 68;"><span class="line" id="L68"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">while</span><span style="color: #24292EFF"> (</span><span style="color: #1976D2">pointTree</span><span style="color: #212121">.</span><span style="color: #6F42C1">moveToSibling</span><span style="color: #24292EFF">()) {</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 68;"><span class="line" id="L68"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">while</span><span style="color: #24292EFF"> (</span><span style="color: #1976D2">pointTree</span><span style="color: #212121">.</span><span style="color: #6F42C1">moveToSibling</span><span style="color: #24292EFF">()) {</span></span>
 <span class="line" id="L69"><span style="color: #24292EFF">            </span><span style="color: #6F42C1">printTree(pointTree</span><span style="color: #212121">,</span><span style="color: #6F42C1"> level)</span><span style="color: #24292EFF">;</span></span>
 <span class="line" id="L70"><span style="color: #24292EFF">        }</span></span>
 <span class="line" id="L71"><span style="color: #24292EFF">    }</span></span>
 <span class="line empty-line" id="L72"></span>
-<span class="line empty-line" id="L73"></span></code></pre>
-      
+<span class="line empty-line" id="L73"></span></code></pre></div>
+            
+        </li>
         
-        <h2 id="the-worked-example">The worked example</h2>
+        
+        <li id="section-7">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-7">&#x00a7;</a>
+              </div>
+              <h2 id="the-worked-example">The worked example</h2>
 
+            </div>
+            
+        </li>
         
-      
+        
+        <li id="section-8">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-8">&#x00a7;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 75;"><span class="line" id="L75"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">main(</span><span style="color: #D32F2F">String</span><span style="color: #6F42C1">[] args)</span><span style="color: #24292EFF"> throws IOException {</span></span>
+<span class="line empty-line" id="L76"></span></code></pre></div>
+            
+        </li>
         
         
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 75;"><span class="line" id="L75"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">main(</span><span style="color: #D32F2F">String</span><span style="color: #6F42C1">[] args)</span><span style="color: #24292EFF"> throws IOException {</span></span>
-<span class="line empty-line" id="L76"></span></code></pre>
-      
-        
-        <p>Create a temporary directory to hold the index, then create the Lucene Directory and IndexWriter.</p>
+        <li id="section-9">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-9">&#x00a7;</a>
+              </div>
+              <p>Create a temporary directory to hold the index, then create the Lucene Directory and IndexWriter.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 77;"><span class="line" id="L77"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF"> tmpDir </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">createTempDirectory</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">SimpleSearch</span><span style="color: #212121">.</span><span style="color: #1976D2">class</span><span style="color: #212121">.</span><span style="color: #6F42C1">getSimpleName</span><span style="color: #24292EFF">());</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 77;"><span class="line" id="L77"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF"> tmpDir </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">createTempDirectory</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">SimpleSearch</span><span style="color: #212121">.</span><span style="color: #1976D2">class</span><span style="color: #212121">.</span><span style="color: #6F42C1">getSimpleName</span><span style="color: #24292EFF">());</span></span>
 <span class="line" id="L78"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">Directory</span><span style="color: #24292EFF"> directory </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(tmpDir);</span></span>
 <span class="line" id="L79"><span style="color: #24292EFF">             </span><span style="color: #D32F2F">IndexWriter</span><span style="color: #24292EFF"> writer </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexWriter(directory</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> IndexWriterConfig())</span><span style="color: #24292EFF">) {</span></span>
 <span class="line empty-line" id="L80"></span>
-<span class="line empty-line" id="L81"></span></code></pre>
-      
+<span class="line empty-line" id="L81"></span></code></pre></div>
+            
+        </li>
         
-        <h3 id="index-documents">Index documents</h3>
+        
+        <li id="section-10">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-10">&#x00a7;</a>
+              </div>
+              <h3 id="index-documents">Index documents</h3>
 
+            </div>
+            
+        </li>
         
-      
         
-        <p>We will generate 20,000 documents, distributed over 10,000 integer point values.</p>
+        <li id="section-11">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-11">&#x00a7;</a>
+              </div>
+              <p>We will generate 20,000 documents, distributed over 10,000 integer point values.</p>
 <p>For the <code>val</code> field, we use type <code>IntField</code>. This is a convenient field type that tells Lucene to store
 the field as a doc value and as a point. Note that this field <strong>does not</strong> get indexed to terms.</p>
 <p><em>Optional exercise:</em> Try modifying these to output the same <code>val</code> value for every document.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 89;"><span class="line" id="L89"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">; i </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">10_000</span><span style="color: #24292EFF">; i</span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">) {</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 89;"><span class="line" id="L89"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">; i </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">10_000</span><span style="color: #24292EFF">; i</span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">) {</span></span>
 <span class="line" id="L90"><span style="color: #24292EFF">                </span><span style="color: #1976D2">writer</span><span style="color: #212121">.</span><span style="color: #6F42C1">addDocument</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">List</span><span style="color: #212121">.</span><span style="color: #6F42C1">of</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">KeywordField(</span><span style="color: #22863A">&quot;id&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;first &quot;</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">+</span><span style="color: #6F42C1"> i</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">Field</span><span style="color: #212121">.</span><span style="color: #1976D2">Store</span><span style="color: #212121">.</span><span style="color: #1976D2">NO</span><span style="color: #6F42C1">)</span><span style="color: #212121">,</span></span>
 <span class="line" id="L91"><span style="color: #24292EFF">                        </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IntField(</span><span style="color: #22863A">&quot;val&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> i</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">Field</span><span style="color: #212121">.</span><span style="color: #1976D2">Store</span><span style="color: #212121">.</span><span style="color: #1976D2">NO</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">));</span></span>
 <span class="line" id="L92"><span style="color: #24292EFF">                </span><span style="color: #1976D2">writer</span><span style="color: #212121">.</span><span style="color: #6F42C1">addDocument</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">List</span><span style="color: #212121">.</span><span style="color: #6F42C1">of</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">KeywordField(</span><span style="color: #22863A">&quot;id&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;second &quot;</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">+</span><span style="color: #6F42C1"> i</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">Field</span><span style="color: #212121">.</span><span style="color: #1976D2">Store</span><span style="color: #212121">.</span><span style="color: #1976D2">NO</span><span style="color: #6F42C1">)</span><span style="color: #212121">,</span></span>
 <span class="line" id="L93"><span style="color: #24292EFF">                        </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IntField(</span><span style="color: #22863A">&quot;val&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> i</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">Field</span><span style="color: #212121">.</span><span style="color: #1976D2">Store</span><span style="color: #212121">.</span><span style="color: #1976D2">NO</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">));</span></span>
-<span class="line empty-line" id="L94"></span></code></pre>
-      
+<span class="line empty-line" id="L94"></span></code></pre></div>
+            
+        </li>
         
-        <p><em>Optional exercise:</em> Uncomment this flush block if you want to write the documents to 5 segments:</p>
+        
+        <li id="section-12">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-12">&#x00a7;</a>
+              </div>
+              <p><em>Optional exercise:</em> Uncomment this flush block if you want to write the documents to 5 segments:</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 97;"><span class="line" id="L97"><span style="color: #24292EFF">                </span><span style="color: #C2C3C5">/*</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 97;"><span class="line" id="L97"><span style="color: #24292EFF">                </span><span style="color: #C2C3C5">/*</span></span>
 <span class="line" id="L98"><span style="color: #C2C3C5">                if ((i + 1) % 2000 == 0) {</span></span>
 <span class="line" id="L99"><span style="color: #C2C3C5">                    writer.flush();</span></span>
 <span class="line" id="L100"><span style="color: #C2C3C5">                }</span></span>
 <span class="line" id="L101"><span style="color: #C2C3C5">                */</span></span>
 <span class="line" id="L102"><span style="color: #24292EFF">            }</span></span>
-<span class="line empty-line" id="L103"></span></code></pre>
-      
+<span class="line empty-line" id="L103"></span></code></pre></div>
+            
+        </li>
         
-        <h3 id="reading-the-point-tree">Reading the point tree</h3>
+        
+        <li id="section-13">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-13">&#x00a7;</a>
+              </div>
+              <h3 id="reading-the-point-tree">Reading the point tree</h3>
 
+            </div>
+            
+        </li>
         
-      
         
-        <p>Now we open a reader from the writer and iterate over the segments. (If the <code>flush</code> block above was left
+        <li id="section-14">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-14">&#x00a7;</a>
+              </div>
+              <p>Now we open a reader from the writer and iterate over the segments. (If the <code>flush</code> block above was left
 commented out, we have a single segment with all points. Otherwise, each segment has its own points.)</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 108;"><span class="line" id="L108"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">IndexReader</span><span style="color: #24292EFF"> reader </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">DirectoryReader</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(writer)) {</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 108;"><span class="line" id="L108"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">IndexReader</span><span style="color: #24292EFF"> reader </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">DirectoryReader</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(writer)) {</span></span>
 <span class="line" id="L109"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">LeafReaderContext</span><span style="color: #24292EFF"> lrc </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">reader</span><span style="color: #212121">.</span><span style="color: #6F42C1">leaves</span><span style="color: #24292EFF">()) {</span></span>
 <span class="line" id="L110"><span style="color: #24292EFF">                    </span><span style="color: #D32F2F">LeafReader</span><span style="color: #24292EFF"> lr </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">lrc</span><span style="color: #212121">.</span><span style="color: #6F42C1">reader</span><span style="color: #24292EFF">();</span></span>
 <span class="line" id="L111"><span style="color: #24292EFF">                    </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;Tree for segment &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">lrc</span><span style="color: #212121">.</span><span style="color: #1976D2">ord</span><span style="color: #24292EFF">);</span></span>
@@ -291,35 +392,73 @@ commented out, we have a single segment with all points. Otherwise, each segment
 <span class="line" id="L117"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> indexFile </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">listAll</span><span style="color: #24292EFF">(tmpDir)) {</span></span>
 <span class="line" id="L118"><span style="color: #24292EFF">                </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">deleteIfExists</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">tmpDir</span><span style="color: #212121">.</span><span style="color: #6F42C1">resolve</span><span style="color: #24292EFF">(indexFile));</span></span>
 <span class="line" id="L119"><span style="color: #24292EFF">            }</span></span>
-<span class="line empty-line" id="L120"></span></code></pre>
-      
+<span class="line empty-line" id="L120"></span></code></pre></div>
+            
+        </li>
         
-        <p>Then we delete the directory itself.</p>
+        
+        <li id="section-15">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-15">&#x00a7;</a>
+              </div>
+              <p>Then we delete the directory itself.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 121;"><span class="line" id="L121"><span style="color: #24292EFF">            </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">deleteIfExists</span><span style="color: #24292EFF">(tmpDir);</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 121;"><span class="line" id="L121"><span style="color: #24292EFF">            </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">deleteIfExists</span><span style="color: #24292EFF">(tmpDir);</span></span>
 <span class="line" id="L122"><span style="color: #24292EFF">        }</span></span>
 <span class="line" id="L123"><span style="color: #24292EFF">    }</span></span>
 <span class="line empty-line" id="L124"></span>
 <span class="line empty-line" id="L125"></span>
 <span class="line" id="L126"><span style="color: #24292EFF">}</span></span>
-<span class="line empty-line" id="L127"></span></code></pre>
-      
+<span class="line empty-line" id="L127"></span></code></pre></div>
+            
+        </li>
         
-        <h2 id="program-output">Program output</h2>
+        
+        <li id="section-16">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-16">&#x00a7;</a>
+              </div>
+              <h2 id="program-output">Program output</h2>
 
+            </div>
+            
+        </li>
         
-      
+        
+        <li id="section-17">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-17">&#x00a7;</a>
+              </div>
+              
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 129;"><span class="line" id="L129"><span style="color: #C2C3C5">/*</span></span>
+<span class="line empty-line" id="L130"></span></code></pre></div>
+            
+        </li>
         
         
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 129;"><span class="line" id="L129"><span style="color: #C2C3C5">/*</span></span>
-<span class="line empty-line" id="L130"></span></code></pre>
-      
-        
-        <p>This is the output of the program with a single segment. There are 20,000 documents across 10,000 distinct point
+        <li id="section-18">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-18">&#x00a7;</a>
+              </div>
+              <p>This is the output of the program with a single segment. There are 20,000 documents across 10,000 distinct point
 values (0 to 9999).</p>
 <p>Note that the leaf nodes all correspond to blocks of (up to) 512 documents.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 135;"><span class="line" id="L135"><span style="color: #D32F2F">Tree</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> segment </span><span style="color: #1976D2">0</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 135;"><span class="line" id="L135"><span style="color: #D32F2F">Tree</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> segment </span><span style="color: #1976D2">0</span></span>
 <span class="line" id="L136"><span style="color: #1976D2">0</span><span style="color: #24292EFF"> [</span><span style="color: #1976D2">0</span><span style="color: #212121">,</span><span style="color: #1976D2">9999</span><span style="color: #24292EFF">] </span><span style="color: #D32F2F">-</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">20000</span></span>
 <span class="line" id="L137"><span style="color: #24292EFF"> </span><span style="color: #1976D2">1</span><span style="color: #24292EFF">  [</span><span style="color: #1976D2">0</span><span style="color: #212121">,</span><span style="color: #1976D2">6144</span><span style="color: #24292EFF">] </span><span style="color: #D32F2F">-</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">12288</span></span>
 <span class="line" id="L138"><span style="color: #24292EFF">  </span><span style="color: #1976D2">2</span><span style="color: #24292EFF">   [</span><span style="color: #1976D2">0</span><span style="color: #212121">,</span><span style="color: #1976D2">4096</span><span style="color: #24292EFF">] </span><span style="color: #D32F2F">-</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">8192</span></span>
@@ -401,13 +540,23 @@ values (0 to 9999).</p>
 <span class="line" id="L214"><span style="color: #24292EFF">     </span><span style="color: #1976D2">5</span><span style="color: #24292EFF">      [</span><span style="color: #1976D2">9984</span><span style="color: #212121">,</span><span style="color: #1976D2">9999</span><span style="color: #24292EFF">] </span><span style="color: #D32F2F">-</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">32</span></span>
 <span class="line empty-line" id="L215"></span>
 <span class="line empty-line" id="L216"></span>
-<span class="line empty-line" id="L217"></span></code></pre>
-      
+<span class="line empty-line" id="L217"></span></code></pre></div>
+            
+        </li>
         
-        <p>This is the output with multiple segments (i.e. flush block uncommented). Each segment has 4000 documents distributed
+        
+        <li id="section-19">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-19">&#x00a7;</a>
+              </div>
+              <p>This is the output with multiple segments (i.e. flush block uncommented). Each segment has 4000 documents distributed
 across 2000 point values.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 220;"><span class="line" id="L220"><span style="color: #D32F2F">Tree</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> segment </span><span style="color: #1976D2">0</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 220;"><span class="line" id="L220"><span style="color: #D32F2F">Tree</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> segment </span><span style="color: #1976D2">0</span></span>
 <span class="line" id="L221"><span style="color: #1976D2">0</span><span style="color: #24292EFF"> [</span><span style="color: #1976D2">0</span><span style="color: #212121">,</span><span style="color: #1976D2">1999</span><span style="color: #24292EFF">] </span><span style="color: #D32F2F">-</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">4000</span></span>
 <span class="line" id="L222"><span style="color: #24292EFF"> </span><span style="color: #1976D2">1</span><span style="color: #24292EFF">  [</span><span style="color: #1976D2">0</span><span style="color: #212121">,</span><span style="color: #1976D2">1024</span><span style="color: #24292EFF">] </span><span style="color: #D32F2F">-</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">2048</span></span>
 <span class="line" id="L223"><span style="color: #24292EFF">  </span><span style="color: #1976D2">2</span><span style="color: #24292EFF">   [</span><span style="color: #1976D2">0</span><span style="color: #212121">,</span><span style="color: #1976D2">512</span><span style="color: #24292EFF">] </span><span style="color: #D32F2F">-</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">1024</span></span>
@@ -490,13 +639,23 @@ across 2000 point values.</p>
 <span class="line empty-line" id="L300"></span>
 <span class="line empty-line" id="L301"></span>
 <span class="line empty-line" id="L302"></span>
-<span class="line empty-line" id="L303"></span></code></pre>
-      
+<span class="line empty-line" id="L303"></span></code></pre></div>
+            
+        </li>
         
-        <p>Finally, here is the output if we modify the code to set <code>val</code> to 1 for every document. Notice that we still create
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="sswrap ">
+                <a class="ss" href="#section-20">&#x00a7;</a>
+              </div>
+              <p>Finally, here is the output if we modify the code to set <code>val</code> to 1 for every document. Notice that we still create
 the full binary tree structure with leaves of up to 512 documents, even though every node has the same bounds.</p>
 
-        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 307;"><span class="line" id="L307"><span style="color: #D32F2F">Tree</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> segment </span><span style="color: #1976D2">0</span></span>
+            </div>
+            
+            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 307;"><span class="line" id="L307"><span style="color: #D32F2F">Tree</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> segment </span><span style="color: #1976D2">0</span></span>
 <span class="line" id="L308"><span style="color: #1976D2">0</span><span style="color: #24292EFF"> [</span><span style="color: #1976D2">1</span><span style="color: #212121">,</span><span style="color: #1976D2">1</span><span style="color: #24292EFF">] </span><span style="color: #D32F2F">-</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">20000</span></span>
 <span class="line" id="L309"><span style="color: #24292EFF"> </span><span style="color: #1976D2">1</span><span style="color: #24292EFF">  [</span><span style="color: #1976D2">1</span><span style="color: #212121">,</span><span style="color: #1976D2">1</span><span style="color: #24292EFF">] </span><span style="color: #D32F2F">-</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">12288</span></span>
 <span class="line" id="L310"><span style="color: #24292EFF">  </span><span style="color: #1976D2">2</span><span style="color: #24292EFF">   [</span><span style="color: #1976D2">1</span><span style="color: #212121">,</span><span style="color: #1976D2">1</span><span style="color: #24292EFF">] </span><span style="color: #D32F2F">-</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">8192</span></span>
@@ -579,14 +738,11 @@ the full binary tree structure with leaves of up to 512 documents, even though e
 <span class="line" id="L387"><span style="color: #24292EFF"> </span><span style="color: #D32F2F">*/</span></span>
 <span class="line empty-line" id="L388"></span>
 <span class="line empty-line" id="L389"></span>
-<span class="line empty-line" id="L390"></span></code></pre>
-      
-    </div>
-    <footer>
-      <div>
-        Generated by <a href="https://github.com/mercmobily/docco">Docco</a>
-      </div>
-    </footer>
+<span class="line empty-line" id="L390"></span></code></pre></div>
+            
+        </li>
+        
+    </ul>
   </div>
 </body>
 </html>
