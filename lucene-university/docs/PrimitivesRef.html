@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>BytesRef (and other array references)</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="main">
+
+      <div class="header">
+        <h1>BytesRef (and other array references)</h1>
+
+        
+          <div class="toc">
+            <h3>Table of Contents</h3>
+            <ol>
+              
+                
+                <li>
+                  <a class="source" href="AnalyzerBasics.html">
+                    AnalyzerBasics.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BooleanQueryANDInternals.html">
+                    BooleanQueryANDInternals.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BooleanQueryIntro.html">
+                    BooleanQueryIntro.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BottomUpIndexReader.html">
+                    BottomUpIndexReader.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BytesRefHashExample.html">
+                    BytesRefHashExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="CombinedFieldQueryExample.html">
+                    CombinedFieldQueryExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DirectoryFileContents.html">
+                    DirectoryFileContents.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DocValuesSearchExample.html">
+                    DocValuesSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="FunctionQuerySearchExample.html">
+                    FunctionQuerySearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="KnnSearchExample.html">
+                    KnnSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="PointTreeRangeQuery.html">
+                    PointTreeRangeQuery.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="PrimitivesRef.html">
+                    PrimitivesRef.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SearchWithTermsEnum.html">
+                    SearchWithTermsEnum.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SimpleSearch.html">
+                    SimpleSearch.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="TextVectorSearchExample.html">
+                    TextVectorSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="VisualizePointTree.html">
+                    VisualizePointTree.java
+                  </a>
+                </li>
+              
+            </ol>
+          </div>
+        
+      </div>
+      
+        
+        <p>One of Lucene’s performance advantages is that it is very cautious about allocating memory, striving to reuse buffers
+where possible. While Java makes management of short-lived objects pretty lightweight, it’s even more lightweight
+to avoid allocating them altogether.</p>
+<p>To simplify the management of arrays used as buffers, Lucene provides some wrapper classes, like <code>BytesRef</code>,
+<code>CharsRef</code>, <code>IntsRef</code>, and <code>LongsRef</code>.</p>
+<p>This example will focus on <code>BytesRef</code>, which is the most widely used within the Lucene codebase.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 11;"><span class="line" id="L11"><span style="color: #D32F2F">package</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">foundations</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L12"></span>
+<span class="line" id="L13"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">ArrayUtil</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L14"></span>
+<span class="line" id="L15"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">io</span><span style="color: #212121">.</span><span style="color: #D32F2F">BufferedWriter</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L16"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">io</span><span style="color: #212121">.</span><span style="color: #D32F2F">IOException</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L17"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">io</span><span style="color: #212121">.</span><span style="color: #D32F2F">InputStream</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L18"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">nio</span><span style="color: #212121">.</span><span style="color: #D32F2F">file</span><span style="color: #212121">.</span><span style="color: #D32F2F">Files</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L19"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">nio</span><span style="color: #212121">.</span><span style="color: #D32F2F">file</span><span style="color: #212121">.</span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L20"></span>
+<span class="line" id="L21"><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">PrimitivesRef</span><span style="color: #24292EFF"> {</span></span>
+<span class="line empty-line" id="L22"></span>
+<span class="line empty-line" id="L23"></span>
+<span class="line empty-line" id="L24"></span></code></pre>
+      
+        
+        <p>Lucene’s <code>BytesRef</code> holds a reference to a byte array, a start offset into the byte array representing the
+start of the value of interest, and the length of the value of interest. Since we aim to reuse the buffer,
+the length of the value is often less than the length of the array, since the array may have previously
+held a larger value.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 28;"><span class="line" id="L28"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BytesRef</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L29"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">final</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">byte</span><span style="color: #24292EFF">[] EMPTY_BYTES </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">byte</span><span style="color: #24292EFF">[</span><span style="color: #1976D2">0</span><span style="color: #24292EFF">];</span></span>
+<span class="line" id="L30"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">byte</span><span style="color: #24292EFF">[] bytes;</span></span>
+<span class="line" id="L31"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> offset;</span></span>
+<span class="line" id="L32"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> length;</span></span>
+<span class="line empty-line" id="L33"></span>
+<span class="line" id="L34"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BytesRef</span><span style="color: #24292EFF">() {</span></span>
+<span class="line" id="L35"><span style="color: #24292EFF">            bytes </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> EMPTY_BYTES;</span></span>
+<span class="line" id="L36"><span style="color: #24292EFF">        }</span></span>
+<span class="line" id="L37"><span style="color: #24292EFF">    }</span></span>
+<span class="line empty-line" id="L38"></span>
+<span class="line empty-line" id="L39"></span></code></pre>
+      
+        
+        <p>Let’s use <code>BytesRef</code> to simulate tokenizing a text file into lines, and then splitting those lines into
+individual words. This is similar to the logic used to tokenize a text file.</p>
+<p>To start, let’s create a helper method that creates a text file. The content is taken from “A Book About Words”
+by G. F. Graham, published in 1869, copied from <a href="https://www.gutenberg.org/ebooks/55200">https://www.gutenberg.org/ebooks/55200</a>.</p>
+<p>Note that by using <code>Files#newBufferedWriter</code>, we guarantee that the resulting file is encoded with the UTF-8
+character set.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 47;"><span class="line" id="L47"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createTextFile()</span><span style="color: #24292EFF"> throws IOException {</span></span>
+<span class="line" id="L48"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF"> file </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">createTempFile</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;.txt&quot;</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L49"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">BufferedWriter</span><span style="color: #24292EFF"> writer </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">newBufferedWriter</span><span style="color: #24292EFF">(file)) {</span></span>
+<span class="line" id="L50"><span style="color: #24292EFF">            </span><span style="color: #1976D2">writer</span><span style="color: #212121">.</span><span style="color: #6F42C1">append</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;&quot;&quot;</span></span>
+<span class="line" id="L51"><span style="color: #22863A">                    What is meant by a Language? It is a collection of all the words,</span></span>
+<span class="line" id="L52"><span style="color: #22863A">                    phrases, grammatical forms, idioms, &amp;c., which are used by one</span></span>
+<span class="line" id="L53"><span style="color: #22863A">                    people. It is the outward expression of the tendencies, turn of</span></span>
+<span class="line" id="L54"><span style="color: #22863A">                    mind, and habits of thought of some one nation, and the best</span></span>
+<span class="line" id="L55"><span style="color: #22863A">                    criterion of their intellect and feelings. If this explanation be</span></span>
+<span class="line" id="L56"><span style="color: #22863A">                    admitted, it will naturally follow that the connection between a</span></span>
+<span class="line" id="L57"><span style="color: #22863A">                    people and their language is so close, that the one may be judged</span></span>
+<span class="line" id="L58"><span style="color: #22863A">                    of by the other; and that the language is a lasting monument of the</span></span>
+<span class="line" id="L59"><span style="color: #22863A">                    nature and character of the people.</span></span>
+<span class="line" id="L60"><span style="color: #22863A">                    </span></span>
+<span class="line" id="L61"><span style="color: #22863A">                    Every language, then, has its genius; forms of words, idioms, and</span></span>
+<span class="line" id="L62"><span style="color: #22863A">                    turns of expression peculiar to itself; by which, independently of</span></span>
+<span class="line" id="L63"><span style="color: #22863A">                    other differences, one nation may be distinguished from another.</span></span>
+<span class="line" id="L64"><span style="color: #22863A">                    This condition may be produced by various causes; such as soil,</span></span>
+<span class="line" id="L65"><span style="color: #22863A">                    climate, conquest, immigration, &amp;c. Out of the old Roman, or Latin,</span></span>
+<span class="line" id="L66"><span style="color: #22863A">                    there arose several modern languages of Europe; all known by the</span></span>
+<span class="line" id="L67"><span style="color: #22863A">                    generic name--Romance; viz. Italian, French, Provençal, Spanish,</span></span>
+<span class="line" id="L68"><span style="color: #22863A">                    and Portuguese. These may be called daughters of ancient Latin; and</span></span>
+<span class="line" id="L69"><span style="color: #22863A">                    the natives of all these countries down to the seventh century,</span></span>
+<span class="line" id="L70"><span style="color: #22863A">                    both spoke and wrote that language. But when the Scandinavian and</span></span>
+<span class="line" id="L71"><span style="color: #22863A">                    Germanic tribes invaded the West of Europe, the Latin was broken</span></span>
+<span class="line" id="L72"><span style="color: #22863A">                    up, and was succeeded by Italian, French, Spanish, &amp;c. The Latin</span></span>
+<span class="line" id="L73"><span style="color: #22863A">                    now became gradually more and more corrupt, and was, at length, in</span></span>
+<span class="line" id="L74"><span style="color: #22863A">                    each of these countries, wholly remodelled.</span></span>
+<span class="line" id="L75"><span style="color: #22863A">                    </span></span>
+<span class="line" id="L76"><span style="color: #22863A">                    History has been called ‘the study of the law of change;’ i.e. the</span></span>
+<span class="line" id="L77"><span style="color: #22863A">                    process by which human affairs are transferred from one condition</span></span>
+<span class="line" id="L78"><span style="color: #22863A">                    to another. The history of a language has naturally a close</span></span>
+<span class="line" id="L79"><span style="color: #22863A">                    analogy with political history; the chief difference being that</span></span>
+<span class="line" id="L80"><span style="color: #22863A">                    the materials of the latter are facts, events, and institutions;</span></span>
+<span class="line" id="L81"><span style="color: #22863A">                    whilst the former treats of words, forms, and constructions. Now,</span></span>
+<span class="line" id="L82"><span style="color: #22863A">                    in the same way as a nation never stands still, but is continually</span></span>
+<span class="line" id="L83"><span style="color: #22863A">                    undergoing a silent--perhaps imperceptible--transformation, so</span></span>
+<span class="line" id="L84"><span style="color: #22863A">                    it is with its language. This is proved both by experience and</span></span>
+<span class="line" id="L85"><span style="color: #22863A">                    reason. We need hardly say that the English of the present time</span></span>
+<span class="line" id="L86"><span style="color: #22863A">                    differ widely from the English of the fourteenth century; and we</span></span>
+<span class="line" id="L87"><span style="color: #22863A">                    may be quite sure that the language of this country, two or three</span></span>
+<span class="line" id="L88"><span style="color: #22863A">                    centuries hence, will be very different from what it is at present.</span></span>
+<span class="line" id="L89"><span style="color: #22863A">                    It would be impossible for a nation either to improve or decay, and</span></span>
+<span class="line" id="L90"><span style="color: #22863A">                    for its language at the same time to remain stationary. The one</span></span>
+<span class="line" id="L91"><span style="color: #22863A">                    being a reflex of the other, they must stand or fall together.</span></span>
+<span class="line" id="L92"><span style="color: #22863A">                    &quot;&quot;&quot;</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L93"><span style="color: #24292EFF">        }</span></span>
+<span class="line" id="L94"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> file;</span></span>
+<span class="line" id="L95"><span style="color: #24292EFF">    }</span></span>
+<span class="line empty-line" id="L96"></span>
+<span class="line" id="L97"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">main(</span><span style="color: #D32F2F">String</span><span style="color: #6F42C1">[] args)</span><span style="color: #24292EFF"> throws IOException {</span></span>
+<span class="line empty-line" id="L98"></span>
+<span class="line" id="L99"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF"> textFile </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createTextFile()</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L100"></span>
+<span class="line empty-line" id="L101"></span></code></pre>
+      
+        
+        <p>We allocate an initially-empty <code>BytesRef</code> for each line. We will dynamically resize it to accommodate
+the maximum size needed for a line. We also allocate a <code>BytesRef</code> that will provide a view over each word in
+each line. Note that the variable memory used by this program is given by the maximum size of
+<code>lineBytesRef.bytes</code>. Everything else operates within bytes of that same buffer.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 105;"><span class="line" id="L105"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">BytesRef</span><span style="color: #24292EFF"> lineBytesRef </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BytesRef()</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L106"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">BytesRef</span><span style="color: #24292EFF"> wordBytesRef </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BytesRef()</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L107"></span>
+<span class="line empty-line" id="L108"></span></code></pre>
+      
+        
+        <p>We open a basic Java <code>InputStream</code>, so that we can process the input file byte-by-byte.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 109;"><span class="line" id="L109"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">InputStream</span><span style="color: #24292EFF"> is </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">newInputStream</span><span style="color: #24292EFF">(textFile)) {</span></span>
+<span class="line empty-line" id="L110"></span></code></pre>
+      
+        
+        <p>The following loop will collect each line into <code>linesBytesRef</code>.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 111;"><span class="line" id="L111"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> linePos </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L112"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> nextByte;</span></span>
+<span class="line" id="L113"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">while</span><span style="color: #24292EFF"> ((nextByte </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">is</span><span style="color: #212121">.</span><span style="color: #6F42C1">read</span><span style="color: #24292EFF">()) </span><span style="color: #D32F2F">&gt;=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">) {</span></span>
+<span class="line empty-line" id="L114"></span></code></pre>
+      
+        
+        <p>Let’s consider the case where we’re not at the end of a line yet.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 115;"><span class="line" id="L115"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (nextByte </span><span style="color: #D32F2F">!=</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&#39;\n&#39;</span><span style="color: #24292EFF">) {</span></span>
+<span class="line empty-line" id="L116"></span></code></pre>
+      
+        
+        <p>If the current <code>lineBytesRef</code> is not large enough, we use Lucene’s <code>ArrayUtil#grow</code> helper
+method, which will allocate an exponentially-larger array and copy the existing contents.</p>
+<p>If we did not want to preserve the existing contents, we could use <code>ArrayUtil.growNoCopy</code>.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 120;"><span class="line" id="L120"><span style="color: #24292EFF">                    </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (linePos </span><span style="color: #D32F2F">==</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">lineBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">bytes</span><span style="color: #212121">.</span><span style="color: #1976D2">length</span><span style="color: #24292EFF">) {</span></span>
+<span class="line" id="L121"><span style="color: #24292EFF">                        </span><span style="color: #1976D2">lineBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">bytes</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">ArrayUtil</span><span style="color: #212121">.</span><span style="color: #6F42C1">grow</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">lineBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">bytes</span><span style="color: #212121">,</span><span style="color: #24292EFF"> linePos </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">1</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L122"><span style="color: #24292EFF">                    }</span></span>
+<span class="line empty-line" id="L123"></span></code></pre>
+      
+        
+        <p>Append the current character to the line.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 124;"><span class="line" id="L124"><span style="color: #24292EFF">                    </span><span style="color: #1976D2">lineBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">bytes</span><span style="color: #24292EFF">[linePos</span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">] </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">byte</span><span style="color: #24292EFF">) (nextByte </span><span style="color: #D32F2F">&amp;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0xFF</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L125"><span style="color: #24292EFF">                } </span><span style="color: #D32F2F">else</span><span style="color: #24292EFF"> {</span></span>
+<span class="line empty-line" id="L126"></span></code></pre>
+      
+        
+        <p>Finished the current line. We set the length to the current position.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 127;"><span class="line" id="L127"><span style="color: #24292EFF">                    </span><span style="color: #1976D2">lineBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">length</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> linePos;</span></span>
+<span class="line empty-line" id="L128"></span>
+<span class="line empty-line" id="L129"></span></code></pre>
+      
+        
+        <p>In the following method call, <code>wordsBytesRef</code> is just used as a reusable scratch variable
+that lets us filter over a subset of <code>lineBytesRef</code>.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 131;"><span class="line" id="L131"><span style="color: #24292EFF">                    </span><span style="color: #6F42C1">outputWords(lineBytesRef</span><span style="color: #212121">,</span><span style="color: #6F42C1"> wordBytesRef)</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L132"></span></code></pre>
+      
+        
+        <p>Reset linePos in preparation for the next line.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 133;"><span class="line" id="L133"><span style="color: #24292EFF">                    linePos </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L134"><span style="color: #24292EFF">                }</span></span>
+<span class="line" id="L135"><span style="color: #24292EFF">            }</span></span>
+<span class="line" id="L136"><span style="color: #24292EFF">        } </span><span style="color: #D32F2F">finally</span><span style="color: #24292EFF"> {</span></span>
+<span class="line empty-line" id="L137"></span></code></pre>
+      
+        
+        <p>Clean up the file when we’re done.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 138;"><span class="line" id="L138"><span style="color: #24292EFF">            </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">deleteIfExists</span><span style="color: #24292EFF">(textFile);</span></span>
+<span class="line" id="L139"><span style="color: #24292EFF">        }</span></span>
+<span class="line" id="L140"><span style="color: #24292EFF">    }</span></span>
+<span class="line empty-line" id="L141"></span>
+<span class="line empty-line" id="L142"></span></code></pre>
+      
+        
+        <p>The following helper method uses <code>wordsBytesRef</code> as a window over <code>lineBytesRef</code>. They share the same underlying
+byte array, but <code>wordsBytesRef</code> is updated to point to the starting offset and length of each word.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 144;"><span class="line" id="L144"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">outputWords(</span><span style="color: #D32F2F">BytesRef</span><span style="color: #6F42C1"> lineBytesRef</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">BytesRef</span><span style="color: #6F42C1"> wordBytesRef)</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L145"><span style="color: #24292EFF">        </span><span style="color: #1976D2">wordBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">offset</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">lineBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">offset</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L146"><span style="color: #24292EFF">        </span><span style="color: #1976D2">wordBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">bytes</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">lineBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">bytes</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L147"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">lineBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">offset</span><span style="color: #24292EFF">; i </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">lineBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">offset</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">lineBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">length</span><span style="color: #24292EFF">; </span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">i) {</span></span>
+<span class="line" id="L148"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (</span><span style="color: #1976D2">Character</span><span style="color: #212121">.</span><span style="color: #6F42C1">isWhitespace</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">wordBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">bytes</span><span style="color: #24292EFF">[i])) {</span></span>
+<span class="line empty-line" id="L149"></span></code></pre>
+      
+        
+        <p>Reached the end of a word. Update the length of the word, then output it.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 150;"><span class="line" id="L150"><span style="color: #24292EFF">                </span><span style="color: #1976D2">wordBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">length</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">-</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">wordBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">offset</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L151"><span style="color: #24292EFF">                </span><span style="color: #6F42C1">outputWord(wordBytesRef)</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L152"></span></code></pre>
+      
+        
+        <p>Update the word offset in preparation for the next word.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 153;"><span class="line" id="L153"><span style="color: #24292EFF">                </span><span style="color: #1976D2">wordBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">offset</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">1</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L154"><span style="color: #24292EFF">            }</span></span>
+<span class="line" id="L155"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L156"></span></code></pre>
+      
+        
+        <p>Output the last word from each line.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 157;"><span class="line" id="L157"><span style="color: #24292EFF">        </span><span style="color: #1976D2">wordBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">length</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">lineBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">length</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">lineBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">offset</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">-</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">wordBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">offset</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L158"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">outputWord(wordBytesRef)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L159"><span style="color: #24292EFF">    }</span></span>
+<span class="line empty-line" id="L160"></span>
+<span class="line" id="L161"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">outputWord(</span><span style="color: #D32F2F">BytesRef</span><span style="color: #6F42C1"> bytesRef)</span><span style="color: #24292EFF"> {</span></span>
+<span class="line empty-line" id="L162"></span></code></pre>
+      
+        
+        <p>Output each word character-by-character.</p>
+<p>Note that because the input above contains some UTF-8 multi-byte characters, we have three branches to
+handle 1-, 2-, and 3-byte characters. This logic is lifted from Lucene’s <code>UnicodeUtil#UTF8toUTF16</code> method,
+which is conveniently called from <code>BytesRef#utf8ToString</code>. (I skipped the 4-byte branch, since it’s
+complicated and not needed for this specific example.)</p>
+<p>In this case, I didn’t want to use <code>BytesRef#utf8ToString</code>, since the goal of this example is to avoid
+allocating any unnecessary extra objects, including the <code>String</code> objects returned by that method.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 171;"><span class="line" id="L171"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">bytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">offset</span><span style="color: #24292EFF">; i </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">bytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">offset</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">bytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">length</span><span style="color: #24292EFF">; </span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">i) {</span></span>
+<span class="line" id="L172"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> b </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">bytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">bytes</span><span style="color: #24292EFF">[i] </span><span style="color: #D32F2F">&amp;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0xff</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L173"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (b </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0xc0</span><span style="color: #24292EFF">) {</span></span>
+<span class="line" id="L174"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">assert</span><span style="color: #24292EFF"> b </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0x80</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L175"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">print</span><span style="color: #24292EFF">((</span><span style="color: #D32F2F">char</span><span style="color: #24292EFF">) b);</span></span>
+<span class="line" id="L176"><span style="color: #24292EFF">            } </span><span style="color: #D32F2F">else</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (b </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0xe0</span><span style="color: #24292EFF">) {</span></span>
+<span class="line" id="L177"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">char</span><span style="color: #24292EFF"> c  </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">char</span><span style="color: #24292EFF">) (((b </span><span style="color: #D32F2F">&amp;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0x1f</span><span style="color: #24292EFF">) </span><span style="color: #D32F2F">&lt;&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">6</span><span style="color: #24292EFF">) </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> (</span><span style="color: #1976D2">bytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">bytes</span><span style="color: #24292EFF">[</span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">i] </span><span style="color: #D32F2F">&amp;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0x3f</span><span style="color: #24292EFF">));</span></span>
+<span class="line" id="L178"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">print</span><span style="color: #24292EFF">(c);</span></span>
+<span class="line" id="L179"><span style="color: #24292EFF">            } </span><span style="color: #D32F2F">else</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (b </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0xf0</span><span style="color: #24292EFF">) {</span></span>
+<span class="line" id="L180"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">char</span><span style="color: #24292EFF"> c </span><span style="color: #D32F2F">=</span></span>
+<span class="line" id="L181"><span style="color: #24292EFF">                        (</span><span style="color: #D32F2F">char</span><span style="color: #24292EFF">) (((b </span><span style="color: #D32F2F">&amp;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0xf</span><span style="color: #24292EFF">) </span><span style="color: #D32F2F">&lt;&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">12</span><span style="color: #24292EFF">) </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> ((</span><span style="color: #1976D2">bytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">bytes</span><span style="color: #24292EFF">[i</span><span style="color: #D32F2F">+</span><span style="color: #1976D2">1</span><span style="color: #24292EFF">] </span><span style="color: #D32F2F">&amp;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0x3f</span><span style="color: #24292EFF">) </span><span style="color: #D32F2F">&lt;&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">6</span><span style="color: #24292EFF">) </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> (</span><span style="color: #1976D2">bytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">bytes</span><span style="color: #24292EFF">[i </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">2</span><span style="color: #24292EFF">] </span><span style="color: #D32F2F">&amp;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0x3f</span><span style="color: #24292EFF">));</span></span>
+<span class="line" id="L182"><span style="color: #24292EFF">                i </span><span style="color: #D32F2F">+=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">2</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L183"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">print</span><span style="color: #24292EFF">(c);</span></span>
+<span class="line" id="L184"><span style="color: #24292EFF">            } </span><span style="color: #D32F2F">else</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L185"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">throw</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IllegalArgumentException()</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L186"><span style="color: #24292EFF">            }</span></span>
+<span class="line" id="L187"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L188"></span></code></pre>
+      
+        
+        <p>Add a newline between words.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 189;"><span class="line" id="L189"><span style="color: #24292EFF">        </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">();</span></span>
+<span class="line" id="L190"><span style="color: #24292EFF">    }</span></span>
+<span class="line" id="L191"><span style="color: #24292EFF">}</span></span>
+<span class="line empty-line" id="L192"></span>
+<span class="line empty-line" id="L193"></span></code></pre>
+      
+    </div>
+    <footer>
+      <div>
+        Generated by <a href="https://github.com/mercmobily/docco">Docco</a>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

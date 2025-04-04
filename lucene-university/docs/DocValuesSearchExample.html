@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Doc values example</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="main">
+
+      <div class="header">
+        <h1>Doc values example</h1>
+
+        
+          <div class="toc">
+            <h3>Table of Contents</h3>
+            <ol>
+              
+                
+                <li>
+                  <a class="source" href="AnalyzerBasics.html">
+                    AnalyzerBasics.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BooleanQueryANDInternals.html">
+                    BooleanQueryANDInternals.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BooleanQueryIntro.html">
+                    BooleanQueryIntro.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BottomUpIndexReader.html">
+                    BottomUpIndexReader.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BytesRefHashExample.html">
+                    BytesRefHashExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="CombinedFieldQueryExample.html">
+                    CombinedFieldQueryExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DirectoryFileContents.html">
+                    DirectoryFileContents.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DocValuesSearchExample.html">
+                    DocValuesSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="FunctionQuerySearchExample.html">
+                    FunctionQuerySearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="KnnSearchExample.html">
+                    KnnSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="PointTreeRangeQuery.html">
+                    PointTreeRangeQuery.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="PrimitivesRef.html">
+                    PrimitivesRef.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SearchWithTermsEnum.html">
+                    SearchWithTermsEnum.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SimpleSearch.html">
+                    SimpleSearch.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="TextVectorSearchExample.html">
+                    TextVectorSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="VisualizePointTree.html">
+                    VisualizePointTree.java
+                  </a>
+                </li>
+              
+            </ol>
+          </div>
+        
+      </div>
+      
+        
+        <p>This example will cover the basics of the Apache Lucene doc values, including storing, querying and retrieving
+them (for the search hits).</p>
+<ol>
+<li><a href="https://www.elastic.co/guide/en/elasticsearch/reference/7.10/doc-values.html#doc-values">https://www.elastic.co/guide/en/elasticsearch/reference/7.10/doc-values.html#doc-values</a></li>
+<li><a href="https://www.elastic.co/blog/sparse-versus-dense-document-values-with-apache-lucene">https://www.elastic.co/blog/sparse-versus-dense-document-values-with-apache-lucene</a></li>
+</ol>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 9;"><span class="line" id="L9"><span style="color: #D32F2F">package</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">docvalues</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L10"></span>
+<span class="line" id="L11"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">basic</span><span style="color: #212121">.</span><span style="color: #D32F2F">SimpleSearch</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L12"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">Field</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L13"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">IntPoint</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L14"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">SortedNumericDocValuesField</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L15"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">StringField</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L16"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">*</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L17"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">*</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L18"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">SortField</span><span style="color: #212121">.</span><span style="color: #D32F2F">Type</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L19"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">store</span><span style="color: #212121">.</span><span style="color: #D32F2F">Directory</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L20"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">store</span><span style="color: #212121">.</span><span style="color: #D32F2F">FSDirectory</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L21"></span>
+<span class="line" id="L22"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">io</span><span style="color: #212121">.</span><span style="color: #D32F2F">IOException</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L23"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">nio</span><span style="color: #212121">.</span><span style="color: #D32F2F">file</span><span style="color: #212121">.</span><span style="color: #D32F2F">Files</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L24"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">nio</span><span style="color: #212121">.</span><span style="color: #D32F2F">file</span><span style="color: #212121">.</span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L25"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">ArrayList</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L26"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L27"></span>
+<span class="line" id="L28"><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">DocValuesSearchExample</span><span style="color: #24292EFF"> {</span></span>
+<span class="line empty-line" id="L29"></span>
+<span class="line empty-line" id="L30"></span></code></pre>
+      
+        
+        <h2 id="what-are-doc-values">What are doc values?</h2>
+
+        
+      
+        
+        <p>Doc values are Apache Lucene’s column-stride field value storage, that could be used to store, per document: </p>
+<ul>
+<li>numerics (single- or multi-valued)</li>
+<li>sorted keywords (single or multi-valued) </li>
+<li>binary data blobs</li>
+</ul>
+<p>Doc values are the on-disk data structure, built at document index time. They store the same values as the 
+document source but in a column-oriented fashion that is way more  efficient for sorting, custom scoring (FunctionScoreQuery)
+and aggregations and are quite fast to access at search time (only the  value for field in question needs to be decoded per hit).
+This is in contrast to Lucene’s stored document fields,  which store all field values for one document together 
+in a row-stride fashion, and are therefore relatively slow to access.</p>
+<h2 id="creating-documents">Creating Documents</h2>
+
+        
+      
+        
+        <p>We will create a list of documents, where each document has a single numeric field <code>order</code> of type INT.</p>
+<p>We use the <code>SortedNumericDocValuesField</code> type to indicate that it’s a numeric field with doc values that
+will be used for sorting.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 50;"><span class="line" id="L50"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">List&lt;List&lt;</span><span style="color: #24292EFF">IndexableField</span><span style="color: #D32F2F">&gt;&gt;</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createDocuments()</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L51"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">IndexableField</span><span style="color: #24292EFF">&gt;&gt; docs </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">ArrayList</span><span style="color: #24292EFF">&lt;&gt;();</span></span>
+<span class="line" id="L52"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">; i </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">30</span><span style="color: #24292EFF">; </span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">i) {</span></span>
+<span class="line empty-line" id="L53"></span></code></pre>
+      
+        
+        <h2 id="indexed-vs-stored-vs-docvalues-fields">Indexed vs Stored vs DocValues Fields</h2>
+
+        
+      
+        
+        <ul>
+<li>Indexed fields are organized by field -&gt; term -&gt; matching doc IDs -&gt; positions.</li>
+<li>Stored fields are organized by document -&gt; fields -&gt; values (row wide).</li>
+<li>Doc values are organized by field -&gt; specific doc -&gt; values (sorted, column wide).</li>
+</ul>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 59;"><span class="line" id="L59"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">IndexableField</span><span style="color: #24292EFF">&gt; doc </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">ArrayList</span><span style="color: #24292EFF">&lt;&gt;();</span></span>
+<span class="line" id="L60"><span style="color: #24292EFF">            </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">StringField(</span><span style="color: #22863A">&quot;id&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">Integer</span><span style="color: #212121">.</span><span style="color: #6F42C1">toString(i)</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">Field</span><span style="color: #212121">.</span><span style="color: #1976D2">Store</span><span style="color: #212121">.</span><span style="color: #1976D2">YES</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L61"><span style="color: #24292EFF">            </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IntPoint(</span><span style="color: #22863A">&quot;order&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> i)</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L62"><span style="color: #24292EFF">            </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">SortedNumericDocValuesField(</span><span style="color: #22863A">&quot;order&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> i)</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L63"><span style="color: #24292EFF">            </span><span style="color: #1976D2">docs</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(doc);</span></span>
+<span class="line" id="L64"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L65"></span>
+<span class="line" id="L66"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> docs;</span></span>
+<span class="line" id="L67"><span style="color: #24292EFF">    }</span></span>
+<span class="line empty-line" id="L68"></span>
+<span class="line empty-line" id="L69"></span></code></pre>
+      
+        
+        <h2 id="example-code">Example code</h2>
+
+        
+      
+        
+        
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 71;"><span class="line" id="L71"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">main(</span><span style="color: #D32F2F">String</span><span style="color: #6F42C1">[] args)</span><span style="color: #24292EFF"> throws IOException {</span></span>
+<span class="line empty-line" id="L72"></span></code></pre>
+      
+        
+        <p>We start by creating a temporary directory, wherever your JVM specifies its default <code>java.io.tmpdir</code>.
+This will hold the index files.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 74;"><span class="line" id="L74"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF"> tmpDir </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">createTempDirectory</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">SimpleSearch</span><span style="color: #212121">.</span><span style="color: #1976D2">class</span><span style="color: #212121">.</span><span style="color: #6F42C1">getSimpleName</span><span style="color: #24292EFF">());</span></span>
+<span class="line empty-line" id="L75"></span>
+<span class="line empty-line" id="L76"></span></code></pre>
+      
+        
+        <p>We “open” the file system directory as a Lucene <code>Directory</code>, then open an <code>IndexWriter</code> able to write to
+that directory.</p>
+<p>Lucene places and locks a <code>write.lock</code> file in the directory to make sure that other processes are not able
+to write to the directory while we hold the lock (as long as those other processes try to obtain the lock).</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 81;"><span class="line" id="L81"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">Directory</span><span style="color: #24292EFF"> directory </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(tmpDir);</span></span>
+<span class="line" id="L82"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">IndexWriter</span><span style="color: #24292EFF"> writer </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexWriter(directory</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> IndexWriterConfig())</span><span style="color: #24292EFF">) {</span></span>
+<span class="line empty-line" id="L83"></span></code></pre>
+      
+        
+        <p>Use our <code>createDocuments</code> helper function to create the documents and write them to the index.
+Since they are all written at once without calling <code>writer.flush()</code> in between, they get written
+contiguously in a single segment. We’ll cover segments in another lesson.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 86;"><span class="line" id="L86"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">IndexableField</span><span style="color: #24292EFF">&gt; doc </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createDocuments()</span><span style="color: #24292EFF">) {</span></span>
+<span class="line" id="L87"><span style="color: #24292EFF">                </span><span style="color: #1976D2">writer</span><span style="color: #212121">.</span><span style="color: #6F42C1">addDocument</span><span style="color: #24292EFF">(doc);</span></span>
+<span class="line" id="L88"><span style="color: #24292EFF">            }</span></span>
+<span class="line empty-line" id="L89"></span>
+<span class="line empty-line" id="L90"></span></code></pre>
+      
+        
+        <p>Open an <code>IndexReader</code> based on the <code>writer</code>. This causes <code>writer</code> to flush pending documents, so they
+can be read. Note that <code>reader</code> has a view of the index at this point in time.
+If we were to write more documents with <code>writer</code>, they would not be visible to <code>reader</code>.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 93;"><span class="line" id="L93"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">IndexReader</span><span style="color: #24292EFF"> reader </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">DirectoryReader</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(writer)) {</span></span>
+<span class="line empty-line" id="L94"></span></code></pre>
+      
+        
+        <p>An <code>IndexReader</code> is able to read the underlying structure of the index, but high-level searching
+requires an <code>IndexSearcher</code>. We’ll explore the low-level <code>IndexReader</code> operations in a later lesson.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 96;"><span class="line" id="L96"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">IndexSearcher</span><span style="color: #24292EFF"> searcher </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexSearcher(reader)</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L97"></span></code></pre>
+      
+        
+        <p>A field that both indexed as <code>IntPoint</code> and as <code>SortedNumericDocValuesField</code> with the same value.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 98;"><span class="line" id="L98"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">final</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">Query</span><span style="color: #24292EFF"> pointQuery </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">IntPoint</span><span style="color: #212121">.</span><span style="color: #6F42C1">newRangeQuery</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;order&quot;</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">5</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">18</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L99"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">final</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">Query</span><span style="color: #24292EFF"> dvQuery </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">SortedNumericDocValuesField</span><span style="color: #212121">.</span><span style="color: #6F42C1">newSlowRangeQuery</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;order&quot;</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">5</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">18</span><span style="color: #24292EFF">);</span></span>
+<span class="line empty-line" id="L100"></span></code></pre>
+      
+        
+        <p>A <code>IndexOrDocValuesQuery</code> is a query that uses either an index structure (points or terms) or doc values 
+in order to run a query, depending which one is more efficient.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 102;"><span class="line" id="L102"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">IndexOrDocValuesQuery</span><span style="color: #24292EFF"> indexOrDocValuesQuery </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexOrDocValuesQuery(pointQuery</span><span style="color: #212121">,</span><span style="color: #6F42C1"> dvQuery)</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L103"></span></code></pre>
+      
+        
+        <p>We ask <code>searcher</code> to run our <code>indexOrDocValuesQuery</code> and return the top 10 documents, sorted by <code>order</code>
+field in reverse order.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 105;"><span class="line" id="L105"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">TopDocs</span><span style="color: #24292EFF"> topDocs </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">searcher</span><span style="color: #212121">.</span><span style="color: #6F42C1">search</span><span style="color: #24292EFF">(indexOrDocValuesQuery</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">10</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">Sort(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> SortedNumericSortField(</span><span style="color: #22863A">&quot;order&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">Type</span><span style="color: #212121">.</span><span style="color: #1976D2">INT</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">true</span><span style="color: #6F42C1">))</span><span style="color: #24292EFF">);</span></span>
+<span class="line empty-line" id="L106"></span></code></pre>
+      
+        
+        <p>If our query had matched more than 10 documents, then <code>topDocs</code> would contain the top 10 documents,
+while <code>topDocs.totalHits</code> would have the total number of matching documents (or a lower bound on the
+total number of matching documents, if more than 1000 documents match).</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 109;"><span class="line" id="L109"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;Query &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> indexOrDocValuesQuery </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; matched &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">topDocs</span><span style="color: #212121">.</span><span style="color: #1976D2">totalHits</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; documents:&quot;</span><span style="color: #24292EFF">);</span></span>
+<span class="line empty-line" id="L110"></span></code></pre>
+      
+        
+        <p>The <code>topDocs</code> contains a list of <code>ScoreDoc</code>, which just have scores and Lucene-generated doc IDs.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 111;"><span class="line" id="L111"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">ScoreDoc</span><span style="color: #24292EFF"> scoreDoc </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">topDocs</span><span style="color: #212121">.</span><span style="color: #1976D2">scoreDocs</span><span style="color: #24292EFF">) {</span></span>
+<span class="line empty-line" id="L112"></span></code></pre>
+      
+        
+        <p>The access to doc values is possible through <code>LeafReader</code> and not individual document(s). The <code>DocValues</code> 
+class has a number of utility methods to access doc values. The <code>MultiDocValues</code> simplifies access to doc values
+a bit by using <code>IndexReader</code> directly, not individual  <code>LeafReader</code>s.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 115;"><span class="line" id="L115"><span style="color: #24292EFF">                    </span><span style="color: #D32F2F">final</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">SortedNumericDocValues</span><span style="color: #24292EFF"> sortedNumericDocValues </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">MultiDocValues</span><span style="color: #212121">.</span><span style="color: #6F42C1">getSortedNumericValues</span><span style="color: #24292EFF">(reader</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;order&quot;</span><span style="color: #24292EFF">);</span></span>
+<span class="line empty-line" id="L116"></span></code></pre>
+      
+        
+        <p>Extract the doc values for a field within specific document by advancing the iterator to the exact 
+document position.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 118;"><span class="line" id="L118"><span style="color: #24292EFF">                    </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (</span><span style="color: #1976D2">sortedNumericDocValues</span><span style="color: #212121">.</span><span style="color: #6F42C1">advanceExact</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">scoreDoc</span><span style="color: #212121">.</span><span style="color: #1976D2">doc</span><span style="color: #24292EFF">)) {</span></span>
+<span class="line" id="L119"><span style="color: #24292EFF">                        </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">print</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;Doc values for doc [&quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">scoreDoc</span><span style="color: #212121">.</span><span style="color: #1976D2">doc</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;]: &quot;</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L120"><span style="color: #24292EFF">                        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> count </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">; count </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">sortedNumericDocValues</span><span style="color: #212121">.</span><span style="color: #6F42C1">docValueCount</span><span style="color: #24292EFF">(); </span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">count) {</span></span>
+<span class="line" id="L121"><span style="color: #24292EFF">                            </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">print</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">sortedNumericDocValues</span><span style="color: #212121">.</span><span style="color: #6F42C1">nextValue</span><span style="color: #24292EFF">());</span></span>
+<span class="line" id="L122"><span style="color: #24292EFF">                        }</span></span>
+<span class="line" id="L123"><span style="color: #24292EFF">                        </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">();</span></span>
+<span class="line" id="L124"><span style="color: #24292EFF">                    }</span></span>
+<span class="line" id="L125"><span style="color: #24292EFF">                }</span></span>
+<span class="line" id="L126"><span style="color: #24292EFF">            }</span></span>
+<span class="line" id="L127"><span style="color: #24292EFF">        } </span><span style="color: #D32F2F">finally</span><span style="color: #24292EFF"> {</span></span>
+<span class="line empty-line" id="L128"></span></code></pre>
+      
+        
+        <h2 id="clean-up">Clean up</h2>
+
+        
+      
+        
+        <p>Before we finish the program, we delete each of the files in the directory.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 132;"><span class="line" id="L132"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> indexFile </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">listAll</span><span style="color: #24292EFF">(tmpDir)) {</span></span>
+<span class="line" id="L133"><span style="color: #24292EFF">                </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">deleteIfExists</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">tmpDir</span><span style="color: #212121">.</span><span style="color: #6F42C1">resolve</span><span style="color: #24292EFF">(indexFile));</span></span>
+<span class="line" id="L134"><span style="color: #24292EFF">            }</span></span>
+<span class="line empty-line" id="L135"></span></code></pre>
+      
+        
+        <p>Then we delete the directory itself.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 136;"><span class="line" id="L136"><span style="color: #24292EFF">            </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">deleteIfExists</span><span style="color: #24292EFF">(tmpDir);</span></span>
+<span class="line" id="L137"><span style="color: #24292EFF">            </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;cleanup completed&quot;</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L138"><span style="color: #24292EFF">        }</span></span>
+<span class="line" id="L139"><span style="color: #24292EFF">    }</span></span>
+<span class="line" id="L140"><span style="color: #24292EFF">}</span></span>
+<span class="line empty-line" id="L141"></span>
+<span class="line empty-line" id="L142"></span></code></pre>
+      
+    </div>
+    <footer>
+      <div>
+        Generated by <a href="https://github.com/mercmobily/docco">Docco</a>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

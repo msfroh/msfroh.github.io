@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>What is Lucene CombinedFieldQuery?</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="main">
+
+      <div class="header">
+        <h1>What is Lucene CombinedFieldQuery?</h1>
+
+        
+          <div class="toc">
+            <h3>Table of Contents</h3>
+            <ol>
+              
+                
+                <li>
+                  <a class="source" href="AnalyzerBasics.html">
+                    AnalyzerBasics.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BooleanQueryANDInternals.html">
+                    BooleanQueryANDInternals.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BooleanQueryIntro.html">
+                    BooleanQueryIntro.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BottomUpIndexReader.html">
+                    BottomUpIndexReader.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BytesRefHashExample.html">
+                    BytesRefHashExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="CombinedFieldQueryExample.html">
+                    CombinedFieldQueryExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DirectoryFileContents.html">
+                    DirectoryFileContents.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DocValuesSearchExample.html">
+                    DocValuesSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="FunctionQuerySearchExample.html">
+                    FunctionQuerySearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="KnnSearchExample.html">
+                    KnnSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="PointTreeRangeQuery.html">
+                    PointTreeRangeQuery.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="PrimitivesRef.html">
+                    PrimitivesRef.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SearchWithTermsEnum.html">
+                    SearchWithTermsEnum.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SimpleSearch.html">
+                    SimpleSearch.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="TextVectorSearchExample.html">
+                    TextVectorSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="VisualizePointTree.html">
+                    VisualizePointTree.java
+                  </a>
+                </li>
+              
+            </ol>
+          </div>
+        
+      </div>
+      
+        
+        <p>Lucene’s <code>CombinedFieldQuery</code> is a powerful query type that allows you to search across multiple fields as if they were
+a single field. It is particularly useful when you have multiple fields that contribute to the same conceptual aspect
+of a document, and you want to perform a search that considers all of them together.</p>
+<p>For example, if you have separate fields for the “title” and “description” of a document, you can use <code>CombinedFieldQuery</code>
+to treat them as a single searchable entity. Lucene will combine the term frequencies across all the fields when
+computing scores, providing a more holistic search experience.</p>
+<h2 id="key-features-of-combinedfieldquery">Key Features of CombinedFieldQuery:</h2>
+
+        
+      
+        
+        <ul>
+<li>The search engine tries to “combine” those fields to make sense of the whole query.</li>
+<li>When you have multiple fields that represent related data, like title, author, and description, and you want to treat them as one field during search.</li>
+<li>Simplifies complex multi-field queries by treating fields as a unified text source.</li>
+<li>Enhances relevance scoring by considering all specified fields in the context of the query.</li>
+<li>When users perform searches with terms that might appear in different fields but are conceptually related.</li>
+</ul>
+<p>In the following example, we demonstrate how to use <code>CombinedFieldQuery</code> to perform a search over the fields <code>author</code>, <code>title</code>, and <code>description</code>.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 21;"><span class="line" id="L21"><span style="color: #D32F2F">package</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">basic</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L22"></span>
+<span class="line" id="L23"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">analysis</span><span style="color: #212121">.</span><span style="color: #D32F2F">standard</span><span style="color: #212121">.</span><span style="color: #D32F2F">StandardAnalyzer</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L24"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">Document</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L25"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">Field</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L26"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">TextField</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L27"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">DirectoryReader</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L28"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexWriter</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L29"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexWriterConfig</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L30"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">Term</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L31"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">sandbox</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">CombinedFieldQuery</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L32"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">BooleanClause</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L33"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">BooleanQuery</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L34"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexSearcher</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L35"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">Query</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L36"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">ScoreDoc</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L37"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">TermQuery</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L38"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">TopDocs</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L39"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">store</span><span style="color: #212121">.</span><span style="color: #D32F2F">ByteBuffersDirectory</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L40"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">store</span><span style="color: #212121">.</span><span style="color: #D32F2F">Directory</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L41"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">BytesRef</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L42"></span>
+<span class="line" id="L43"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">io</span><span style="color: #212121">.</span><span style="color: #D32F2F">IOException</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L44"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L45"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">Locale</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L46"></span>
+<span class="line" id="L47"><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">CombinedFieldQueryExample</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L48"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">main</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF">[] args) </span><span style="color: #D32F2F">throws</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">Exception</span><span style="color: #24292EFF"> {</span></span>
+<span class="line empty-line" id="L49"></span></code></pre>
+      
+        
+        <h3 id="step-1-create-a-new-index">Step 1: Create a new index</h3>
+
+        
+      
+        
+        <p>In-memory ByteBuffersDirectory is used for indexing</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 51;"><span class="line" id="L51"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Directory</span><span style="color: #24292EFF"> directory </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">ByteBuffersDirectory()</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L52"></span>
+<span class="line empty-line" id="L53"></span></code></pre>
+      
+        
+        <p>Create the configuration for the index writer, using a standard analyzer</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 54;"><span class="line" id="L54"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">IndexWriterConfig</span><span style="color: #24292EFF"> config </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexWriterConfig(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> StandardAnalyzer())</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L55"></span>
+<span class="line empty-line" id="L56"></span></code></pre>
+      
+        
+        <p>Create an IndexWriter to add documents to the index</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 57;"><span class="line" id="L57"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">IndexWriter</span><span style="color: #24292EFF"> indexWriter </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexWriter(directory</span><span style="color: #212121">,</span><span style="color: #6F42C1"> config)</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L58"></span>
+<span class="line empty-line" id="L59"></span></code></pre>
+      
+        
+        <h3 id="step-2-add-documents-to-the-index">Step 2: Add documents to the index</h3>
+
+        
+      
+        
+        <p>Add sample documents with author (as a string), title, and description fields</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 61;"><span class="line" id="L61"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;J.K. Rowling&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">    </span><span style="color: #22863A">&quot;Harry Potter and the Philosopher&#39;s Stone&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">  </span><span style="color: #22863A">&quot;A young wizard embarks on a magical journey.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L62"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;J.R.R. Tolkien&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">   </span><span style="color: #22863A">&quot;The Hobbit: An Unexpected Journey&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">          </span><span style="color: #22863A">&quot;A hobbit sets off on an epic quest with a band of dwarves.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L63"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;George Orwell&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">     </span><span style="color: #22863A">&quot;Nineteen Eighty-Four&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">                       </span><span style="color: #22863A">&quot;A novel depicting a society under constant surveillance and control.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L64"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;F. Scott Fitzgerald&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;The Magnificent Gatsby&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">                    </span><span style="color: #22863A">&quot;A story of wealth, passion, and the American Dream.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L65"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;Harper Lee&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">        </span><span style="color: #22863A">&quot;To Kill a Mockingbird: A Story of Injustice&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;A narrative about racial inequality and moral awakening in the South.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L66"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;Jane Austen&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">       </span><span style="color: #22863A">&quot;Pride and Prejudice: Love and Class&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">       </span><span style="color: #22863A">&quot;A romantic tale that delves into themes of social class and relationships.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L67"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;Mark Twain&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">        </span><span style="color: #22863A">&quot;The Adventures of Huckleberry Finn&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">         </span><span style="color: #22863A">&quot;The escapades of a boy journeying down the Mississippi River.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L68"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;Agatha Christie&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">   </span><span style="color: #22863A">&quot;Murder on the Express Train&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">                </span><span style="color: #22863A">&quot;A mystery novel featuring the famous detective Hercule Poirot.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L69"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;Gabriel García Márquez&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;One Hundred Years of Solitude: A Family Saga&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;A generational saga of the Buendía family in the mythical town of Macondo.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L70"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;F. Scott Fitzgerald&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;This Side of Paradise: A Novel of Youth&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">  </span><span style="color: #22863A">&quot;A narrative exploring the life and romances of Amory Blaine.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L71"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;Khaled Hosseini&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">   </span><span style="color: #22863A">&quot;The Kite Runner: A Story of Redemption&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">     </span><span style="color: #22863A">&quot;A tale of friendship and forgiveness set against the backdrop of Afghanistan.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L72"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;George R.R. Martin&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;A Clash of Kings&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">                           </span><span style="color: #22863A">&quot;The second book in a fantasy series about the battle for the Iron Throne.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L73"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;Herman Melville&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">   </span><span style="color: #22863A">&quot;Moby Dick: The Whale&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">                       </span><span style="color: #22863A">&quot;The journey of Captain Ahab as he hunts the elusive white whale.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L74"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;C.S. Lewis&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">        </span><span style="color: #22863A">&quot;The Chronicles of Narnia: The Lion, the Witch, and the Wardrobe&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;A fantasy series about a magical land filled with adventure.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L75"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;J.D. Salinger&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">     </span><span style="color: #22863A">&quot;The Catcher in the Rye: A Teenage Tale&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">    </span><span style="color: #22863A">&quot;A story highlighting adolescent alienation and rebellion.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L76"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;Chinua Achebe&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">     </span><span style="color: #22863A">&quot;Things Fall Apart: A Tale of Tradition&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">     </span><span style="color: #22863A">&quot;A narrative examining the effects of colonialism on African culture.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L77"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;Ray Bradbury&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">      </span><span style="color: #22863A">&quot;Fahrenheit 451: A Future Without Books&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">     </span><span style="color: #22863A">&quot;A dystopian tale about a world where reading is forbidden.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L78"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;Virginia Woolf&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">    </span><span style="color: #22863A">&quot;Mrs. Dalloway: A Day in London&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">            </span><span style="color: #22863A">&quot;A narrative that portrays a woman&#39;s life and thoughts in post-war England.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L79"></span>
+<span class="line empty-line" id="L80"></span>
+<span class="line empty-line" id="L81"></span></code></pre>
+      
+        
+        <p>Close the IndexWriter after adding all documents</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 82;"><span class="line" id="L82"><span style="color: #24292EFF">        </span><span style="color: #1976D2">indexWriter</span><span style="color: #212121">.</span><span style="color: #6F42C1">close</span><span style="color: #24292EFF">();</span></span>
+<span class="line empty-line" id="L83"></span>
+<span class="line empty-line" id="L84"></span></code></pre>
+      
+        
+        <h3 id="step-3-search-the-index">Step 3: Search the index</h3>
+
+        
+      
+        
+        <p>Open a DirectoryReader to read the index</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 86;"><span class="line" id="L86"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">DirectoryReader</span><span style="color: #24292EFF"> reader </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">DirectoryReader</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(directory);</span></span>
+<span class="line empty-line" id="L87"></span>
+<span class="line empty-line" id="L88"></span></code></pre>
+      
+        
+        <p>Create an IndexSearcher to perform searches on the indexed data</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 89;"><span class="line" id="L89"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">IndexSearcher</span><span style="color: #24292EFF"> searcher </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexSearcher(reader)</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L90"></span>
+<span class="line empty-line" id="L91"></span></code></pre>
+      
+        
+        <h3 id="step-4-execute-different-types-of-queries">Step 4: Execute different types of queries</h3>
+
+        
+      
+        
+        <ol>
+<li>CombinedFieldQuery: Treats multiple fields as one and combines term frequencies</li>
+</ol>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 94;"><span class="line" id="L94"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">CombinedFieldQuery</span><span style="color: #212121">.</span><span style="color: #D32F2F">Builder</span><span style="color: #24292EFF"> combinedFieldQueryBuilder </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> CombinedFieldQuery</span><span style="color: #212121">.</span><span style="color: #6F42C1">Builder</span><span style="color: #24292EFF">();</span></span>
+<span class="line" id="L95"><span style="color: #24292EFF">        </span><span style="color: #1976D2">combinedFieldQueryBuilder</span><span style="color: #212121">.</span><span style="color: #6F42C1">addField</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;author&quot;</span><span style="color: #24292EFF">)</span><span style="color: #212121">.</span><span style="color: #6F42C1">addField</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;title&quot;</span><span style="color: #24292EFF">)</span><span style="color: #212121">.</span><span style="color: #6F42C1">addField</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;description&quot;</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L96"><span style="color: #24292EFF">        </span><span style="color: #1976D2">combinedFieldQueryBuilder</span><span style="color: #212121">.</span><span style="color: #6F42C1">addTerm</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BytesRef(</span><span style="color: #22863A">&quot;Rowling&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L97"><span style="color: #24292EFF">        </span><span style="color: #1976D2">combinedFieldQueryBuilder</span><span style="color: #212121">.</span><span style="color: #6F42C1">addTerm</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BytesRef(</span><span style="color: #22863A">&quot;Potter&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L98"><span style="color: #24292EFF">        </span><span style="color: #1976D2">combinedFieldQueryBuilder</span><span style="color: #212121">.</span><span style="color: #6F42C1">addTerm</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BytesRef(</span><span style="color: #22863A">&quot;magical&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L99"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Query</span><span style="color: #24292EFF"> combinedFieldQuery </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">combinedFieldQueryBuilder</span><span style="color: #212121">.</span><span style="color: #6F42C1">build</span><span style="color: #24292EFF">();</span></span>
+<span class="line empty-line" id="L100"></span>
+<span class="line empty-line" id="L101"></span></code></pre>
+      
+        
+        <ol start="2">
+<li>BooleanQuery: Separate queries for each field with OR (SHOULD) clauses</li>
+</ol>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 102;"><span class="line" id="L102"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">BooleanQuery</span><span style="color: #212121">.</span><span style="color: #D32F2F">Builder</span><span style="color: #24292EFF"> boolQueryBuilder </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> BooleanQuery</span><span style="color: #212121">.</span><span style="color: #6F42C1">Builder</span><span style="color: #24292EFF">();</span></span>
+<span class="line" id="L103"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> field </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">List</span><span style="color: #212121">.</span><span style="color: #6F42C1">of</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;author&quot;</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;title&quot;</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;description&quot;</span><span style="color: #24292EFF">)) {</span></span>
+<span class="line" id="L104"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> term </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">List</span><span style="color: #212121">.</span><span style="color: #6F42C1">of</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;Rowling&quot;</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;Potter&quot;</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;magical&quot;</span><span style="color: #24292EFF">)) {</span></span>
+<span class="line" id="L105"><span style="color: #24292EFF">                </span><span style="color: #1976D2">boolQueryBuilder</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(field</span><span style="color: #212121">,</span><span style="color: #6F42C1"> term))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">SHOULD</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L106"><span style="color: #24292EFF">            }</span></span>
+<span class="line" id="L107"><span style="color: #24292EFF">        }</span></span>
+<span class="line" id="L108"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">BooleanQuery</span><span style="color: #24292EFF"> boolQuery </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">boolQueryBuilder</span><span style="color: #212121">.</span><span style="color: #6F42C1">build</span><span style="color: #24292EFF">();</span></span>
+<span class="line empty-line" id="L109"></span>
+<span class="line empty-line" id="L110"></span></code></pre>
+      
+        
+        <ol start="3">
+<li>docCombinedFieldQuery: Querying the “combined_field” field where all terms are combined which should have the same result as CombinedFieldQuery</li>
+</ol>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 111;"><span class="line" id="L111"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">BooleanQuery</span><span style="color: #24292EFF"> docCombinedFieldQuery </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> BooleanQuery</span><span style="color: #212121">.</span><span style="color: #6F42C1">Builder</span><span style="color: #24292EFF">()</span></span>
+<span class="line" id="L112"><span style="color: #24292EFF">                </span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;combined_field&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;Rowling&quot;</span><span style="color: #6F42C1">))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">SHOULD</span><span style="color: #24292EFF">)</span></span>
+<span class="line" id="L113"><span style="color: #24292EFF">                </span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;combined_field&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;Potter&quot;</span><span style="color: #6F42C1">))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">SHOULD</span><span style="color: #24292EFF">)</span></span>
+<span class="line" id="L114"><span style="color: #24292EFF">                </span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;combined_field&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;magical&quot;</span><span style="color: #6F42C1">))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">SHOULD</span><span style="color: #24292EFF">)</span></span>
+<span class="line" id="L115"><span style="color: #24292EFF">                </span><span style="color: #212121">.</span><span style="color: #6F42C1">build</span><span style="color: #24292EFF">();</span></span>
+<span class="line empty-line" id="L116"></span>
+<span class="line empty-line" id="L117"></span></code></pre>
+      
+        
+        <h3 id="step-5-execute-and-print-results-for-each-query-type">Step 5: Execute and print results for each query type</h3>
+
+        
+      
+        
+        <h4 id="combinedfieldquery-results">CombinedFieldQuery Results:</h4>
+
+        
+      
+        
+        <p>Score: 0.98660445, Author: J.K. Rowling, Title: Harry Potter and the Philosopher’s Stone, Description: A young wizard embarks on a magical journey.
+Score: 0.8499142, Author: C.S. Lewis, Title: The Chronicles of Narnia: The Lion, the Witch, and the Wardrobe, Description: A fantasy series about a magical land filled with adventure.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 121;"><span class="line" id="L121"><span style="color: #24292EFF">        </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;### CombinedFieldQuery Results:&quot;</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L122"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">printResults(searcher</span><span style="color: #212121">,</span><span style="color: #6F42C1"> combinedFieldQuery)</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L123"></span>
+<span class="line empty-line" id="L124"></span></code></pre>
+      
+        
+        <h4 id="booleanquery-results">BooleanQuery Results:</h4>
+
+        
+      
+        
+        <p>Score: 1.0287321, Author: J.K. Rowling, Title: Harry Potter and the Philosopher’s Stone, Description: A young wizard embarks on a magical journey.
+Score: 0.9480082, Author: C.S. Lewis, Title: The Chronicles of Narnia: The Lion, the Witch, and the Wardrobe, Description: A fantasy series about a magical land filled with adventure.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 127;"><span class="line" id="L127"><span style="color: #24292EFF">        </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;\n### BooleanQuery Results:&quot;</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L128"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">printResults(searcher</span><span style="color: #212121">,</span><span style="color: #6F42C1"> boolQuery)</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L129"></span>
+<span class="line empty-line" id="L130"></span></code></pre>
+      
+        
+        <h4 id="doccombinedfieldquery-results">DocCombinedFieldQuery Results:</h4>
+
+        
+      
+        
+        <p>Score: 0.98660445, Author: J.K. Rowling, Title: Harry Potter and the Philosopher’s Stone, Description: A young wizard embarks on a magical journey.
+Score: 0.8499142, Author: C.S. Lewis, Title: The Chronicles of Narnia: The Lion, the Witch, and the Wardrobe, Description: A fantasy series about a magical land filled with adventure.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 133;"><span class="line" id="L133"><span style="color: #24292EFF">        </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;\n### DocCombinedFieldQuery Results:&quot;</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L134"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">printResults(searcher</span><span style="color: #212121">,</span><span style="color: #6F42C1"> docCombinedFieldQuery)</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L135"></span>
+<span class="line" id="L136"><span style="color: #24292EFF">        </span><span style="color: #1976D2">reader</span><span style="color: #212121">.</span><span style="color: #6F42C1">close</span><span style="color: #24292EFF">();</span></span>
+<span class="line" id="L137"><span style="color: #24292EFF">    }</span></span>
+<span class="line empty-line" id="L138"></span>
+<span class="line empty-line" id="L139"></span></code></pre>
+      
+        
+        <h3 id="helper-method-to-print-search-results">Helper method to print search results</h3>
+
+        
+      
+        
+        
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 140;"><span class="line" id="L140"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">printResults(</span><span style="color: #D32F2F">IndexSearcher</span><span style="color: #6F42C1"> searcher</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">Query</span><span style="color: #6F42C1"> query)</span><span style="color: #24292EFF"> throws IOException {</span></span>
+<span class="line" id="L141"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">TopDocs</span><span style="color: #24292EFF"> topDocs </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">searcher</span><span style="color: #212121">.</span><span style="color: #6F42C1">search</span><span style="color: #24292EFF">(query</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">10</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L142"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">ScoreDoc</span><span style="color: #24292EFF"> scoreDoc </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">topDocs</span><span style="color: #212121">.</span><span style="color: #1976D2">scoreDocs</span><span style="color: #24292EFF">) {</span></span>
+<span class="line" id="L143"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">Document</span><span style="color: #24292EFF"> doc </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">searcher</span><span style="color: #212121">.</span><span style="color: #6F42C1">storedFields</span><span style="color: #24292EFF">()</span><span style="color: #212121">.</span><span style="color: #6F42C1">document</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">scoreDoc</span><span style="color: #212121">.</span><span style="color: #1976D2">doc</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L144"><span style="color: #24292EFF">            </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;Score: &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">scoreDoc</span><span style="color: #212121">.</span><span style="color: #1976D2">score</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span></span>
+<span class="line" id="L145"><span style="color: #24292EFF">                    </span><span style="color: #22863A">&quot;, Author: &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">get</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;author&quot;</span><span style="color: #24292EFF">) </span><span style="color: #D32F2F">+</span></span>
+<span class="line" id="L146"><span style="color: #24292EFF">                    </span><span style="color: #22863A">&quot;, Title: &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">get</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;title&quot;</span><span style="color: #24292EFF">) </span><span style="color: #D32F2F">+</span></span>
+<span class="line" id="L147"><span style="color: #24292EFF">                    </span><span style="color: #22863A">&quot;, Description: &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">get</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;description&quot;</span><span style="color: #24292EFF">));</span></span>
+<span class="line" id="L148"><span style="color: #24292EFF">        }</span></span>
+<span class="line" id="L149"><span style="color: #24292EFF">    }</span></span>
+<span class="line empty-line" id="L150"></span>
+<span class="line empty-line" id="L151"></span></code></pre>
+      
+        
+        <h3 id="helper-method-to-add-a-document-to-the-index">Helper method to add a document to the index</h3>
+
+        
+      
+        
+        
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 152;"><span class="line" id="L152"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">addDocument(</span><span style="color: #D32F2F">IndexWriter</span><span style="color: #6F42C1"> indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">String</span><span style="color: #6F42C1"> author</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">String</span><span style="color: #6F42C1"> title</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">String</span><span style="color: #6F42C1"> description)</span><span style="color: #24292EFF"> throws IOException {</span></span>
+<span class="line empty-line" id="L153"></span></code></pre>
+      
+        
+        <p>Create a new document</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 154;"><span class="line" id="L154"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Document</span><span style="color: #24292EFF"> doc </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">Document()</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L155"></span></code></pre>
+      
+        
+        <p>Add the author field as a string (stored)</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 156;"><span class="line" id="L156"><span style="color: #24292EFF">        </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TextField(</span><span style="color: #22863A">&quot;author&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> author</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">Field</span><span style="color: #212121">.</span><span style="color: #1976D2">Store</span><span style="color: #212121">.</span><span style="color: #1976D2">YES</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">);</span></span>
+<span class="line empty-line" id="L157"></span></code></pre>
+      
+        
+        <p>Add the title field as a text field (stored)</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 158;"><span class="line" id="L158"><span style="color: #24292EFF">        </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TextField(</span><span style="color: #22863A">&quot;title&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> title</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">Field</span><span style="color: #212121">.</span><span style="color: #1976D2">Store</span><span style="color: #212121">.</span><span style="color: #1976D2">YES</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">);</span></span>
+<span class="line empty-line" id="L159"></span></code></pre>
+      
+        
+        <p>Add the description field as a text field (stored)</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 160;"><span class="line" id="L160"><span style="color: #24292EFF">        </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TextField(</span><span style="color: #22863A">&quot;description&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> description</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">Field</span><span style="color: #212121">.</span><span style="color: #1976D2">Store</span><span style="color: #212121">.</span><span style="color: #1976D2">YES</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">);</span></span>
+<span class="line empty-line" id="L161"></span></code></pre>
+      
+        
+        <p>Add combined_field in one field</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 162;"><span class="line" id="L162"><span style="color: #24292EFF">        </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TextField(</span><span style="color: #22863A">&quot;combined_field&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">String</span><span style="color: #212121">.</span><span style="color: #6F42C1">format(</span><span style="color: #1976D2">Locale</span><span style="color: #212121">.</span><span style="color: #1976D2">ROOT</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;%s %s %s&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> author</span><span style="color: #212121">,</span><span style="color: #6F42C1"> title</span><span style="color: #212121">,</span><span style="color: #6F42C1"> description)</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">Field</span><span style="color: #212121">.</span><span style="color: #1976D2">Store</span><span style="color: #212121">.</span><span style="color: #1976D2">YES</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">);</span></span>
+<span class="line empty-line" id="L163"></span></code></pre>
+      
+        
+        <p>Add the document to the index</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 164;"><span class="line" id="L164"><span style="color: #24292EFF">        </span><span style="color: #1976D2">indexWriter</span><span style="color: #212121">.</span><span style="color: #6F42C1">addDocument</span><span style="color: #24292EFF">(doc);</span></span>
+<span class="line" id="L165"><span style="color: #24292EFF">    }</span></span>
+<span class="line" id="L166"><span style="color: #24292EFF">}</span></span>
+<span class="line empty-line" id="L167"></span>
+<span class="line empty-line" id="L168"></span></code></pre>
+      
+    </div>
+    <footer>
+      <div>
+        Generated by <a href="https://github.com/mercmobily/docco">Docco</a>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

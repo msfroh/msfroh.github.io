@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>BytesRefHash example</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="main">
+
+      <div class="header">
+        <h1>BytesRefHash example</h1>
+
+        
+          <div class="toc">
+            <h3>Table of Contents</h3>
+            <ol>
+              
+                
+                <li>
+                  <a class="source" href="AnalyzerBasics.html">
+                    AnalyzerBasics.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BooleanQueryANDInternals.html">
+                    BooleanQueryANDInternals.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BooleanQueryIntro.html">
+                    BooleanQueryIntro.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BottomUpIndexReader.html">
+                    BottomUpIndexReader.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BytesRefHashExample.html">
+                    BytesRefHashExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="CombinedFieldQueryExample.html">
+                    CombinedFieldQueryExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DirectoryFileContents.html">
+                    DirectoryFileContents.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DocValuesSearchExample.html">
+                    DocValuesSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="FunctionQuerySearchExample.html">
+                    FunctionQuerySearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="KnnSearchExample.html">
+                    KnnSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="PointTreeRangeQuery.html">
+                    PointTreeRangeQuery.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="PrimitivesRef.html">
+                    PrimitivesRef.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SearchWithTermsEnum.html">
+                    SearchWithTermsEnum.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SimpleSearch.html">
+                    SimpleSearch.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="TextVectorSearchExample.html">
+                    TextVectorSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="VisualizePointTree.html">
+                    VisualizePointTree.java
+                  </a>
+                </li>
+              
+            </ol>
+          </div>
+        
+      </div>
+      
+        
+        <p>Building on the previous example in <code>PrimitivesRef</code>, which introduced the Lucene <code>BytesRef</code> class, this example
+dives into <code>BytesRefHash</code>, a highly-optimized data structure for storing and sorting distinct <code>BytesRef</code> instances.
+A <code>BytesRefHash</code> operates like a <code>HashSet</code></p>
+<p>The internal structure of <code>BytesRefHash</code> is fairly simple. It includes:</p>
+<ul>
+<li><code>count</code>: an <code>int</code> that serves as an auto-incrementing ID generator (starting at zero) and counter for the number of elements,</li>
+<li><code>ids</code>: an <code>int[]</code> acting as a hash map from values to their auto-incrementing IDs, with <code>-1</code> indicating an empty slot,</li>
+<li><code>byteStart</code>: an <code>int[]</code> array from IDs to starting byte offsets in a large byte buffer, and</li>
+<li><code>pool</code> : a large, chunked byte buffer that holds the actual <code>BytesRef</code> values, with their length encoded as a prefix.</li>
+</ul>
+<p>The basic flow for inserting into a <code>BytesRefHash</code> (within the <code>add(BytesRef)</code> method) is as follows:</p>
+<ol>
+<li>Compute the hash code of the input <code>BytesRef</code>, modulo the size of <code>ids</code>, as a possible insert position.<ol>
+<li>If there is an entry at the given position in <code>ids</code>, check if it is the current <code>BytesRef</code>. The check works
+by comparing against the value in <code>pool</code> starting at <code>byteStart[ids[position]]</code>.</li>
+<li>If the existing entry <strong>is not</strong> the current <code>BytesRef</code>, then check the next position.</li>
+<li>Keep checking consecutive positions until you either find the value being inserted or an empty slot.</li>
+</ol>
+</li>
+<li>Check the value of <code>ids</code> at the returned position.<ol>
+<li>If it’s not <code>-1</code>, then we must already have the current value. Nothing to do. Return</li>
+<li>Otherwise, we need to insert the value. Continue.</li>
+</ol>
+</li>
+<li>Write the current value of <code>counter</code> to <code>ids[position]</code>. This maps from the hash bucket to the numeric ID.</li>
+<li>Append the new value to <code>pool</code>, saving the start offset in <code>byteStart[counter]</code>.</li>
+<li>Increment <code>counter</code> in preparation for the next value.</li>
+</ol>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 29;"><span class="line" id="L29"><span style="color: #D32F2F">package</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">foundations</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L30"></span>
+<span class="line" id="L31"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">ArrayUtil</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L32"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">BytesRef</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L33"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">BytesRefHash</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L34"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">UnicodeUtil</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L35"></span>
+<span class="line" id="L36"><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BytesRefHashExample</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L37"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">main</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF">[] args) {</span></span>
+<span class="line" id="L38"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">BytesRefHash</span><span style="color: #24292EFF"> bytesRefHash </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BytesRefHash()</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L39"></span></code></pre>
+      
+        
+        <h2 id="insertion-into-a-bytesrefhash">Insertion into a BytesRefHash</h2>
+
+        
+      
+        
+        <p>The basic flow for inserting into a <code>BytesRefHash</code> (within the <code>add(BytesRef)</code> method) is as follows:</p>
+<ol>
+<li>Compute the hash code of the input <code>BytesRef</code>, modulo the size of <code>ids</code>, as a possible insert position.<ol>
+<li>If there is an entry at the given position in <code>ids</code>, check if it is the current <code>BytesRef</code>. The check works
+by comparing against the value in <code>pool</code> starting at <code>byteStart[ids[position]]</code>.</li>
+<li>If the existing entry <strong>is not</strong> the current <code>BytesRef</code>, then check the next position.</li>
+<li>Keep checking consecutive positions until you either find the value being inserted or an empty slot.</li>
+</ol>
+</li>
+<li>Check the value of <code>ids</code> at the returned position.<ol>
+<li>If it’s not <code>-1</code>, then we must already have the current value. Nothing to do. Return</li>
+<li>Otherwise, we need to insert the value. Continue.</li>
+</ol>
+</li>
+<li>Write the current value of <code>counter</code> to <code>ids[position]</code>. This maps from the hash bucket to the numeric ID.</li>
+<li>Append the new value to <code>pool</code>, saving the start offset in <code>byteStart[counter]</code>.</li>
+<li>Increment <code>counter</code> in preparation for the next value.</li>
+</ol>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 55;"><span class="line" id="L55"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">BytesRef</span><span style="color: #24292EFF"> bytesRef </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BytesRef(</span><span style="color: #22863A">&quot;foo&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L56"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> id </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">bytesRefHash</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(bytesRef);</span></span>
+<span class="line empty-line" id="L57"></span></code></pre>
+      
+        
+        <p>Position will be greater than zero, because we inserted a new value.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 58;"><span class="line" id="L58"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">assert</span><span style="color: #24292EFF"> id </span><span style="color: #D32F2F">&gt;=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L59"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">setBytesRefValue(bytesRef</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;bar&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L60"></span></code></pre>
+      
+        
+        <p>Position will be greater than zero, because we inserted a new value.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 61;"><span class="line" id="L61"><span style="color: #24292EFF">        id </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">bytesRefHash</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(bytesRef);</span></span>
+<span class="line" id="L62"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">assert</span><span style="color: #24292EFF"> id </span><span style="color: #D32F2F">&gt;=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L63"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">setBytesRefValue(bytesRef</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;foo&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L64"><span style="color: #24292EFF">        id </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">bytesRefHash</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(bytesRef);</span></span>
+<span class="line empty-line" id="L65"></span></code></pre>
+      
+        
+        <p>Position will be negative, because we’ve seen this value before.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 66;"><span class="line" id="L66"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">assert</span><span style="color: #24292EFF"> id </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L67"></span>
+<span class="line empty-line" id="L68"></span></code></pre>
+      
+        
+        <p>Let’s add a bunch of values to the <code>BytesRefHash</code>:</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 69;"><span class="line" id="L69"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> word </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;One point to be observed in the nature and history of words is their tendency to contract in form and degenerate in meaning.&quot;</span><span style="color: #212121">.</span><span style="color: #6F42C1">split</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot; &quot;</span><span style="color: #24292EFF">)) {</span></span>
+<span class="line" id="L70"><span style="color: #24292EFF">            </span><span style="color: #6F42C1">setBytesRefValue(bytesRef</span><span style="color: #212121">,</span><span style="color: #6F42C1"> word)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L71"><span style="color: #24292EFF">            </span><span style="color: #1976D2">bytesRefHash</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(bytesRef);</span></span>
+<span class="line" id="L72"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L73"></span>
+<span class="line empty-line" id="L74"></span></code></pre>
+      
+        
+        <h2 id="reading-values">Reading values</h2>
+
+        
+      
+        
+        <p>The values in a <code>BytesRefHash</code> are assigned IDs sequentially from 0 (inclusive) to <code>bytesRefHash.size()</code> (exclusive).
+Since a <code>BytesRef</code> is intended to be reused, we can use the same <code>BytesRef</code> instance to access values from
+a <code>BytesRefHash</code>. Note, though, that the <code>BytesRef</code> is updated to point into the backing <code>pool</code> of the <code>BytesRefHash</code>,
+so we must not modify the returned <code>bytes</code> array.</p>
+<p>The <code>get()</code> method does not do a hash table lookup, as it only needs to know the starting offset for each
+value, which it gets from the internal <code>byteStart</code> array.</p>
+<p>The following will return values in the order that they were added to the <code>BytesRefHash</code> (without duplicates).</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 85;"><span class="line" id="L85"><span style="color: #24292EFF">        </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;---- Insertion-ordered values ----&quot;</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L86"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">; i </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">bytesRefHash</span><span style="color: #212121">.</span><span style="color: #6F42C1">size</span><span style="color: #24292EFF">(); </span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">i) {</span></span>
+<span class="line" id="L87"><span style="color: #24292EFF">            </span><span style="color: #1976D2">bytesRefHash</span><span style="color: #212121">.</span><span style="color: #6F42C1">get</span><span style="color: #24292EFF">(i</span><span style="color: #212121">,</span><span style="color: #24292EFF"> bytesRef);</span></span>
+<span class="line" id="L88"><span style="color: #24292EFF">            </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(i </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; -&gt; &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">bytesRef</span><span style="color: #212121">.</span><span style="color: #6F42C1">utf8ToString</span><span style="color: #24292EFF">());</span></span>
+<span class="line" id="L89"><span style="color: #24292EFF">        }</span></span>
+<span class="line" id="L90"><span style="color: #24292EFF">        </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">();</span></span>
+<span class="line empty-line" id="L91"></span>
+<span class="line empty-line" id="L92"></span></code></pre>
+      
+        
+        <h2 id="destructive-operations">Destructive operations</h2>
+
+        
+      
+        
+        <p>There are two “destructive” operations on <code>BytesRefHash</code>, so named because they discard the structure of the
+<code>ids</code> hash table.</p>
+<p>The first is <code>compact()</code>, which moves all <code>ids</code> values to the beginning of the table and
+returns them. Note that the returned array is the size of the full hash table, with the <code>-1</code> entries pushed
+to the end, so we must take care to only iterate over the first <code>bytesRefHash.size()</code> entries.
+The following outputs the set of inserted values in seemingly random (hash) order.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 101;"><span class="line" id="L101"><span style="color: #24292EFF">        </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;---- Hash-ordered values ----&quot;</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L102"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF">[] ids </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">bytesRefHash</span><span style="color: #212121">.</span><span style="color: #6F42C1">compact</span><span style="color: #24292EFF">();</span></span>
+<span class="line" id="L103"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">; i </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">bytesRefHash</span><span style="color: #212121">.</span><span style="color: #6F42C1">size</span><span style="color: #24292EFF">(); i</span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">) {</span></span>
+<span class="line" id="L104"><span style="color: #24292EFF">            </span><span style="color: #1976D2">bytesRefHash</span><span style="color: #212121">.</span><span style="color: #6F42C1">get</span><span style="color: #24292EFF">(ids[i]</span><span style="color: #212121">,</span><span style="color: #24292EFF"> bytesRef);</span></span>
+<span class="line" id="L105"><span style="color: #24292EFF">            </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(ids[i] </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; -&gt; &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">bytesRef</span><span style="color: #212121">.</span><span style="color: #6F42C1">utf8ToString</span><span style="color: #24292EFF">());</span></span>
+<span class="line" id="L106"><span style="color: #24292EFF">        }</span></span>
+<span class="line" id="L107"><span style="color: #24292EFF">        </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">();</span></span>
+<span class="line empty-line" id="L108"></span></code></pre>
+      
+        
+        <p>The <code>compact()</code> method on its own is not used anywhere in Lucene outside of the <code>sort()</code> method, described
+next. The <code>compact()</code> method should probably be made <code>private</code>.</p>
+<p>The second destructive operation is <code>sort()</code>. Part of why it is destructive is that it relies on compact().
+The output of <code>sort()</code> is also an array of ids, but instead of appearing in hash order, they are in lexicographic
+order of the corresponding values.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 114;"><span class="line" id="L114"><span style="color: #24292EFF">        </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;---- Sorted values ----&quot;</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L115"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF">[] sortedIds </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">bytesRefHash</span><span style="color: #212121">.</span><span style="color: #6F42C1">sort</span><span style="color: #24292EFF">();</span></span>
+<span class="line" id="L116"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">; i </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">bytesRefHash</span><span style="color: #212121">.</span><span style="color: #6F42C1">size</span><span style="color: #24292EFF">(); i</span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">) {</span></span>
+<span class="line" id="L117"><span style="color: #24292EFF">            </span><span style="color: #1976D2">bytesRefHash</span><span style="color: #212121">.</span><span style="color: #6F42C1">get</span><span style="color: #24292EFF">(sortedIds[i]</span><span style="color: #212121">,</span><span style="color: #24292EFF"> bytesRef);</span></span>
+<span class="line" id="L118"><span style="color: #24292EFF">            </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(sortedIds[i] </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; -&gt; &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">bytesRef</span><span style="color: #212121">.</span><span style="color: #6F42C1">utf8ToString</span><span style="color: #24292EFF">());</span></span>
+<span class="line" id="L119"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L120"></span>
+<span class="line empty-line" id="L121"></span></code></pre>
+      
+        
+        <p>The <code>sort()</code> method is used to produce a sorted set of unique values. This is how Lucene builds
+<code>SortedSetDocValues</code> (via <code>SortedSetDocValuesWriter</code>), as well as the term dictionary used during
+an index writer flush (via <code>TermsHashPerField</code> and its subclasses). This deduplicating and sorting
+behavior is key to the construction of a search index.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 125;"><span class="line" id="L125"><span style="color: #24292EFF">    }</span></span>
+<span class="line empty-line" id="L126"></span>
+<span class="line empty-line" id="L127"></span></code></pre>
+      
+        
+        <p>The following is a helper function to load string values into a (reusable) <code>BytesRef</code> instance.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 128;"><span class="line" id="L128"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">setBytesRefValue(</span><span style="color: #D32F2F">BytesRef</span><span style="color: #6F42C1"> bytesRef</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">String</span><span style="color: #6F42C1"> value)</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L129"><span style="color: #24292EFF">        </span><span style="color: #1976D2">bytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">bytes</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">ArrayUtil</span><span style="color: #212121">.</span><span style="color: #6F42C1">growNoCopy</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">bytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">bytes</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">UnicodeUtil</span><span style="color: #212121">.</span><span style="color: #6F42C1">maxUTF8Length</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">value</span><span style="color: #212121">.</span><span style="color: #6F42C1">length</span><span style="color: #24292EFF">()));</span></span>
+<span class="line" id="L130"><span style="color: #24292EFF">        </span><span style="color: #1976D2">bytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">offset</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L131"><span style="color: #24292EFF">        </span><span style="color: #1976D2">bytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">length</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">UnicodeUtil</span><span style="color: #212121">.</span><span style="color: #6F42C1">UTF16toUTF8</span><span style="color: #24292EFF">(value</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">value</span><span style="color: #212121">.</span><span style="color: #6F42C1">length</span><span style="color: #24292EFF">()</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">bytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">bytes</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L132"><span style="color: #24292EFF">    }</span></span>
+<span class="line" id="L133"><span style="color: #24292EFF">}</span></span>
+<span class="line empty-line" id="L134"></span>
+<span class="line empty-line" id="L135"></span></code></pre>
+      
+    </div>
+    <footer>
+      <div>
+        Generated by <a href="https://github.com/mercmobily/docco">Docco</a>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

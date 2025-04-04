@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Text Vector Search Example</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="main">
+
+      <div class="header">
+        <h1>Text Vector Search Example</h1>
+
+        
+          <div class="toc">
+            <h3>Table of Contents</h3>
+            <ol>
+              
+                
+                <li>
+                  <a class="source" href="AnalyzerBasics.html">
+                    AnalyzerBasics.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BooleanQueryANDInternals.html">
+                    BooleanQueryANDInternals.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BooleanQueryIntro.html">
+                    BooleanQueryIntro.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BottomUpIndexReader.html">
+                    BottomUpIndexReader.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BytesRefHashExample.html">
+                    BytesRefHashExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="CombinedFieldQueryExample.html">
+                    CombinedFieldQueryExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DirectoryFileContents.html">
+                    DirectoryFileContents.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DocValuesSearchExample.html">
+                    DocValuesSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="FunctionQuerySearchExample.html">
+                    FunctionQuerySearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="KnnSearchExample.html">
+                    KnnSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="PointTreeRangeQuery.html">
+                    PointTreeRangeQuery.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="PrimitivesRef.html">
+                    PrimitivesRef.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SearchWithTermsEnum.html">
+                    SearchWithTermsEnum.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SimpleSearch.html">
+                    SimpleSearch.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="TextVectorSearchExample.html">
+                    TextVectorSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="VisualizePointTree.html">
+                    VisualizePointTree.java
+                  </a>
+                </li>
+              
+            </ol>
+          </div>
+        
+      </div>
+      
+        
+        <p>This example demonstrates how to use Lucene to index documents with textual content
+and perform a <code>KNN</code> (k-nearest neighbors) search using vector representations of the text.</p>
+<p>The example includes the following steps:</p>
+<ol>
+<li>Create and index documents with textual content and vector fields.</li>
+<li>Convert text into vectors (using a hypothetical method).</li>
+<li>Perform a <code>KNN</code> search using a query vector.</li>
+<li>Retrieve and display the top matching documents based on the <code>KNN</code> search.</li>
+</ol>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 12;"><span class="line" id="L12"><span style="color: #D32F2F">package</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">advanced</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L13"></span>
+<span class="line" id="L14"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">Document</span><span style="color: #24292EFF">;  </span><span style="color: #C2C3C5">// For creating and manipulating Lucene documents</span></span>
+<span class="line" id="L15"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">Field</span><span style="color: #24292EFF">;  </span><span style="color: #C2C3C5">// Base class for all fields in a Lucene document</span></span>
+<span class="line" id="L16"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">TextField</span><span style="color: #24292EFF">;  </span><span style="color: #C2C3C5">// For indexing and storing textual content</span></span>
+<span class="line" id="L17"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">KnnFloatVectorField</span><span style="color: #24292EFF">;  </span><span style="color: #C2C3C5">// For storing and indexing float vectors for `KNN` searches</span></span>
+<span class="line" id="L18"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">DirectoryReader</span><span style="color: #24292EFF">;  </span><span style="color: #C2C3C5">// For reading an index</span></span>
+<span class="line" id="L19"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexWriter</span><span style="color: #24292EFF">;  </span><span style="color: #C2C3C5">// For writing documents to an index</span></span>
+<span class="line" id="L20"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexWriterConfig</span><span style="color: #24292EFF">;  </span><span style="color: #C2C3C5">// For configuring the IndexWriter</span></span>
+<span class="line" id="L21"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexSearcher</span><span style="color: #24292EFF">;  </span><span style="color: #C2C3C5">// For searching an index</span></span>
+<span class="line" id="L22"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">KnnFloatVectorQuery</span><span style="color: #24292EFF">;  </span><span style="color: #C2C3C5">// For querying using float vectors</span></span>
+<span class="line" id="L23"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">TopDocs</span><span style="color: #24292EFF">;  </span><span style="color: #C2C3C5">// For holding search results</span></span>
+<span class="line" id="L24"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">store</span><span style="color: #212121">.</span><span style="color: #D32F2F">Directory</span><span style="color: #24292EFF">;  </span><span style="color: #C2C3C5">// Base class for storage implementations</span></span>
+<span class="line" id="L25"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">store</span><span style="color: #212121">.</span><span style="color: #D32F2F">ByteBuffersDirectory</span><span style="color: #24292EFF">;  </span><span style="color: #C2C3C5">// In-memory implementation of Directory for testing</span></span>
+<span class="line empty-line" id="L26"></span>
+<span class="line" id="L27"><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TextVectorSearchExample</span><span style="color: #24292EFF"> {</span></span>
+<span class="line empty-line" id="L28"></span>
+<span class="line empty-line" id="L29"></span></code></pre>
+      
+        
+        <h2 id="the-main-method">The main method</h2>
+
+        
+      
+        
+        <p>This is the entry point of the example. It will perform all steps necessary to:</p>
+<ol>
+<li>Create an in-memory index.</li>
+<li>Index example documents.</li>
+<li>Perform a <code>KNN</code> search on the indexed data.</li>
+<li>Display the search results.</li>
+</ol>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 36;"><span class="line" id="L36"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">main(</span><span style="color: #D32F2F">String</span><span style="color: #6F42C1">[] args)</span><span style="color: #24292EFF"> throws Exception {</span></span>
+<span class="line empty-line" id="L37"></span></code></pre>
+      
+        
+        <p>Create an in-memory index using <code>ByteBuffersDirectory</code></p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 38;"><span class="line" id="L38"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Directory</span><span style="color: #24292EFF"> directory </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">ByteBuffersDirectory()</span><span style="color: #24292EFF">;  </span><span style="color: #C2C3C5">// Creates an in-memory directory to store the index</span></span>
+<span class="line empty-line" id="L39"></span>
+<span class="line empty-line" id="L40"></span></code></pre>
+      
+        
+        <p>Configure the <code>IndexWriter</code></p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 41;"><span class="line" id="L41"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">IndexWriterConfig</span><span style="color: #24292EFF"> config </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexWriterConfig()</span><span style="color: #24292EFF">;  </span><span style="color: #C2C3C5">// Configures the `IndexWriter` with default settings</span></span>
+<span class="line" id="L42"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">IndexWriter</span><span style="color: #24292EFF"> indexWriter </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexWriter(directory</span><span style="color: #212121">,</span><span style="color: #6F42C1"> config)</span><span style="color: #24292EFF">;  </span><span style="color: #C2C3C5">// Creates an `IndexWriter` to add documents to the in-memory index</span></span>
+<span class="line empty-line" id="L43"></span>
+<span class="line empty-line" id="L44"></span></code></pre>
+      
+        
+        <h2 id="indexing-example-documents">Indexing Example Documents</h2>
+
+        
+      
+        
+        <p>We will index a set of example documents. Each document contains text that will be converted to a vector
+for the purpose of <code>KNN</code> search.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 48;"><span class="line" id="L48"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">String</span><span style="color: #24292EFF">[] texts </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L49"><span style="color: #24292EFF">                </span><span style="color: #22863A">&quot;Lucene is a powerful search library.&quot;</span><span style="color: #212121">,</span><span style="color: #24292EFF">  </span><span style="color: #C2C3C5">// Document 1: Text content about Lucene</span></span>
+<span class="line" id="L50"><span style="color: #24292EFF">                </span><span style="color: #22863A">&quot;OpenSearch is built on top of Lucene.&quot;</span><span style="color: #212121">,</span><span style="color: #24292EFF">  </span><span style="color: #C2C3C5">// Document 2: Text content about OpenSearch</span></span>
+<span class="line" id="L51"><span style="color: #24292EFF">                </span><span style="color: #22863A">&quot;Text search is crucial in modern applications.&quot;</span><span style="color: #24292EFF">  </span><span style="color: #C2C3C5">// Document 3: Text content about the importance of text search</span></span>
+<span class="line" id="L52"><span style="color: #24292EFF">        };</span></span>
+<span class="line empty-line" id="L53"></span>
+<span class="line empty-line" id="L54"></span></code></pre>
+      
+        
+        <p>Index the documents</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 55;"><span class="line" id="L55"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> text </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> texts) {</span></span>
+<span class="line" id="L56"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">Document</span><span style="color: #24292EFF"> doc </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createDocument(text)</span><span style="color: #24292EFF">;  </span><span style="color: #C2C3C5">// Creates a Lucene Document for each text</span></span>
+<span class="line" id="L57"><span style="color: #24292EFF">            </span><span style="color: #1976D2">indexWriter</span><span style="color: #212121">.</span><span style="color: #6F42C1">addDocument</span><span style="color: #24292EFF">(doc);  </span><span style="color: #C2C3C5">// Adds the document to the index</span></span>
+<span class="line" id="L58"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L59"></span>
+<span class="line" id="L60"><span style="color: #24292EFF">        </span><span style="color: #1976D2">indexWriter</span><span style="color: #212121">.</span><span style="color: #6F42C1">close</span><span style="color: #24292EFF">();  </span><span style="color: #C2C3C5">// Closes the `IndexWriter` to finalize the index and release resources</span></span>
+<span class="line empty-line" id="L61"></span>
+<span class="line empty-line" id="L62"></span></code></pre>
+      
+        
+        <h2 id="perform-a-vector-search">Perform a Vector Search</h2>
+
+        
+      
+        
+        <p>We will now perform a <code>KNN</code> search using a query vector. The vector is generated from a query text.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 65;"><span class="line" id="L65"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> queryText </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;search engine library&quot;</span><span style="color: #24292EFF">;  </span><span style="color: #C2C3C5">// Defines a query text for searching</span></span>
+<span class="line" id="L66"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">float</span><span style="color: #24292EFF">[] queryVector </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">textToVector(queryText)</span><span style="color: #24292EFF">;  </span><span style="color: #C2C3C5">// Converts the query text to a vector (dummy vector in this case)</span></span>
+<span class="line empty-line" id="L67"></span>
+<span class="line" id="L68"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">DirectoryReader</span><span style="color: #24292EFF"> reader </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">DirectoryReader</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(directory);  </span><span style="color: #C2C3C5">// Opens a `DirectoryReader` to read the index</span></span>
+<span class="line empty-line" id="L69"></span>
+<span class="line empty-line" id="L70"></span></code></pre>
+      
+        
+        <p>Create a <code>KNN</code> query with the vector field</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 71;"><span class="line" id="L71"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">KnnFloatVectorQuery</span><span style="color: #24292EFF"> query </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">KnnFloatVectorQuery(</span><span style="color: #22863A">&quot;vector&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> queryVector</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">2</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;  </span><span style="color: #C2C3C5">// Creates a `KNN` query to find the nearest vectors</span></span>
+<span class="line empty-line" id="L72"></span>
+<span class="line empty-line" id="L73"></span></code></pre>
+      
+        
+        <p>Create an <code>IndexSearcher</code> to perform the search</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 74;"><span class="line" id="L74"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">IndexSearcher</span><span style="color: #24292EFF"> searcher </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexSearcher(reader)</span><span style="color: #24292EFF">;  </span><span style="color: #C2C3C5">// Creates an `IndexSearcher` to perform the search</span></span>
+<span class="line" id="L75"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">TopDocs</span><span style="color: #24292EFF"> topDocs </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">searcher</span><span style="color: #212121">.</span><span style="color: #6F42C1">search</span><span style="color: #24292EFF">(query</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">10</span><span style="color: #24292EFF">);  </span><span style="color: #C2C3C5">// Executes the query and retrieves the top 10 results</span></span>
+<span class="line empty-line" id="L76"></span>
+<span class="line empty-line" id="L77"></span></code></pre>
+      
+        
+        <h2 id="display-the-search-results">Display the Search Results</h2>
+
+        
+      
+        
+        <p>The search results will be displayed, including the text of each matching document and its relevance score.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 80;"><span class="line" id="L80"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">; i </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">topDocs</span><span style="color: #212121">.</span><span style="color: #1976D2">scoreDocs</span><span style="color: #212121">.</span><span style="color: #1976D2">length</span><span style="color: #24292EFF">; i</span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">) {</span></span>
+<span class="line empty-line" id="L81"></span></code></pre>
+      
+        
+        <p>Retrieves the document by ID from the search results</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 82;"><span class="line" id="L82"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">Document</span><span style="color: #24292EFF"> doc </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">searcher</span><span style="color: #212121">.</span><span style="color: #6F42C1">storedFields</span><span style="color: #24292EFF">()</span><span style="color: #212121">.</span><span style="color: #6F42C1">document</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">topDocs</span><span style="color: #212121">.</span><span style="color: #1976D2">scoreDocs</span><span style="color: #24292EFF">[i]</span><span style="color: #212121">.</span><span style="color: #1976D2">doc</span><span style="color: #24292EFF">);</span></span>
+<span class="line empty-line" id="L83"></span></code></pre>
+      
+        
+        <p>Prints the document text and its score</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 84;"><span class="line" id="L84"><span style="color: #24292EFF">            </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;Found doc: &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">get</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #24292EFF">) </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; with score: &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">topDocs</span><span style="color: #212121">.</span><span style="color: #1976D2">scoreDocs</span><span style="color: #24292EFF">[i]</span><span style="color: #212121">.</span><span style="color: #1976D2">score</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L85"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L86"></span>
+<span class="line" id="L87"><span style="color: #24292EFF">        </span><span style="color: #1976D2">reader</span><span style="color: #212121">.</span><span style="color: #6F42C1">close</span><span style="color: #24292EFF">();  </span><span style="color: #C2C3C5">// Closes the `DirectoryReader` to release resources</span></span>
+<span class="line" id="L88"><span style="color: #24292EFF">        </span><span style="color: #1976D2">directory</span><span style="color: #212121">.</span><span style="color: #6F42C1">close</span><span style="color: #24292EFF">();  </span><span style="color: #C2C3C5">// Closes the in-memory directory to release resources</span></span>
+<span class="line" id="L89"><span style="color: #24292EFF">    }</span></span>
+<span class="line empty-line" id="L90"></span>
+<span class="line empty-line" id="L91"></span></code></pre>
+      
+        
+        <h2 id="helper-method-to-create-a-lucene-document">Helper method to create a Lucene Document</h2>
+
+        
+      
+        
+        <p>This method creates a Lucene Document from the provided text. It converts the text into a vector
+and adds both the text and the vector as fields in the document.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 95;"><span class="line" id="L95"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">Document</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createDocument(</span><span style="color: #D32F2F">String</span><span style="color: #6F42C1"> text)</span><span style="color: #24292EFF"> {</span></span>
+<span class="line empty-line" id="L96"></span></code></pre>
+      
+        
+        <p>Convert text to vector (using a hypothetical method)</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 97;"><span class="line" id="L97"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">float</span><span style="color: #24292EFF">[] vector </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">textToVector(text)</span><span style="color: #24292EFF">;  </span><span style="color: #C2C3C5">// Converts the document text to a vector</span></span>
+<span class="line empty-line" id="L98"></span>
+<span class="line" id="L99"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Document</span><span style="color: #24292EFF"> doc </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">Document()</span><span style="color: #24292EFF">;  </span><span style="color: #C2C3C5">// Creates a new Lucene Document</span></span>
+<span class="line" id="L100"><span style="color: #24292EFF">        </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TextField(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> text</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">Field</span><span style="color: #212121">.</span><span style="color: #1976D2">Store</span><span style="color: #212121">.</span><span style="color: #1976D2">YES</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">);  </span><span style="color: #C2C3C5">// Adds the text field to the document, storing the original text</span></span>
+<span class="line" id="L101"><span style="color: #24292EFF">        </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">KnnFloatVectorField(</span><span style="color: #22863A">&quot;vector&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> vector)</span><span style="color: #24292EFF">);  </span><span style="color: #C2C3C5">// Adds the vector field for KNN search</span></span>
+<span class="line empty-line" id="L102"></span>
+<span class="line" id="L103"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> doc;  </span><span style="color: #C2C3C5">// Returns the created document</span></span>
+<span class="line" id="L104"><span style="color: #24292EFF">    }</span></span>
+<span class="line empty-line" id="L105"></span>
+<span class="line empty-line" id="L106"></span></code></pre>
+      
+        
+        <h2 id="hypothetical-method-to-convert-text-to-a-vector">Hypothetical method to convert text to a vector</h2>
+
+        
+      
+        
+        <p>This method is a placeholder for converting text into a vector representation. In a real application,
+this would likely use a model like <code>BERT</code> or <code>Word2Vec</code> to generate the vector.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 110;"><span class="line" id="L110"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">float</span><span style="color: #24292EFF">[] </span><span style="color: #6F42C1">textToVector(</span><span style="color: #D32F2F">String</span><span style="color: #6F42C1"> text)</span><span style="color: #24292EFF"> {</span></span>
+<span class="line empty-line" id="L111"></span></code></pre>
+      
+        
+        <p>This method would typically use a model like <code>BERT</code> or <code>Word2Vec</code>
+Here, we return a dummy vector for demonstration</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 113;"><span class="line" id="L113"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">float</span><span style="color: #24292EFF">[] vector </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">float</span><span style="color: #24292EFF">[</span><span style="color: #1976D2">768</span><span style="color: #24292EFF">];  </span><span style="color: #C2C3C5">// Creates a dummy vector of size 768</span></span>
+<span class="line empty-line" id="L114"></span></code></pre>
+      
+        
+        <p>Normally, you’d populate this vector with actual values from a model.
+Example: <code>BertModel model = BertModel.load(&quot;bert-base-uncased&quot;)</code>;</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 116;"><span class="line" id="L116"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> vector;  </span><span style="color: #C2C3C5">// Returns the dummy vector</span></span>
+<span class="line" id="L117"><span style="color: #24292EFF">    }</span></span>
+<span class="line" id="L118"><span style="color: #24292EFF">}</span></span>
+<span class="line empty-line" id="L119"></span>
+<span class="line empty-line" id="L120"></span></code></pre>
+      
+    </div>
+    <footer>
+      <div>
+        Generated by <a href="https://github.com/mercmobily/docco">Docco</a>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

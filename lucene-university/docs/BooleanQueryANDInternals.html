@@ -4,93 +4,140 @@
 <head>
   <title>Conjunctive Boolean query (AND) internals</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
   <link rel="stylesheet" media="all" href="docco.css" />
 </head>
 <body>
-  <div id="container">
-    <div id="background"></div>
-    
-      <ul id="jump_to">
-        <li>
-          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
-          <a class="small" href="javascript:void(0);">+</a>
-          <div id="jump_wrapper">
-          <div id="jump_page_wrapper">
-            <div id="jump_page">
+  <div class="container">
+    <div class="main">
+
+      <div class="header">
+        <h1>Conjunctive Boolean query (AND) internals</h1>
+
+        
+          <div class="toc">
+            <h3>Table of Contents</h3>
+            <ol>
               
                 
-                <a class="source" href="AnalyzerBasics.html">
-                  AnalyzerBasics.java
-                </a>
+                <li>
+                  <a class="source" href="AnalyzerBasics.html">
+                    AnalyzerBasics.java
+                  </a>
+                </li>
               
                 
-                <a class="source" href="BooleanQueryANDInternals.html">
-                  BooleanQueryANDInternals.java
-                </a>
+                <li>
+                  <a class="source" href="BooleanQueryANDInternals.html">
+                    BooleanQueryANDInternals.java
+                  </a>
+                </li>
               
                 
-                <a class="source" href="BooleanQueryIntro.html">
-                  BooleanQueryIntro.java
-                </a>
+                <li>
+                  <a class="source" href="BooleanQueryIntro.html">
+                    BooleanQueryIntro.java
+                  </a>
+                </li>
               
                 
-                <a class="source" href="BottomUpIndexReader.html">
-                  BottomUpIndexReader.java
-                </a>
+                <li>
+                  <a class="source" href="BottomUpIndexReader.html">
+                    BottomUpIndexReader.java
+                  </a>
+                </li>
               
                 
-                <a class="source" href="DirectoryFileContents.html">
-                  DirectoryFileContents.java
-                </a>
+                <li>
+                  <a class="source" href="BytesRefHashExample.html">
+                    BytesRefHashExample.java
+                  </a>
+                </li>
               
                 
-                <a class="source" href="FunctionQuerySearchExample.html">
-                  FunctionQuerySearchExample.java
-                </a>
+                <li>
+                  <a class="source" href="CombinedFieldQueryExample.html">
+                    CombinedFieldQueryExample.java
+                  </a>
+                </li>
               
                 
-                <a class="source" href="KnnSearchExample.html">
-                  KnnSearchExample.java
-                </a>
+                <li>
+                  <a class="source" href="DirectoryFileContents.html">
+                    DirectoryFileContents.java
+                  </a>
+                </li>
               
                 
-                <a class="source" href="PointTreeRangeQuery.html">
-                  PointTreeRangeQuery.java
-                </a>
+                <li>
+                  <a class="source" href="DocValuesSearchExample.html">
+                    DocValuesSearchExample.java
+                  </a>
+                </li>
               
                 
-                <a class="source" href="SearchWithTermsEnum.html">
-                  SearchWithTermsEnum.java
-                </a>
+                <li>
+                  <a class="source" href="FunctionQuerySearchExample.html">
+                    FunctionQuerySearchExample.java
+                  </a>
+                </li>
               
                 
-                <a class="source" href="SimpleSearch.html">
-                  SimpleSearch.java
-                </a>
+                <li>
+                  <a class="source" href="KnnSearchExample.html">
+                    KnnSearchExample.java
+                  </a>
+                </li>
               
                 
-                <a class="source" href="VisualizePointTree.html">
-                  VisualizePointTree.java
-                </a>
+                <li>
+                  <a class="source" href="PointTreeRangeQuery.html">
+                    PointTreeRangeQuery.java
+                  </a>
+                </li>
               
-            </div>
+                
+                <li>
+                  <a class="source" href="PrimitivesRef.html">
+                    PrimitivesRef.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SearchWithTermsEnum.html">
+                    SearchWithTermsEnum.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SimpleSearch.html">
+                    SimpleSearch.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="TextVectorSearchExample.html">
+                    TextVectorSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="VisualizePointTree.html">
+                    VisualizePointTree.java
+                  </a>
+                </li>
+              
+            </ol>
           </div>
-        </li>
-      </ul>
-    
-    <ul class="sections">
         
+      </div>
+      
         
-        
-        <li id="section-1">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-1">&#x00a7;</a>
-              </div>
-              <h1 id="conjunctive-boolean-query-and-internals">Conjunctive Boolean query (AND) internals</h1>
-<p>This example partly builds on top of the concepts introduced in <code>BooleanQueryIntro</code>, so I suggest you go check
+        <p>This example partly builds on top of the concepts introduced in <code>BooleanQueryIntro</code>, so I suggest you go check
 that example first.</p>
 <p>If you happen to have arrived here through a web search, please <strong>DO NOT ACTUALLY USE THIS CODE</strong>. Lucene already
 has a BooleanQuery class. See the neighboring <code>BooleanQueryIntro</code> example for some guidance on using it.</p>
@@ -115,395 +162,313 @@ queries in general are implemented, and how Boolean queries implement “leap-fr
      the matching doc ID greater than or equal to <code>n</code>.</li>
 </ol>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">package</span> example.basic;
-
-<span class="hljs-keyword">import</span> org.apache.lucene.document.Field;
-<span class="hljs-keyword">import</span> org.apache.lucene.document.TextField;
-<span class="hljs-keyword">import</span> org.apache.lucene.index.DirectoryReader;
-<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexReader;
-<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexWriter;
-<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexWriterConfig;
-<span class="hljs-keyword">import</span> org.apache.lucene.index.LeafReaderContext;
-<span class="hljs-keyword">import</span> org.apache.lucene.index.Term;
-<span class="hljs-keyword">import</span> org.apache.lucene.search.BooleanClause;
-<span class="hljs-keyword">import</span> org.apache.lucene.search.DocIdSetIterator;
-<span class="hljs-keyword">import</span> org.apache.lucene.search.Explanation;
-<span class="hljs-keyword">import</span> org.apache.lucene.search.IndexSearcher;
-<span class="hljs-keyword">import</span> org.apache.lucene.search.Query;
-<span class="hljs-keyword">import</span> org.apache.lucene.search.QueryVisitor;
-<span class="hljs-keyword">import</span> org.apache.lucene.search.ScoreDoc;
-<span class="hljs-keyword">import</span> org.apache.lucene.search.ScoreMode;
-<span class="hljs-keyword">import</span> org.apache.lucene.search.Scorer;
-<span class="hljs-keyword">import</span> org.apache.lucene.search.TermQuery;
-<span class="hljs-keyword">import</span> org.apache.lucene.search.TopDocs;
-<span class="hljs-keyword">import</span> org.apache.lucene.search.Weight;
-<span class="hljs-keyword">import</span> org.apache.lucene.search.similarities.BasicStats;
-<span class="hljs-keyword">import</span> org.apache.lucene.search.similarities.SimilarityBase;
-<span class="hljs-keyword">import</span> org.apache.lucene.store.Directory;
-<span class="hljs-keyword">import</span> org.apache.lucene.store.FSDirectory;
-
-<span class="hljs-keyword">import</span> java.io.IOException;
-<span class="hljs-keyword">import</span> java.nio.file.Files;
-<span class="hljs-keyword">import</span> java.nio.file.Path;
-<span class="hljs-keyword">import</span> java.util.ArrayList;
-<span class="hljs-keyword">import</span> java.util.List;
-<span class="hljs-keyword">import</span> java.util.Objects;
-
-<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">BooleanQueryANDInternals</span> {</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 29;"><span class="line" id="L29"><span style="color: #D32F2F">package</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">basic</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L30"></span>
+<span class="line" id="L31"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">Field</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L32"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">TextField</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L33"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">DirectoryReader</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L34"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexReader</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L35"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexWriter</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L36"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexWriterConfig</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L37"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">LeafReaderContext</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L38"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">Term</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L39"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">BooleanClause</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L40"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">DocIdSetIterator</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L41"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">Explanation</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L42"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexSearcher</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L43"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">Query</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L44"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">QueryVisitor</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L45"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">ScoreDoc</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L46"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">ScoreMode</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L47"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">Scorer</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L48"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">ScorerSupplier</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L49"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">TermQuery</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L50"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">TopDocs</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L51"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">Weight</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L52"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">similarities</span><span style="color: #212121">.</span><span style="color: #D32F2F">BasicStats</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L53"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">similarities</span><span style="color: #212121">.</span><span style="color: #D32F2F">SimilarityBase</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L54"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">store</span><span style="color: #212121">.</span><span style="color: #D32F2F">Directory</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L55"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">store</span><span style="color: #212121">.</span><span style="color: #D32F2F">FSDirectory</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L56"></span>
+<span class="line" id="L57"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">io</span><span style="color: #212121">.</span><span style="color: #D32F2F">IOException</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L58"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">nio</span><span style="color: #212121">.</span><span style="color: #D32F2F">file</span><span style="color: #212121">.</span><span style="color: #D32F2F">Files</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L59"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">nio</span><span style="color: #212121">.</span><span style="color: #D32F2F">file</span><span style="color: #212121">.</span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L60"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">ArrayList</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L61"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L62"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">Objects</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L63"></span>
+<span class="line" id="L64"><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BooleanQueryANDInternals</span><span style="color: #24292EFF"> {</span></span>
+<span class="line empty-line" id="L65"></span></code></pre>
+      
         
+        <h2 id="document-construction">Document construction</h2>
+
         
-        <li id="section-2">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-2">&#x00a7;</a>
-              </div>
-              <h2 id="document-construction">Document construction</h2>
-<p>We’ll reuse the documents from <code>BooleanQueryIntro</code>. In brief, the documents contain the words for their
+      
+        
+        <p>We’ll reuse the documents from <code>BooleanQueryIntro</code>. In brief, the documents contain the words for their
 prime factors less than 10.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> List&lt;String&gt; <span class="hljs-title function_">createDocumentText</span><span class="hljs-params">(<span class="hljs-type">int</span> numDocs)</span> {
-        List&lt;String&gt; docs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
-        docs.add(<span class="hljs-string">&quot;zero&quot;</span>); <span class="hljs-comment">/* First doc will just have &quot;zero&quot;, since the first doc ID is 0 */</span>
-        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">1</span>; i &lt; numDocs; i++) {
-            <span class="hljs-type">StringBuilder</span> <span class="hljs-variable">sb</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuilder</span>();
-            sb.append(<span class="hljs-string">&quot;one&quot;</span>);
-            <span class="hljs-keyword">if</span> (i % <span class="hljs-number">2</span> == <span class="hljs-number">0</span>) {
-                sb.append(<span class="hljs-string">&quot; two&quot;</span>);
-            }
-            <span class="hljs-keyword">if</span> (i % <span class="hljs-number">3</span> == <span class="hljs-number">0</span>) {
-                sb.append(<span class="hljs-string">&quot; three&quot;</span>);
-            }
-            <span class="hljs-keyword">if</span> (i % <span class="hljs-number">5</span> == <span class="hljs-number">0</span>) {
-                sb.append(<span class="hljs-string">&quot; five&quot;</span>);
-            }
-            <span class="hljs-keyword">if</span> (i % <span class="hljs-number">7</span> == <span class="hljs-number">0</span>) {
-                sb.append(<span class="hljs-string">&quot; seven&quot;</span>);
-            }
-            docs.add(sb.toString());
-        }
-        <span class="hljs-keyword">return</span> docs;
-    }</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 70;"><span class="line" id="L70"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">List&lt;</span><span style="color: #24292EFF">String</span><span style="color: #D32F2F">&gt;</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createDocumentText(</span><span style="color: #D32F2F">int</span><span style="color: #6F42C1"> numDocs)</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L71"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF">&gt; docs </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">ArrayList</span><span style="color: #24292EFF">&lt;&gt;();</span></span>
+<span class="line" id="L72"><span style="color: #24292EFF">        </span><span style="color: #1976D2">docs</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;zero&quot;</span><span style="color: #24292EFF">); </span><span style="color: #C2C3C5">/* First doc will just have &quot;zero&quot;, since the first doc ID is 0 */</span></span>
+<span class="line" id="L73"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">1</span><span style="color: #24292EFF">; i </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> numDocs; i</span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">) {</span></span>
+<span class="line" id="L74"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">StringBuilder</span><span style="color: #24292EFF"> sb </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">StringBuilder()</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L75"><span style="color: #24292EFF">            </span><span style="color: #1976D2">sb</span><span style="color: #212121">.</span><span style="color: #6F42C1">append</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;one&quot;</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L76"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (i </span><span style="color: #D32F2F">%</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">2</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">==</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">) {</span></span>
+<span class="line" id="L77"><span style="color: #24292EFF">                </span><span style="color: #1976D2">sb</span><span style="color: #212121">.</span><span style="color: #6F42C1">append</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot; two&quot;</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L78"><span style="color: #24292EFF">            }</span></span>
+<span class="line" id="L79"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (i </span><span style="color: #D32F2F">%</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">3</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">==</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">) {</span></span>
+<span class="line" id="L80"><span style="color: #24292EFF">                </span><span style="color: #1976D2">sb</span><span style="color: #212121">.</span><span style="color: #6F42C1">append</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot; three&quot;</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L81"><span style="color: #24292EFF">            }</span></span>
+<span class="line" id="L82"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (i </span><span style="color: #D32F2F">%</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">5</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">==</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">) {</span></span>
+<span class="line" id="L83"><span style="color: #24292EFF">                </span><span style="color: #1976D2">sb</span><span style="color: #212121">.</span><span style="color: #6F42C1">append</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot; five&quot;</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L84"><span style="color: #24292EFF">            }</span></span>
+<span class="line" id="L85"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (i </span><span style="color: #D32F2F">%</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">7</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">==</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">) {</span></span>
+<span class="line" id="L86"><span style="color: #24292EFF">                </span><span style="color: #1976D2">sb</span><span style="color: #212121">.</span><span style="color: #6F42C1">append</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot; seven&quot;</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L87"><span style="color: #24292EFF">            }</span></span>
+<span class="line" id="L88"><span style="color: #24292EFF">            </span><span style="color: #1976D2">docs</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">sb</span><span style="color: #212121">.</span><span style="color: #6F42C1">toString</span><span style="color: #24292EFF">());</span></span>
+<span class="line" id="L89"><span style="color: #24292EFF">        }</span></span>
+<span class="line" id="L90"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> docs;</span></span>
+<span class="line" id="L91"><span style="color: #24292EFF">    }</span></span>
+<span class="line empty-line" id="L92"></span>
+<span class="line empty-line" id="L93"></span></code></pre>
+      
         
+        <h2 id="query-class">Query class</h2>
+
         
-        <li id="section-3">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-3">&#x00a7;</a>
-              </div>
-              <h2 id="query-class">Query class</h2>
-<p>Let’s start with our custom query class. Since we want to represent the specific <code>a AND b</code> case, we will
+      
+        
+        <p>Let’s start with our custom query class. Since we want to represent the specific <code>a AND b</code> case, we will
 explicitly take <code>a</code> and <code>b</code> as “left” and “right” operands.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">BinaryAndQuery</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Query</span> {
-        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Query left;
-        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Query right;
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 98;"><span class="line" id="L98"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">final</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BinaryAndQuery</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">extends</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">Query</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L99"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">final</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">Query</span><span style="color: #24292EFF"> left;</span></span>
+<span class="line" id="L100"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">final</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">Query</span><span style="color: #24292EFF"> right;</span></span>
+<span class="line empty-line" id="L101"></span>
+<span class="line" id="L102"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BinaryAndQuery</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">Query</span><span style="color: #24292EFF"> left</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">Query</span><span style="color: #24292EFF"> right) {</span></span>
+<span class="line" id="L103"><span style="color: #24292EFF">            </span><span style="color: #1976D2">this</span><span style="color: #212121">.</span><span style="color: #1976D2">left</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Objects</span><span style="color: #212121">.</span><span style="color: #6F42C1">requireNonNull</span><span style="color: #24292EFF">(left);</span></span>
+<span class="line" id="L104"><span style="color: #24292EFF">            </span><span style="color: #1976D2">this</span><span style="color: #212121">.</span><span style="color: #1976D2">right</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Objects</span><span style="color: #212121">.</span><span style="color: #6F42C1">requireNonNull</span><span style="color: #24292EFF">(right);</span></span>
+<span class="line" id="L105"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L106"></span>
+<span class="line empty-line" id="L107"></span></code></pre>
+      
+        
+        <p>A query should implement a friendly <code>toString</code> method that provides a human-readable representation.</p>
 
-        <span class="hljs-keyword">public</span> <span class="hljs-title function_">BinaryAndQuery</span><span class="hljs-params">(Query left, Query right)</span> {
-            <span class="hljs-built_in">this</span>.left = Objects.requireNonNull(left);
-            <span class="hljs-built_in">this</span>.right = Objects.requireNonNull(right);
-        }</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 108;"><span class="line" id="L108"><span style="color: #24292EFF">        @</span><span style="color: #D32F2F">Override</span></span>
+<span class="line" id="L109"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">toString(</span><span style="color: #D32F2F">String</span><span style="color: #6F42C1"> field)</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L110"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">left</span><span style="color: #212121">.</span><span style="color: #6F42C1">toString</span><span style="color: #24292EFF">(field) </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; AND &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">right</span><span style="color: #212121">.</span><span style="color: #6F42C1">toString</span><span style="color: #24292EFF">(field);</span></span>
+<span class="line" id="L111"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L112"></span>
+<span class="line empty-line" id="L113"></span></code></pre>
+      
         
-        
-        <li id="section-4">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-4">&#x00a7;</a>
-              </div>
-              <p>A query should implement a friendly <code>toString</code> method that provides a human-readable representation.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-meta">@Override</span>
-        <span class="hljs-keyword">public</span> String <span class="hljs-title function_">toString</span><span class="hljs-params">(String field)</span> {
-            <span class="hljs-keyword">return</span> left.toString(field) + <span class="hljs-string">&quot; AND &quot;</span> + right.toString(field);
-        }</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-5">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-5">&#x00a7;</a>
-              </div>
-              <p>To allow operations on complex query hierarchies, queries are expected to take a <code>QueryVisitor</code> and pass
+        <p>To allow operations on complex query hierarchies, queries are expected to take a <code>QueryVisitor</code> and pass
 it down the tree. The “leaf” queries at the end of a query hierarchy should call <code>visitor.visitLeaf(this)</code>.
 Functionally, this implementation is identical to what <code>BooleanQuery</code> will do with a pair of <code>MUST</code> clauses.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-meta">@Override</span>
-        <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">visit</span><span class="hljs-params">(QueryVisitor visitor)</span> {
-            <span class="hljs-type">QueryVisitor</span> <span class="hljs-variable">childVisitor</span> <span class="hljs-operator">=</span> visitor.getSubVisitor(BooleanClause.Occur.MUST, <span class="hljs-built_in">this</span>);
-            left.visit(childVisitor);
-            right.visit(childVisitor);
-        }</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 116;"><span class="line" id="L116"><span style="color: #24292EFF">        @</span><span style="color: #D32F2F">Override</span></span>
+<span class="line" id="L117"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">visit(</span><span style="color: #D32F2F">QueryVisitor</span><span style="color: #6F42C1"> visitor)</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L118"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">QueryVisitor</span><span style="color: #24292EFF"> childVisitor </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">visitor</span><span style="color: #212121">.</span><span style="color: #6F42C1">getSubVisitor</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">MUST</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">this</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L119"><span style="color: #24292EFF">            </span><span style="color: #1976D2">left</span><span style="color: #212121">.</span><span style="color: #6F42C1">visit</span><span style="color: #24292EFF">(childVisitor);</span></span>
+<span class="line" id="L120"><span style="color: #24292EFF">            </span><span style="color: #1976D2">right</span><span style="color: #212121">.</span><span style="color: #6F42C1">visit</span><span style="color: #24292EFF">(childVisitor);</span></span>
+<span class="line" id="L121"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L122"></span>
+<span class="line empty-line" id="L123"></span></code></pre>
+      
         
-        
-        <li id="section-6">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-6">&#x00a7;</a>
-              </div>
-              <p>Since a <code>Query</code> may be used as a hash key (e.g. if the results of the query are cached), they are expected
+        <p>Since a <code>Query</code> may be used as a hash key (e.g. if the results of the query are cached), they are expected
 to correctly implement <code>equals</code> and <code>hashCode</code>.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-meta">@Override</span>
-        <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">equals</span><span class="hljs-params">(Object o)</span> {
-            <span class="hljs-keyword">if</span> (<span class="hljs-built_in">this</span> == o) <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
-            <span class="hljs-keyword">if</span> (o == <span class="hljs-literal">null</span> || getClass() != o.getClass()) <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
-            <span class="hljs-type">BinaryAndQuery</span> <span class="hljs-variable">that</span> <span class="hljs-operator">=</span> (BinaryAndQuery) o;
-            <span class="hljs-keyword">return</span> Objects.equals(left, that.left) &amp;&amp; Objects.equals(right, that.right);
-        }
-
-        <span class="hljs-meta">@Override</span>
-        <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">hashCode</span><span class="hljs-params">()</span> {
-            <span class="hljs-keyword">return</span> Objects.hash(left, right);
-        }</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 125;"><span class="line" id="L125"><span style="color: #24292EFF">        @</span><span style="color: #D32F2F">Override</span></span>
+<span class="line" id="L126"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">boolean</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">equals(</span><span style="color: #D32F2F">Object</span><span style="color: #6F42C1"> o)</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L127"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (</span><span style="color: #1976D2">this</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">==</span><span style="color: #24292EFF"> o) </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">true</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L128"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (o </span><span style="color: #D32F2F">==</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">null</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">||</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">getClass()</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">!=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">o</span><span style="color: #212121">.</span><span style="color: #6F42C1">getClass</span><span style="color: #24292EFF">()) </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">false</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L129"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">BinaryAndQuery</span><span style="color: #24292EFF"> that </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> (BinaryAndQuery) o;</span></span>
+<span class="line" id="L130"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Objects</span><span style="color: #212121">.</span><span style="color: #6F42C1">equals</span><span style="color: #24292EFF">(left</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">that</span><span style="color: #212121">.</span><span style="color: #1976D2">left</span><span style="color: #24292EFF">) </span><span style="color: #D32F2F">&amp;&amp;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Objects</span><span style="color: #212121">.</span><span style="color: #6F42C1">equals</span><span style="color: #24292EFF">(right</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">that</span><span style="color: #212121">.</span><span style="color: #1976D2">right</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L131"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L132"></span>
+<span class="line" id="L133"><span style="color: #24292EFF">        @</span><span style="color: #D32F2F">Override</span></span>
+<span class="line" id="L134"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">hashCode()</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L135"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Objects</span><span style="color: #212121">.</span><span style="color: #6F42C1">hash</span><span style="color: #24292EFF">(left</span><span style="color: #212121">,</span><span style="color: #24292EFF"> right);</span></span>
+<span class="line" id="L136"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L137"></span>
+<span class="line empty-line" id="L138"></span></code></pre>
+      
         
-        
-        <li id="section-7">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-7">&#x00a7;</a>
-              </div>
-              <p>Finally, when it comes time to search with our query, we create the <code>Weight</code> instance. Note that
+        <p>Finally, when it comes time to search with our query, we create the <code>Weight</code> instance. Note that
 we need to call <code>createWeight</code> on each of our nested queries, too. Note that while we could call
 <code>createWeight</code> on the <code>left</code> and <code>right</code> queries directly, it is more correct to delegate to the <code>searcher</code>,
 which may have one of the nested queries in its cache. (See the <code>isCacheable</code> method in <code>BinaryAndWeight</code>,
 below.)</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-meta">@Override</span>
-        <span class="hljs-keyword">public</span> Weight <span class="hljs-title function_">createWeight</span><span class="hljs-params">(IndexSearcher searcher, ScoreMode scoreMode, <span class="hljs-type">float</span> boost)</span> <span class="hljs-keyword">throws</span> IOException {
-            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">BinaryAndWeight</span>(<span class="hljs-built_in">this</span>, searcher.createWeight(left, scoreMode, boost), searcher.createWeight(right, scoreMode, boost));
-        }
-    }</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 143;"><span class="line" id="L143"><span style="color: #24292EFF">        @</span><span style="color: #D32F2F">Override</span></span>
+<span class="line" id="L144"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">Weight</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createWeight(</span><span style="color: #D32F2F">IndexSearcher</span><span style="color: #6F42C1"> searcher</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">ScoreMode</span><span style="color: #6F42C1"> scoreMode</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">float</span><span style="color: #6F42C1"> boost)</span><span style="color: #24292EFF"> throws IOException {</span></span>
+<span class="line" id="L145"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BinaryAndWeight(</span><span style="color: #1976D2">this</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">searcher</span><span style="color: #212121">.</span><span style="color: #6F42C1">createWeight(left</span><span style="color: #212121">,</span><span style="color: #6F42C1"> scoreMode</span><span style="color: #212121">,</span><span style="color: #6F42C1"> boost)</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">searcher</span><span style="color: #212121">.</span><span style="color: #6F42C1">createWeight(right</span><span style="color: #212121">,</span><span style="color: #6F42C1"> scoreMode</span><span style="color: #212121">,</span><span style="color: #6F42C1"> boost))</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L146"><span style="color: #24292EFF">        }</span></span>
+<span class="line" id="L147"><span style="color: #24292EFF">    }</span></span>
+<span class="line empty-line" id="L148"></span>
+<span class="line empty-line" id="L149"></span></code></pre>
+      
         
+        <h2 id="weight-class">Weight class</h2>
+
         
-        <li id="section-8">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-8">&#x00a7;</a>
-              </div>
-              <h2 id="weight-class">Weight class</h2>
-<p>For our purposes, the role of the <code>Weight</code> implementation is to hold the <code>Weight</code> instances for the operands,
+      
+        
+        <p>For our purposes, the role of the <code>Weight</code> implementation is to hold the <code>Weight</code> instances for the operands,
 create the <code>Scorer</code> for each segment, and implement the <code>explain</code> method.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">BinaryAndWeight</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Weight</span> {
-        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Weight leftWeight;
-        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Weight rightWeight;
-
-        <span class="hljs-keyword">public</span> <span class="hljs-title function_">BinaryAndWeight</span><span class="hljs-params">(Query query, Weight leftWeight, Weight rightWeight)</span> {
-            <span class="hljs-built_in">super</span>(query);
-            <span class="hljs-built_in">this</span>.leftWeight = leftWeight;
-            <span class="hljs-built_in">this</span>.rightWeight = rightWeight;
-        }</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 154;"><span class="line" id="L154"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BinaryAndWeight</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">extends</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">Weight</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L155"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">final</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">Weight</span><span style="color: #24292EFF"> leftWeight;</span></span>
+<span class="line" id="L156"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">final</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">Weight</span><span style="color: #24292EFF"> rightWeight;</span></span>
+<span class="line empty-line" id="L157"></span>
+<span class="line" id="L158"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BinaryAndWeight</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">Query</span><span style="color: #24292EFF"> query</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">Weight</span><span style="color: #24292EFF"> leftWeight</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">Weight</span><span style="color: #24292EFF"> rightWeight) {</span></span>
+<span class="line" id="L159"><span style="color: #24292EFF">            super(query);</span></span>
+<span class="line" id="L160"><span style="color: #24292EFF">            </span><span style="color: #1976D2">this</span><span style="color: #212121">.</span><span style="color: #1976D2">leftWeight</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> leftWeight;</span></span>
+<span class="line" id="L161"><span style="color: #24292EFF">            </span><span style="color: #1976D2">this</span><span style="color: #212121">.</span><span style="color: #1976D2">rightWeight</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> rightWeight;</span></span>
+<span class="line" id="L162"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L163"></span>
+<span class="line empty-line" id="L164"></span></code></pre>
+      
         
-        
-        <li id="section-9">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-9">&#x00a7;</a>
-              </div>
-              <p>Every <code>Weight</code> is expected to implement the <code>explain</code> method to show how a given document’s score was
+        <p>Every <code>Weight</code> is expected to implement the <code>explain</code> method to show how a given document’s score was
 derived (or to explain why a non-matching document did not match).</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-meta">@Override</span>
-        <span class="hljs-keyword">public</span> Explanation <span class="hljs-title function_">explain</span><span class="hljs-params">(LeafReaderContext context, <span class="hljs-type">int</span> doc)</span> <span class="hljs-keyword">throws</span> IOException {
-            <span class="hljs-type">Explanation</span> <span class="hljs-variable">leftExplain</span> <span class="hljs-operator">=</span> leftWeight.explain(context, doc);
-            <span class="hljs-type">Explanation</span> <span class="hljs-variable">rightExplain</span> <span class="hljs-operator">=</span> rightWeight.explain(context, doc);
-            <span class="hljs-keyword">if</span> (!leftExplain.isMatch()) {
-                <span class="hljs-keyword">return</span> Explanation.noMatch(<span class="hljs-string">&quot;no match on required clause (&quot;</span> + leftWeight.getQuery().toString() + <span class="hljs-string">&quot;)&quot;</span>, leftExplain);
-            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (!rightExplain.isMatch()) {
-                <span class="hljs-keyword">return</span> Explanation.noMatch(<span class="hljs-string">&quot;no match on required clause (&quot;</span> + rightWeight.getQuery().toString() + <span class="hljs-string">&quot;)&quot;</span>, rightExplain);
-            }
-            <span class="hljs-type">Scorer</span> <span class="hljs-variable">scorer</span> <span class="hljs-operator">=</span> scorer(context);
-            <span class="hljs-type">int</span> <span class="hljs-variable">advanced</span> <span class="hljs-operator">=</span> scorer.iterator().advance(doc);
-            <span class="hljs-type">assert</span> <span class="hljs-variable">advanced</span> <span class="hljs-operator">=</span>= doc;
-            <span class="hljs-keyword">return</span> Explanation.match(scorer.score(), <span class="hljs-string">&quot;sum of:&quot;</span>, leftExplain, rightExplain);
-        }</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 166;"><span class="line" id="L166"><span style="color: #24292EFF">        @</span><span style="color: #D32F2F">Override</span></span>
+<span class="line" id="L167"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">Explanation</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">explain(</span><span style="color: #D32F2F">LeafReaderContext</span><span style="color: #6F42C1"> context</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">int</span><span style="color: #6F42C1"> doc)</span><span style="color: #24292EFF"> throws IOException {</span></span>
+<span class="line" id="L168"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">Explanation</span><span style="color: #24292EFF"> leftExplain </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">leftWeight</span><span style="color: #212121">.</span><span style="color: #6F42C1">explain</span><span style="color: #24292EFF">(context</span><span style="color: #212121">,</span><span style="color: #24292EFF"> doc);</span></span>
+<span class="line" id="L169"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">Explanation</span><span style="color: #24292EFF"> rightExplain </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">rightWeight</span><span style="color: #212121">.</span><span style="color: #6F42C1">explain</span><span style="color: #24292EFF">(context</span><span style="color: #212121">,</span><span style="color: #24292EFF"> doc);</span></span>
+<span class="line" id="L170"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">!</span><span style="color: #1976D2">leftExplain</span><span style="color: #212121">.</span><span style="color: #6F42C1">isMatch</span><span style="color: #24292EFF">()) {</span></span>
+<span class="line" id="L171"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Explanation</span><span style="color: #212121">.</span><span style="color: #6F42C1">noMatch</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;no match on required clause (&quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">leftWeight</span><span style="color: #212121">.</span><span style="color: #6F42C1">getQuery</span><span style="color: #24292EFF">()</span><span style="color: #212121">.</span><span style="color: #6F42C1">toString</span><span style="color: #24292EFF">() </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;)&quot;</span><span style="color: #212121">,</span><span style="color: #24292EFF"> leftExplain);</span></span>
+<span class="line" id="L172"><span style="color: #24292EFF">            } </span><span style="color: #D32F2F">else</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">!</span><span style="color: #1976D2">rightExplain</span><span style="color: #212121">.</span><span style="color: #6F42C1">isMatch</span><span style="color: #24292EFF">()) {</span></span>
+<span class="line" id="L173"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Explanation</span><span style="color: #212121">.</span><span style="color: #6F42C1">noMatch</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;no match on required clause (&quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">rightWeight</span><span style="color: #212121">.</span><span style="color: #6F42C1">getQuery</span><span style="color: #24292EFF">()</span><span style="color: #212121">.</span><span style="color: #6F42C1">toString</span><span style="color: #24292EFF">() </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;)&quot;</span><span style="color: #212121">,</span><span style="color: #24292EFF"> rightExplain);</span></span>
+<span class="line" id="L174"><span style="color: #24292EFF">            }</span></span>
+<span class="line" id="L175"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">Scorer</span><span style="color: #24292EFF"> scorer </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">scorer(context)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L176"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> advanced </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">scorer</span><span style="color: #212121">.</span><span style="color: #6F42C1">iterator</span><span style="color: #24292EFF">()</span><span style="color: #212121">.</span><span style="color: #6F42C1">advance</span><span style="color: #24292EFF">(doc);</span></span>
+<span class="line" id="L177"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">assert</span><span style="color: #24292EFF"> advanced </span><span style="color: #D32F2F">==</span><span style="color: #24292EFF"> doc;</span></span>
+<span class="line" id="L178"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Explanation</span><span style="color: #212121">.</span><span style="color: #6F42C1">match</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">scorer</span><span style="color: #212121">.</span><span style="color: #6F42C1">score</span><span style="color: #24292EFF">()</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;sum of:&quot;</span><span style="color: #212121">,</span><span style="color: #24292EFF"> leftExplain</span><span style="color: #212121">,</span><span style="color: #24292EFF"> rightExplain);</span></span>
+<span class="line" id="L179"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L180"></span>
+<span class="line empty-line" id="L181"></span></code></pre>
+      
         
-        
-        <li id="section-10">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-10">&#x00a7;</a>
-              </div>
-              <p>We return our custom <code>Scorer</code> implementation for a given index segment, after creating the scorers for
+        <p>We return our custom <code>Scorer</code> implementation for a given index segment, after creating the scorers for
 each of our operands.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-meta">@Override</span>
-        <span class="hljs-keyword">public</span> Scorer <span class="hljs-title function_">scorer</span><span class="hljs-params">(LeafReaderContext context)</span> <span class="hljs-keyword">throws</span> IOException {
-            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">BinaryAndScorer</span>(<span class="hljs-built_in">this</span>, leftWeight.scorer(context), rightWeight.scorer(context));
-        }</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 183;"><span class="line" id="L183"><span style="color: #24292EFF">        @</span><span style="color: #D32F2F">Override</span></span>
+<span class="line" id="L184"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">ScorerSupplier</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">scorerSupplier(</span><span style="color: #D32F2F">LeafReaderContext</span><span style="color: #6F42C1"> context)</span><span style="color: #24292EFF"> throws IOException {</span></span>
+<span class="line" id="L185"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">ScorerSupplier</span><span style="color: #24292EFF"> leftScorerSupplier </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">leftWeight</span><span style="color: #212121">.</span><span style="color: #6F42C1">scorerSupplier</span><span style="color: #24292EFF">(context);</span></span>
+<span class="line" id="L186"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">ScorerSupplier</span><span style="color: #24292EFF"> rightScorerSupplier </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">rightWeight</span><span style="color: #212121">.</span><span style="color: #6F42C1">scorerSupplier</span><span style="color: #24292EFF">(context);</span></span>
+<span class="line" id="L187"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">Weight</span><span style="color: #24292EFF"> weight </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">this</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L188"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">ScorerSupplier()</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L189"><span style="color: #24292EFF">                @</span><span style="color: #D32F2F">Override</span></span>
+<span class="line" id="L190"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">Scorer</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">get</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">long</span><span style="color: #24292EFF"> l) </span><span style="color: #D32F2F">throws</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">IOException</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L191"><span style="color: #24292EFF">                    </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BinaryAndScorer(weight</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">leftScorerSupplier</span><span style="color: #212121">.</span><span style="color: #6F42C1">get(l)</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">rightScorerSupplier</span><span style="color: #212121">.</span><span style="color: #6F42C1">get(l))</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L192"><span style="color: #24292EFF">                }</span></span>
+<span class="line empty-line" id="L193"></span>
+<span class="line" id="L194"><span style="color: #24292EFF">                @</span><span style="color: #D32F2F">Override</span></span>
+<span class="line" id="L195"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">long</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">cost</span><span style="color: #24292EFF">() {</span></span>
+<span class="line empty-line" id="L196"></span></code></pre>
+      
         
+        <p>Worst case, we match everything from left and right.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 197;"><span class="line" id="L197"><span style="color: #24292EFF">                    </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">leftScorerSupplier</span><span style="color: #212121">.</span><span style="color: #6F42C1">cost</span><span style="color: #24292EFF">() </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">rightScorerSupplier</span><span style="color: #212121">.</span><span style="color: #6F42C1">cost</span><span style="color: #24292EFF">();</span></span>
+<span class="line" id="L198"><span style="color: #24292EFF">                }</span></span>
+<span class="line" id="L199"><span style="color: #24292EFF">            };</span></span>
+<span class="line" id="L200"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L201"></span>
+<span class="line empty-line" id="L202"></span></code></pre>
+      
         
-        <li id="section-11">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-11">&#x00a7;</a>
-              </div>
-              <p>The <code>IndexSearcher</code> holds a <code>QueryCache</code> instance that may store the matching doc IDs for a given query.
+        <p>The <code>IndexSearcher</code> holds a <code>QueryCache</code> instance that may store the matching doc IDs for a given query.
 Not all queries are readily cacheable, though, so the <code>IndexSearcher</code> asks the weight if it is cacheable
 or not.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-meta">@Override</span>
-        <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">isCacheable</span><span class="hljs-params">(LeafReaderContext ctx)</span> {
-            <span class="hljs-keyword">return</span> leftWeight.isCacheable(ctx) &amp;&amp; rightWeight.isCacheable(ctx);
-        }
-    }</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 205;"><span class="line" id="L205"><span style="color: #24292EFF">        @</span><span style="color: #D32F2F">Override</span></span>
+<span class="line" id="L206"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">boolean</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">isCacheable(</span><span style="color: #D32F2F">LeafReaderContext</span><span style="color: #6F42C1"> ctx)</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L207"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">leftWeight</span><span style="color: #212121">.</span><span style="color: #6F42C1">isCacheable</span><span style="color: #24292EFF">(ctx) </span><span style="color: #D32F2F">&amp;&amp;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">rightWeight</span><span style="color: #212121">.</span><span style="color: #6F42C1">isCacheable</span><span style="color: #24292EFF">(ctx);</span></span>
+<span class="line" id="L208"><span style="color: #24292EFF">        }</span></span>
+<span class="line" id="L209"><span style="color: #24292EFF">    }</span></span>
+<span class="line empty-line" id="L210"></span>
+<span class="line empty-line" id="L211"></span></code></pre>
+      
         
+        <h3 id="scorer-class">Scorer class</h3>
+
         
-        <li id="section-12">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-12">&#x00a7;</a>
-              </div>
-              <h3 id="scorer-class">Scorer class</h3>
-<p>Next, we need to implement the <code>Scorer</code> class. Most of the interesting logic lives in the <code>Scorer</code>‘s associated
+      
+        
+        <p>Next, we need to implement the <code>Scorer</code> class. Most of the interesting logic lives in the <code>Scorer</code>‘s associated
 <code>DocIdSetIterator</code>.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">BinaryAndScorer</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Scorer</span> {
-        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Scorer leftScorer;
-        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Scorer rightScorer;
-        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> DocIdSetIterator docIdSetIterator;
-
-        <span class="hljs-keyword">public</span> <span class="hljs-title function_">BinaryAndScorer</span><span class="hljs-params">(Weight weight, Scorer leftScorer, Scorer rightScorer)</span> {
-            <span class="hljs-built_in">super</span>(weight);
-            <span class="hljs-built_in">this</span>.leftScorer = leftScorer;
-            <span class="hljs-built_in">this</span>.rightScorer = rightScorer;
-            <span class="hljs-built_in">this</span>.docIdSetIterator = <span class="hljs-keyword">new</span> <span class="hljs-title class_">BinaryAndDocIdSetIterator</span>(leftScorer.iterator(), rightScorer.iterator());
-        }</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 215;"><span class="line" id="L215"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BinaryAndScorer</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">extends</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">Scorer</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L216"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">final</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">Scorer</span><span style="color: #24292EFF"> leftScorer;</span></span>
+<span class="line" id="L217"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">final</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">Scorer</span><span style="color: #24292EFF"> rightScorer;</span></span>
+<span class="line" id="L218"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">final</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">DocIdSetIterator</span><span style="color: #24292EFF"> docIdSetIterator;</span></span>
+<span class="line empty-line" id="L219"></span>
+<span class="line" id="L220"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BinaryAndScorer</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">Weight</span><span style="color: #24292EFF"> weight</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">Scorer</span><span style="color: #24292EFF"> leftScorer</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">Scorer</span><span style="color: #24292EFF"> rightScorer) {</span></span>
+<span class="line" id="L221"><span style="color: #24292EFF">            </span><span style="color: #1976D2">this</span><span style="color: #212121">.</span><span style="color: #1976D2">leftScorer</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> leftScorer;</span></span>
+<span class="line" id="L222"><span style="color: #24292EFF">            </span><span style="color: #1976D2">this</span><span style="color: #212121">.</span><span style="color: #1976D2">rightScorer</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> rightScorer;</span></span>
+<span class="line" id="L223"><span style="color: #24292EFF">            </span><span style="color: #1976D2">this</span><span style="color: #212121">.</span><span style="color: #1976D2">docIdSetIterator</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BinaryAndDocIdSetIterator(</span><span style="color: #1976D2">leftScorer</span><span style="color: #212121">.</span><span style="color: #6F42C1">iterator()</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">rightScorer</span><span style="color: #212121">.</span><span style="color: #6F42C1">iterator())</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L224"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L225"></span>
+<span class="line empty-line" id="L226"></span></code></pre>
+      
         
-        
-        <li id="section-13">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-13">&#x00a7;</a>
-              </div>
-              <p>If this scorer is pointing at a doc ID, then both the left and right scorers must be pointing at the
+        <p>If this scorer is pointing at a doc ID, then both the left and right scorers must be pointing at the
 same doc ID (since it’s the current match for the left AND right).</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-meta">@Override</span>
-        <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">docID</span><span class="hljs-params">()</span> {
-            <span class="hljs-keyword">assert</span> leftScorer.docID() == rightScorer.docID();
-            <span class="hljs-keyword">return</span> docIdSetIterator.docID();
-        }
-
-        <span class="hljs-meta">@Override</span>
-        <span class="hljs-keyword">public</span> DocIdSetIterator <span class="hljs-title function_">iterator</span><span class="hljs-params">()</span> {
-            <span class="hljs-keyword">return</span> docIdSetIterator;
-        }</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 228;"><span class="line" id="L228"><span style="color: #24292EFF">        @</span><span style="color: #D32F2F">Override</span></span>
+<span class="line" id="L229"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">docID()</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L230"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">assert</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">leftScorer</span><span style="color: #212121">.</span><span style="color: #6F42C1">docID</span><span style="color: #24292EFF">() </span><span style="color: #D32F2F">==</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">rightScorer</span><span style="color: #212121">.</span><span style="color: #6F42C1">docID</span><span style="color: #24292EFF">();</span></span>
+<span class="line" id="L231"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">docIdSetIterator</span><span style="color: #212121">.</span><span style="color: #6F42C1">docID</span><span style="color: #24292EFF">();</span></span>
+<span class="line" id="L232"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L233"></span>
+<span class="line" id="L234"><span style="color: #24292EFF">        @</span><span style="color: #D32F2F">Override</span></span>
+<span class="line" id="L235"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">DocIdSetIterator</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">iterator()</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L236"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> docIdSetIterator;</span></span>
+<span class="line" id="L237"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L238"></span>
+<span class="line empty-line" id="L239"></span></code></pre>
+      
         
-        
-        <li id="section-14">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-14">&#x00a7;</a>
-              </div>
-              <p>This <code>getMaxScore</code> can be used to skip entire blocks of uncompetitive documents, by providing an upper bound
+        <p>This <code>getMaxScore</code> can be used to skip entire blocks of uncompetitive documents, by providing an upper bound
 on the possible score of a match. In this case, we ask each of our subscorers what their maximum scores
 are <code>upTo</code> some future target and sum them together. But the max from <code>left</code> and the max from <code>right</code> might
 not come from the same document, so there may not actually be a document with this score. That’s okay,
 though – the skipping is a best-effort optimization.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-meta">@Override</span>
-        <span class="hljs-keyword">public</span> <span class="hljs-type">float</span> <span class="hljs-title function_">getMaxScore</span><span class="hljs-params">(<span class="hljs-type">int</span> upTo)</span> <span class="hljs-keyword">throws</span> IOException {
-            <span class="hljs-keyword">return</span> leftScorer.getMaxScore(upTo) + rightScorer.getMaxScore(upTo);
-        }</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 244;"><span class="line" id="L244"><span style="color: #24292EFF">        @</span><span style="color: #D32F2F">Override</span></span>
+<span class="line" id="L245"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">float</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">getMaxScore(</span><span style="color: #D32F2F">int</span><span style="color: #6F42C1"> upTo)</span><span style="color: #24292EFF"> throws IOException {</span></span>
+<span class="line" id="L246"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">leftScorer</span><span style="color: #212121">.</span><span style="color: #6F42C1">getMaxScore</span><span style="color: #24292EFF">(upTo) </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">rightScorer</span><span style="color: #212121">.</span><span style="color: #6F42C1">getMaxScore</span><span style="color: #24292EFF">(upTo);</span></span>
+<span class="line" id="L247"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L248"></span>
+<span class="line empty-line" id="L249"></span></code></pre>
+      
         
-        
-        <li id="section-15">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-15">&#x00a7;</a>
-              </div>
-              <p>Consistent with BooleanQuery (using MUST clauses), we sum up the scores of our individual clauses.</p>
+        <p>Consistent with BooleanQuery (using MUST clauses), we sum up the scores of our individual clauses.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-meta">@Override</span>
-        <span class="hljs-keyword">public</span> <span class="hljs-type">float</span> <span class="hljs-title function_">score</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> IOException {
-            <span class="hljs-keyword">assert</span> leftScorer.docID() == rightScorer.docID();
-            <span class="hljs-keyword">return</span> leftScorer.score() + rightScorer.score();
-        }
-    }</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 250;"><span class="line" id="L250"><span style="color: #24292EFF">        @</span><span style="color: #D32F2F">Override</span></span>
+<span class="line" id="L251"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">float</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">score()</span><span style="color: #24292EFF"> throws IOException {</span></span>
+<span class="line" id="L252"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">assert</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">leftScorer</span><span style="color: #212121">.</span><span style="color: #6F42C1">docID</span><span style="color: #24292EFF">() </span><span style="color: #D32F2F">==</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">rightScorer</span><span style="color: #212121">.</span><span style="color: #6F42C1">docID</span><span style="color: #24292EFF">();</span></span>
+<span class="line" id="L253"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">leftScorer</span><span style="color: #212121">.</span><span style="color: #6F42C1">score</span><span style="color: #24292EFF">() </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">rightScorer</span><span style="color: #212121">.</span><span style="color: #6F42C1">score</span><span style="color: #24292EFF">();</span></span>
+<span class="line" id="L254"><span style="color: #24292EFF">        }</span></span>
+<span class="line" id="L255"><span style="color: #24292EFF">    }</span></span>
+<span class="line empty-line" id="L256"></span>
+<span class="line empty-line" id="L257"></span>
+<span class="line empty-line" id="L258"></span></code></pre>
+      
         
+        <h2 id="the-docidsetiterator-class">The DocIdSetIterator class</h2>
+
         
-        <li id="section-16">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-16">&#x00a7;</a>
-              </div>
-              <h2 id="the-docidsetiterator-class">The DocIdSetIterator class</h2>
-<p>This class is really the whole reason for this example (though the journey was hopefully informative too).
+      
+        
+        <p>This class is really the whole reason for this example (though the journey was hopefully informative too).
 The DocIdSetIterator (DISI) classes are fundamental to Lucene’s matching logic.</p>
 <p>Conjunctions of required clauses (like our AND query) step through all documents where all of their underlying
 DISIs point to the same thing. We achieve this with the (generally) fast <code>advance</code> method, asking a DISI
@@ -513,85 +478,53 @@ over the new lead, like a game of leapfrog.</p>
 <p>Note that our <code>advance</code> and <code>nextDoc</code> methods guarantee that they only return when <code>leftIterator</code> and
 <code>rightIterator</code> point to the same value (though that value may be <code>NO_MORE_DOCS</code>).</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">BinaryAndDocIdSetIterator</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">DocIdSetIterator</span> {
-        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> DocIdSetIterator leftIterator;
-        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> DocIdSetIterator rightIterator;
-
-        <span class="hljs-keyword">public</span> <span class="hljs-title function_">BinaryAndDocIdSetIterator</span><span class="hljs-params">(DocIdSetIterator leftIterator, DocIdSetIterator rightIterator)</span> {
-            <span class="hljs-built_in">this</span>.leftIterator = leftIterator;
-            <span class="hljs-built_in">this</span>.rightIterator = rightIterator;
-        }</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 271;"><span class="line" id="L271"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BinaryAndDocIdSetIterator</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">extends</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">DocIdSetIterator</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L272"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">final</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">DocIdSetIterator</span><span style="color: #24292EFF"> leftIterator;</span></span>
+<span class="line" id="L273"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">final</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">DocIdSetIterator</span><span style="color: #24292EFF"> rightIterator;</span></span>
+<span class="line empty-line" id="L274"></span>
+<span class="line" id="L275"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BinaryAndDocIdSetIterator</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">DocIdSetIterator</span><span style="color: #24292EFF"> leftIterator</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">DocIdSetIterator</span><span style="color: #24292EFF"> rightIterator) {</span></span>
+<span class="line" id="L276"><span style="color: #24292EFF">            </span><span style="color: #1976D2">this</span><span style="color: #212121">.</span><span style="color: #1976D2">leftIterator</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> leftIterator;</span></span>
+<span class="line" id="L277"><span style="color: #24292EFF">            </span><span style="color: #1976D2">this</span><span style="color: #212121">.</span><span style="color: #1976D2">rightIterator</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> rightIterator;</span></span>
+<span class="line" id="L278"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L279"></span>
+<span class="line empty-line" id="L280"></span></code></pre>
+      
         
-        
-        <li id="section-17">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-17">&#x00a7;</a>
-              </div>
-              <p>We can (and do) check the invariant that the left and right iterators are pointing to the same doc,
+        <p>We can (and do) check the invariant that the left and right iterators are pointing to the same doc,
 and return the left doc ID.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-meta">@Override</span>
-        <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">docID</span><span class="hljs-params">()</span> {
-            <span class="hljs-keyword">assert</span> leftIterator.docID() == rightIterator.docID();
-            <span class="hljs-keyword">return</span> leftIterator.docID();
-        }</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 282;"><span class="line" id="L282"><span style="color: #24292EFF">        @</span><span style="color: #D32F2F">Override</span></span>
+<span class="line" id="L283"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">docID()</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L284"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">assert</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">leftIterator</span><span style="color: #212121">.</span><span style="color: #6F42C1">docID</span><span style="color: #24292EFF">() </span><span style="color: #D32F2F">==</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">rightIterator</span><span style="color: #212121">.</span><span style="color: #6F42C1">docID</span><span style="color: #24292EFF">();</span></span>
+<span class="line" id="L285"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">leftIterator</span><span style="color: #212121">.</span><span style="color: #6F42C1">docID</span><span style="color: #24292EFF">();</span></span>
+<span class="line" id="L286"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L287"></span>
+<span class="line empty-line" id="L288"></span></code></pre>
+      
         
-        
-        <li id="section-18">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-18">&#x00a7;</a>
-              </div>
-              <p>For <code>nextDoc</code>, we arbitrarily step to the next document with <code>leftIterator</code>, then jump over to our
+        <p>For <code>nextDoc</code>, we arbitrarily step to the next document with <code>leftIterator</code>, then jump over to our
 leapfrogging logic in <code>doNext</code>.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-meta">@Override</span>
-        <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">nextDoc</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> IOException {
-            <span class="hljs-keyword">return</span> doNext(leftIterator.nextDoc());
-        }</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 290;"><span class="line" id="L290"><span style="color: #24292EFF">        @</span><span style="color: #D32F2F">Override</span></span>
+<span class="line" id="L291"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">nextDoc()</span><span style="color: #24292EFF"> throws IOException {</span></span>
+<span class="line" id="L292"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">doNext(</span><span style="color: #1976D2">leftIterator</span><span style="color: #212121">.</span><span style="color: #6F42C1">nextDoc())</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L293"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L294"></span>
+<span class="line empty-line" id="L295"></span></code></pre>
+      
         
-        
-        <li id="section-19">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-19">&#x00a7;</a>
-              </div>
-              <p>As with <code>nextDoc</code>, we can <code>advance</code> the <code>leftIterator</code> and leapfrog in <code>doNext</code> until the iterators
+        <p>As with <code>nextDoc</code>, we can <code>advance</code> the <code>leftIterator</code> and leapfrog in <code>doNext</code> until the iterators
 converge.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-meta">@Override</span>
-        <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">advance</span><span class="hljs-params">(<span class="hljs-type">int</span> target)</span> <span class="hljs-keyword">throws</span> IOException {
-            <span class="hljs-keyword">return</span> doNext(leftIterator.advance(target));
-        }</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 297;"><span class="line" id="L297"><span style="color: #24292EFF">        @</span><span style="color: #D32F2F">Override</span></span>
+<span class="line" id="L298"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">advance(</span><span style="color: #D32F2F">int</span><span style="color: #6F42C1"> target)</span><span style="color: #24292EFF"> throws IOException {</span></span>
+<span class="line" id="L299"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">doNext(</span><span style="color: #1976D2">leftIterator</span><span style="color: #212121">.</span><span style="color: #6F42C1">advance(target))</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L300"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L301"></span>
+<span class="line empty-line" id="L302"></span></code></pre>
+      
         
-        
-        <li id="section-20">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-20">&#x00a7;</a>
-              </div>
-              <p>Here it is, the exciting part of the example and one of the most important concepts in Lucene.
+        <p>Here it is, the exciting part of the example and one of the most important concepts in Lucene.
 The left and right iterators jump over each other, with the lagging iterator advancing to the
 first doc ID greater than or equal to the leading iterator. Several of the built-in query types (including
 TermQuery) have efficient <code>advance</code> methods that can return in logarithmic time.</p>
@@ -599,29 +532,21 @@ TermQuery) have efficient <code>advance</code> methods that can return in logari
 and passing <code>NO_MORE_DOCS</code> to an <code>advance</code> call is expected to return <code>NO_MORE_DOCS</code>. (The comparators work
 because <code>NO_MORE_DOCS</code> is equal to <code>Integer.MAX_VALUE</code>.)</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">private</span> <span class="hljs-type">int</span> <span class="hljs-title function_">doNext</span><span class="hljs-params">(<span class="hljs-type">int</span> target)</span> <span class="hljs-keyword">throws</span> IOException {
-            <span class="hljs-keyword">while</span> (leftIterator.docID() != rightIterator.docID()) {
-                <span class="hljs-keyword">if</span> (rightIterator.docID() &lt; leftIterator.docID()) {
-                    rightIterator.advance(leftIterator.docID());
-                } <span class="hljs-keyword">else</span> {
-                    leftIterator.advance(rightIterator.docID());
-                }
-            }
-            <span class="hljs-keyword">return</span> leftIterator.docID();
-        }</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 310;"><span class="line" id="L310"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">doNext(</span><span style="color: #D32F2F">int</span><span style="color: #6F42C1"> target)</span><span style="color: #24292EFF"> throws IOException {</span></span>
+<span class="line" id="L311"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">while</span><span style="color: #24292EFF"> (</span><span style="color: #1976D2">leftIterator</span><span style="color: #212121">.</span><span style="color: #6F42C1">docID</span><span style="color: #24292EFF">() </span><span style="color: #D32F2F">!=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">rightIterator</span><span style="color: #212121">.</span><span style="color: #6F42C1">docID</span><span style="color: #24292EFF">()) {</span></span>
+<span class="line" id="L312"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (</span><span style="color: #1976D2">rightIterator</span><span style="color: #212121">.</span><span style="color: #6F42C1">docID</span><span style="color: #24292EFF">() </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">leftIterator</span><span style="color: #212121">.</span><span style="color: #6F42C1">docID</span><span style="color: #24292EFF">()) {</span></span>
+<span class="line" id="L313"><span style="color: #24292EFF">                    </span><span style="color: #1976D2">rightIterator</span><span style="color: #212121">.</span><span style="color: #6F42C1">advance</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">leftIterator</span><span style="color: #212121">.</span><span style="color: #6F42C1">docID</span><span style="color: #24292EFF">());</span></span>
+<span class="line" id="L314"><span style="color: #24292EFF">                } </span><span style="color: #D32F2F">else</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L315"><span style="color: #24292EFF">                    </span><span style="color: #1976D2">leftIterator</span><span style="color: #212121">.</span><span style="color: #6F42C1">advance</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">rightIterator</span><span style="color: #212121">.</span><span style="color: #6F42C1">docID</span><span style="color: #24292EFF">());</span></span>
+<span class="line" id="L316"><span style="color: #24292EFF">                }</span></span>
+<span class="line" id="L317"><span style="color: #24292EFF">            }</span></span>
+<span class="line" id="L318"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">leftIterator</span><span style="color: #212121">.</span><span style="color: #6F42C1">docID</span><span style="color: #24292EFF">();</span></span>
+<span class="line" id="L319"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L320"></span>
+<span class="line empty-line" id="L321"></span></code></pre>
+      
         
-        
-        <li id="section-21">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-21">&#x00a7;</a>
-              </div>
-              <p>The <code>cost()</code> of a DISI is a measure of how expensive it would be to step through it fully, generally
+        <p>The <code>cost()</code> of a DISI is a measure of how expensive it would be to step through it fully, generally
 corresponding to an upper bound on the number of docs the DISI matches. We don’t know how many documents
 are in the intersection of <code>left</code> and <code>right</code> without stepping through them, but we know that the
 intersection of <code>left</code> and <code>right</code> is definitely no bigger than whichever is smaller. (Picture the Venn
@@ -630,70 +555,50 @@ diagram of “A AND B”.)</p>
 steps with <code>left</code> first and our “AND” operator is commutative, we could have assigned <code>leftIterator</code>
 to the lower-cost iterator to get a speed-up. (That’s what Lucene’s <code>ConjunctionDISI</code> class does.)</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-meta">@Override</span>
-        <span class="hljs-keyword">public</span> <span class="hljs-type">long</span> <span class="hljs-title function_">cost</span><span class="hljs-params">()</span> {
-            <span class="hljs-keyword">return</span> Math.min(leftIterator.cost(), rightIterator.cost());
-        }
-    }</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 330;"><span class="line" id="L330"><span style="color: #24292EFF">        @</span><span style="color: #D32F2F">Override</span></span>
+<span class="line" id="L331"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">long</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">cost()</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L332"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Math</span><span style="color: #212121">.</span><span style="color: #6F42C1">min</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">leftIterator</span><span style="color: #212121">.</span><span style="color: #6F42C1">cost</span><span style="color: #24292EFF">()</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">rightIterator</span><span style="color: #212121">.</span><span style="color: #6F42C1">cost</span><span style="color: #24292EFF">());</span></span>
+<span class="line" id="L333"><span style="color: #24292EFF">        }</span></span>
+<span class="line" id="L334"><span style="color: #24292EFF">    }</span></span>
+<span class="line empty-line" id="L335"></span>
+<span class="line empty-line" id="L336"></span></code></pre>
+      
         
-        
-        <li id="section-22">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-22">&#x00a7;</a>
-              </div>
-              <p>We can reuse the custom similarity from <code>BooleanQueryIntro</code> to give our example term queries scores of <code>1</code> on a
+        <p>We can reuse the custom similarity from <code>BooleanQueryIntro</code> to give our example term queries scores of <code>1</code> on a
 match, rather than worrying about BM25 scores.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CountMatchingClauseSimilarity</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">SimilarityBase</span> {
-        <span class="hljs-meta">@Override</span>
-        <span class="hljs-keyword">protected</span> <span class="hljs-type">double</span> <span class="hljs-title function_">score</span><span class="hljs-params">(BasicStats stats, <span class="hljs-type">double</span> freq, <span class="hljs-type">double</span> docLen)</span> {
-            <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
-        }
-
-        <span class="hljs-meta">@Override</span>
-        <span class="hljs-keyword">public</span> String <span class="hljs-title function_">toString</span><span class="hljs-params">()</span> {
-            <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Every match has a score of 1&quot;</span>;
-        }</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 338;"><span class="line" id="L338"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">CountMatchingClauseSimilarity</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">extends</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">SimilarityBase</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L339"><span style="color: #24292EFF">        @</span><span style="color: #D32F2F">Override</span></span>
+<span class="line" id="L340"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">protected</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">double</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">score</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">BasicStats</span><span style="color: #24292EFF"> stats</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">double</span><span style="color: #24292EFF"> freq</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">double</span><span style="color: #24292EFF"> docLen) {</span></span>
+<span class="line" id="L341"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">1</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L342"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L343"></span>
+<span class="line" id="L344"><span style="color: #24292EFF">        @</span><span style="color: #D32F2F">Override</span></span>
+<span class="line" id="L345"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">toString</span><span style="color: #24292EFF">() {</span></span>
+<span class="line" id="L346"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;Every match has a score of 1&quot;</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L347"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L348"></span>
+<span class="line empty-line" id="L349"></span></code></pre>
+      
         
-        
-        <li id="section-23">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-23">&#x00a7;</a>
-              </div>
-              <p>While we didn’t look at it in <code>BooleanQueryIntro</code>, a custom similarity can also explain its scoring
+        <p>While we didn’t look at it in <code>BooleanQueryIntro</code>, a custom similarity can also explain its scoring
 methodology. In our case, we can pass along the explanation from the <code>toString</code> method.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-meta">@Override</span>
-        <span class="hljs-keyword">protected</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">explain</span><span class="hljs-params">(List&lt;Explanation&gt; subExpls, BasicStats stats, <span class="hljs-type">double</span> freq, <span class="hljs-type">double</span> docLen)</span> {
-            subExpls.add(Explanation.match(<span class="hljs-number">1</span>, <span class="hljs-built_in">this</span>.toString()));
-        }
-    }</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 351;"><span class="line" id="L351"><span style="color: #24292EFF">        @</span><span style="color: #D32F2F">Override</span></span>
+<span class="line" id="L352"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">protected</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">explain(</span><span style="color: #D32F2F">List&lt;</span><span style="color: #6F42C1">Explanation</span><span style="color: #D32F2F">&gt;</span><span style="color: #6F42C1"> subExpls</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">BasicStats</span><span style="color: #6F42C1"> stats</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">double</span><span style="color: #6F42C1"> freq</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">double</span><span style="color: #6F42C1"> docLen)</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L353"><span style="color: #24292EFF">            </span><span style="color: #1976D2">subExpls</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">Explanation</span><span style="color: #212121">.</span><span style="color: #6F42C1">match</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">1</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">this</span><span style="color: #212121">.</span><span style="color: #6F42C1">toString</span><span style="color: #24292EFF">()));</span></span>
+<span class="line" id="L354"><span style="color: #24292EFF">        }</span></span>
+<span class="line" id="L355"><span style="color: #24292EFF">    }</span></span>
+<span class="line empty-line" id="L356"></span>
+<span class="line empty-line" id="L357"></span></code></pre>
+      
         
+        <h2 id="tying-it-all-together">Tying it all together</h2>
+
         
-        <li id="section-24">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-24">&#x00a7;</a>
-              </div>
-              <h2 id="tying-it-all-together">Tying it all together</h2>
-<p>Let’s put our custom query type to work.</p>
+      
+        
+        <p>Let’s put our custom query type to work.</p>
 <p>After indexing documents 0-999, we create a <code>twoAndFive</code> query, similar to what we did in <code>BooleanQueryIntro</code>,
 but this time it’s using the logic implemented above.</p>
 <p>When the <code>IndexSearcher</code> (or technically the <code>DefaultBulkScorer</code>) first calls <code>nextDoc</code> on our
@@ -702,71 +607,74 @@ iterator steps to its first match greater than or equal to 2 – document 5. The
 document 6. Then the right iterator advances to document 10. Finally, the left iterator advances to document 10
 too, and we return it. (It’s the first hit in the returned <code>TopDocs</code>.)</p>
 <p>The logic for the next (and every other) matching document is similar:</p>
-<pre><code>left=<span class="hljs-number">12</span>
-right=<span class="hljs-number">15</span>
-left=<span class="hljs-number">16</span>
-right=<span class="hljs-number">20</span> &lt;--
-left=<span class="hljs-number">20</span> &lt;-- HIT
+<pre><code><pre class="shiki" style="background-color: transparent"><code ><span class="line"><span style="color: #24292EFF">left</span><span style="color: #D32F2F">=</span><span style="color: #1976D2">12</span></span>
+<span class="line"><span style="color: #24292EFF">right</span><span style="color: #D32F2F">=</span><span style="color: #1976D2">15</span></span>
+<span class="line"><span style="color: #24292EFF">left</span><span style="color: #D32F2F">=</span><span style="color: #1976D2">16</span></span>
+<span class="line"><span style="color: #24292EFF">right</span><span style="color: #D32F2F">=</span><span style="color: #1976D2">20</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">&lt;--</span></span>
+<span class="line"><span style="color: #24292EFF">left</span><span style="color: #D32F2F">=</span><span style="color: #1976D2">20</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">&lt;--</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">HIT</span></span></code></pre>
 </code></pre>
 <p>After returning the top 10 hits, we can take a look at the <code>explain</code> output to see the output from our
 custom <code>Weight</code> and custom <code>Similarity</code>.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> IOException {
-        <span class="hljs-type">Path</span> <span class="hljs-variable">tmpDir</span> <span class="hljs-operator">=</span> Files.createTempDirectory(BooleanQueryIntro.class.getSimpleName());
-        <span class="hljs-keyword">try</span> (<span class="hljs-type">Directory</span> <span class="hljs-variable">directory</span> <span class="hljs-operator">=</span> FSDirectory.open(tmpDir);
-             <span class="hljs-type">IndexWriter</span> <span class="hljs-variable">writer</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexWriter</span>(directory, <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexWriterConfig</span>())) {
-            <span class="hljs-keyword">for</span> (String doc : createDocumentText(<span class="hljs-number">1000</span>)) {
-                writer.addDocument(List.of(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TextField</span>(<span class="hljs-string">&quot;text&quot;</span>, doc, Field.Store.NO)));
-            }
-
-            <span class="hljs-keyword">try</span> (<span class="hljs-type">IndexReader</span> <span class="hljs-variable">reader</span> <span class="hljs-operator">=</span> DirectoryReader.open(writer)) {
-                <span class="hljs-type">IndexSearcher</span> <span class="hljs-variable">searcher</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexSearcher</span>(reader);
-                searcher.setSimilarity(<span class="hljs-keyword">new</span> <span class="hljs-title class_">CountMatchingClauseSimilarity</span>());
-
-                <span class="hljs-type">BinaryAndQuery</span> <span class="hljs-variable">twoAndFive</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">BinaryAndQuery</span>(
-                        <span class="hljs-keyword">new</span> <span class="hljs-title class_">TermQuery</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Term</span>(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;two&quot;</span>)),
-                        <span class="hljs-keyword">new</span> <span class="hljs-title class_">TermQuery</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Term</span>(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;five&quot;</span>))
-                );
-                System.out.println(twoAndFive);
-                <span class="hljs-type">TopDocs</span> <span class="hljs-variable">topDocs</span> <span class="hljs-operator">=</span> searcher.search(twoAndFive, <span class="hljs-number">10</span>);
-                <span class="hljs-keyword">for</span> (ScoreDoc scoreDoc : topDocs.scoreDocs) {
-                    System.out.println(scoreDoc.doc + <span class="hljs-string">&quot;  &quot;</span> + scoreDoc.score);
-                }
-
-
-                System.out.println(searcher.explain(twoAndFive, <span class="hljs-number">20</span>));
-                <span class="hljs-comment">/*
-                2.0 = sum of:
-                  1.0 = weight(text:two in 20) [CountMatchingClauseSimilarity], result of:
-                    1.0 = score(CountMatchingClauseSimilarity, freq=1.0), computed from:
-                      1 = Every match has a score of 1
-                  1.0 = weight(text:five in 20) [CountMatchingClauseSimilarity], result of:
-                    1.0 = score(CountMatchingClauseSimilarity, freq=1.0), computed from:
-                      1 = Every match has a score of 1
-                */</span>
-
-                System.out.println(searcher.explain(twoAndFive, <span class="hljs-number">22</span>));
-                <span class="hljs-comment">/*
-                0.0 = no match on required clause (text:five)
-                  0.0 = no matching term
-                */</span>
-            }
-        } <span class="hljs-keyword">finally</span> {
-            <span class="hljs-keyword">for</span> (String indexFile : FSDirectory.listAll(tmpDir)) {
-                Files.deleteIfExists(tmpDir.resolve(indexFile));
-            }
-            Files.deleteIfExists(tmpDir);
-        }
-    }
-
-
-}</pre></div></div>
-            
-        </li>
-        
-    </ul>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 382;"><span class="line" id="L382"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">main(</span><span style="color: #D32F2F">String</span><span style="color: #6F42C1">[] args)</span><span style="color: #24292EFF"> throws IOException {</span></span>
+<span class="line" id="L383"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF"> tmpDir </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">createTempDirectory</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">BooleanQueryIntro</span><span style="color: #212121">.</span><span style="color: #1976D2">class</span><span style="color: #212121">.</span><span style="color: #6F42C1">getSimpleName</span><span style="color: #24292EFF">());</span></span>
+<span class="line" id="L384"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">Directory</span><span style="color: #24292EFF"> directory </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(tmpDir);</span></span>
+<span class="line" id="L385"><span style="color: #24292EFF">             </span><span style="color: #D32F2F">IndexWriter</span><span style="color: #24292EFF"> writer </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexWriter(directory</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> IndexWriterConfig())</span><span style="color: #24292EFF">) {</span></span>
+<span class="line" id="L386"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> doc </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createDocumentText(</span><span style="color: #1976D2">1000</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">) {</span></span>
+<span class="line" id="L387"><span style="color: #24292EFF">                </span><span style="color: #1976D2">writer</span><span style="color: #212121">.</span><span style="color: #6F42C1">addDocument</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">List</span><span style="color: #212121">.</span><span style="color: #6F42C1">of</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TextField(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> doc</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">Field</span><span style="color: #212121">.</span><span style="color: #1976D2">Store</span><span style="color: #212121">.</span><span style="color: #1976D2">NO</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">));</span></span>
+<span class="line" id="L388"><span style="color: #24292EFF">            }</span></span>
+<span class="line empty-line" id="L389"></span>
+<span class="line" id="L390"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">IndexReader</span><span style="color: #24292EFF"> reader </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">DirectoryReader</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(writer)) {</span></span>
+<span class="line" id="L391"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">IndexSearcher</span><span style="color: #24292EFF"> searcher </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexSearcher(reader)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L392"><span style="color: #24292EFF">                </span><span style="color: #1976D2">searcher</span><span style="color: #212121">.</span><span style="color: #6F42C1">setSimilarity</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">CountMatchingClauseSimilarity()</span><span style="color: #24292EFF">);</span></span>
+<span class="line empty-line" id="L393"></span>
+<span class="line" id="L394"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">BinaryAndQuery</span><span style="color: #24292EFF"> twoAndFive </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BinaryAndQuery(</span></span>
+<span class="line" id="L395"><span style="color: #6F42C1">                        </span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;two&quot;</span><span style="color: #6F42C1">))</span><span style="color: #212121">,</span></span>
+<span class="line" id="L396"><span style="color: #6F42C1">                        </span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;five&quot;</span><span style="color: #6F42C1">))</span></span>
+<span class="line" id="L397"><span style="color: #6F42C1">                )</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L398"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(twoAndFive);</span></span>
+<span class="line" id="L399"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">TopDocs</span><span style="color: #24292EFF"> topDocs </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">searcher</span><span style="color: #212121">.</span><span style="color: #6F42C1">search</span><span style="color: #24292EFF">(twoAndFive</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">10</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L400"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">ScoreDoc</span><span style="color: #24292EFF"> scoreDoc </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">topDocs</span><span style="color: #212121">.</span><span style="color: #1976D2">scoreDocs</span><span style="color: #24292EFF">) {</span></span>
+<span class="line" id="L401"><span style="color: #24292EFF">                    </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">scoreDoc</span><span style="color: #212121">.</span><span style="color: #1976D2">doc</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;  &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">scoreDoc</span><span style="color: #212121">.</span><span style="color: #1976D2">score</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L402"><span style="color: #24292EFF">                }</span></span>
+<span class="line empty-line" id="L403"></span>
+<span class="line empty-line" id="L404"></span>
+<span class="line" id="L405"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">searcher</span><span style="color: #212121">.</span><span style="color: #6F42C1">explain</span><span style="color: #24292EFF">(twoAndFive</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">20</span><span style="color: #24292EFF">));</span></span>
+<span class="line" id="L406"><span style="color: #24292EFF">                </span><span style="color: #C2C3C5">/*</span></span>
+<span class="line" id="L407"><span style="color: #C2C3C5">                2.0 = sum of:</span></span>
+<span class="line" id="L408"><span style="color: #C2C3C5">                  1.0 = weight(text:two in 20) [CountMatchingClauseSimilarity], result of:</span></span>
+<span class="line" id="L409"><span style="color: #C2C3C5">                    1.0 = score(CountMatchingClauseSimilarity, freq=1.0), computed from:</span></span>
+<span class="line" id="L410"><span style="color: #C2C3C5">                      1 = Every match has a score of 1</span></span>
+<span class="line" id="L411"><span style="color: #C2C3C5">                  1.0 = weight(text:five in 20) [CountMatchingClauseSimilarity], result of:</span></span>
+<span class="line" id="L412"><span style="color: #C2C3C5">                    1.0 = score(CountMatchingClauseSimilarity, freq=1.0), computed from:</span></span>
+<span class="line" id="L413"><span style="color: #C2C3C5">                      1 = Every match has a score of 1</span></span>
+<span class="line" id="L414"><span style="color: #C2C3C5">                */</span></span>
+<span class="line empty-line" id="L415"></span>
+<span class="line" id="L416"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">searcher</span><span style="color: #212121">.</span><span style="color: #6F42C1">explain</span><span style="color: #24292EFF">(twoAndFive</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">22</span><span style="color: #24292EFF">));</span></span>
+<span class="line" id="L417"><span style="color: #24292EFF">                </span><span style="color: #C2C3C5">/*</span></span>
+<span class="line" id="L418"><span style="color: #C2C3C5">                0.0 = no match on required clause (text:five)</span></span>
+<span class="line" id="L419"><span style="color: #C2C3C5">                  0.0 = no matching term</span></span>
+<span class="line" id="L420"><span style="color: #C2C3C5">                */</span></span>
+<span class="line" id="L421"><span style="color: #24292EFF">            }</span></span>
+<span class="line" id="L422"><span style="color: #24292EFF">        } </span><span style="color: #D32F2F">finally</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L423"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> indexFile </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">listAll</span><span style="color: #24292EFF">(tmpDir)) {</span></span>
+<span class="line" id="L424"><span style="color: #24292EFF">                </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">deleteIfExists</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">tmpDir</span><span style="color: #212121">.</span><span style="color: #6F42C1">resolve</span><span style="color: #24292EFF">(indexFile));</span></span>
+<span class="line" id="L425"><span style="color: #24292EFF">            }</span></span>
+<span class="line" id="L426"><span style="color: #24292EFF">            </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">deleteIfExists</span><span style="color: #24292EFF">(tmpDir);</span></span>
+<span class="line" id="L427"><span style="color: #24292EFF">        }</span></span>
+<span class="line" id="L428"><span style="color: #24292EFF">    }</span></span>
+<span class="line empty-line" id="L429"></span>
+<span class="line empty-line" id="L430"></span>
+<span class="line" id="L431"><span style="color: #24292EFF">}</span></span>
+<span class="line empty-line" id="L432"></span>
+<span class="line empty-line" id="L433"></span></code></pre>
+      
+    </div>
+    <footer>
+      <div>
+        Generated by <a href="https://github.com/mercmobily/docco">Docco</a>
+      </div>
+    </footer>
   </div>
 </body>
 </html>

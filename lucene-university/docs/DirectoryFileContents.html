@@ -4,93 +4,140 @@
 <head>
   <title>Lucene file content (with SimpleTextCodec)</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
   <link rel="stylesheet" media="all" href="docco.css" />
 </head>
 <body>
-  <div id="container">
-    <div id="background"></div>
-    
-      <ul id="jump_to">
-        <li>
-          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
-          <a class="small" href="javascript:void(0);">+</a>
-          <div id="jump_wrapper">
-          <div id="jump_page_wrapper">
-            <div id="jump_page">
+  <div class="container">
+    <div class="main">
+
+      <div class="header">
+        <h1>Lucene file content (with SimpleTextCodec)</h1>
+
+        
+          <div class="toc">
+            <h3>Table of Contents</h3>
+            <ol>
               
                 
-                <a class="source" href="AnalyzerBasics.html">
-                  AnalyzerBasics.java
-                </a>
+                <li>
+                  <a class="source" href="AnalyzerBasics.html">
+                    AnalyzerBasics.java
+                  </a>
+                </li>
               
                 
-                <a class="source" href="BooleanQueryANDInternals.html">
-                  BooleanQueryANDInternals.java
-                </a>
+                <li>
+                  <a class="source" href="BooleanQueryANDInternals.html">
+                    BooleanQueryANDInternals.java
+                  </a>
+                </li>
               
                 
-                <a class="source" href="BooleanQueryIntro.html">
-                  BooleanQueryIntro.java
-                </a>
+                <li>
+                  <a class="source" href="BooleanQueryIntro.html">
+                    BooleanQueryIntro.java
+                  </a>
+                </li>
               
                 
-                <a class="source" href="BottomUpIndexReader.html">
-                  BottomUpIndexReader.java
-                </a>
+                <li>
+                  <a class="source" href="BottomUpIndexReader.html">
+                    BottomUpIndexReader.java
+                  </a>
+                </li>
               
                 
-                <a class="source" href="DirectoryFileContents.html">
-                  DirectoryFileContents.java
-                </a>
+                <li>
+                  <a class="source" href="BytesRefHashExample.html">
+                    BytesRefHashExample.java
+                  </a>
+                </li>
               
                 
-                <a class="source" href="FunctionQuerySearchExample.html">
-                  FunctionQuerySearchExample.java
-                </a>
+                <li>
+                  <a class="source" href="CombinedFieldQueryExample.html">
+                    CombinedFieldQueryExample.java
+                  </a>
+                </li>
               
                 
-                <a class="source" href="KnnSearchExample.html">
-                  KnnSearchExample.java
-                </a>
+                <li>
+                  <a class="source" href="DirectoryFileContents.html">
+                    DirectoryFileContents.java
+                  </a>
+                </li>
               
                 
-                <a class="source" href="PointTreeRangeQuery.html">
-                  PointTreeRangeQuery.java
-                </a>
+                <li>
+                  <a class="source" href="DocValuesSearchExample.html">
+                    DocValuesSearchExample.java
+                  </a>
+                </li>
               
                 
-                <a class="source" href="SearchWithTermsEnum.html">
-                  SearchWithTermsEnum.java
-                </a>
+                <li>
+                  <a class="source" href="FunctionQuerySearchExample.html">
+                    FunctionQuerySearchExample.java
+                  </a>
+                </li>
               
                 
-                <a class="source" href="SimpleSearch.html">
-                  SimpleSearch.java
-                </a>
+                <li>
+                  <a class="source" href="KnnSearchExample.html">
+                    KnnSearchExample.java
+                  </a>
+                </li>
               
                 
-                <a class="source" href="VisualizePointTree.html">
-                  VisualizePointTree.java
-                </a>
+                <li>
+                  <a class="source" href="PointTreeRangeQuery.html">
+                    PointTreeRangeQuery.java
+                  </a>
+                </li>
               
-            </div>
+                
+                <li>
+                  <a class="source" href="PrimitivesRef.html">
+                    PrimitivesRef.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SearchWithTermsEnum.html">
+                    SearchWithTermsEnum.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SimpleSearch.html">
+                    SimpleSearch.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="TextVectorSearchExample.html">
+                    TextVectorSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="VisualizePointTree.html">
+                    VisualizePointTree.java
+                  </a>
+                </li>
+              
+            </ol>
           </div>
-        </li>
-      </ul>
-    
-    <ul class="sections">
         
+      </div>
+      
         
-        
-        <li id="section-1">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-1">&#x00a7;</a>
-              </div>
-              <h1 id="lucene-file-content-with-simpletextcodec">Lucene file content (with SimpleTextCodec)</h1>
-<p>This worked example helps explain what data structures exist in a Lucene index and how they are stored (albeit with
+        <p>This worked example helps explain what data structures exist in a Lucene index and how they are stored (albeit with
 a text representation – the real implementations use very compact binary files).</p>
 <p>Unlike some other examples, the interesting part is not the code, but rather the output, which is included below
 the <code>DirectoryFileContents</code> class.</p>
@@ -98,228 +145,161 @@ the <code>DirectoryFileContents</code> class.</p>
 producing files too large to walk through here). Readers are encouraged to modify the <code>createDocuments</code> method
 to add other field types, add more documents, etc.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>
-<span class="hljs-keyword">package</span> example.basic;
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 14;"><span class="line" id="L14"><span style="color: #D32F2F">package</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">basic</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L15"></span>
+<span class="line" id="L16"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">codecs</span><span style="color: #212121">.</span><span style="color: #D32F2F">simpletext</span><span style="color: #212121">.</span><span style="color: #D32F2F">SimpleTextCodec</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L17"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">Field</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L18"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">IntField</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L19"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">TextField</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L20"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexWriter</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L21"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexWriterConfig</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L22"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexableField</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L23"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">store</span><span style="color: #212121">.</span><span style="color: #D32F2F">Directory</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L24"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">store</span><span style="color: #212121">.</span><span style="color: #D32F2F">FSDirectory</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L25"></span>
+<span class="line" id="L26"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">io</span><span style="color: #212121">.</span><span style="color: #D32F2F">IOException</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L27"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">nio</span><span style="color: #212121">.</span><span style="color: #D32F2F">file</span><span style="color: #212121">.</span><span style="color: #D32F2F">Files</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L28"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">nio</span><span style="color: #212121">.</span><span style="color: #D32F2F">file</span><span style="color: #212121">.</span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L29"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">ArrayList</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L30"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L31"></span>
+<span class="line empty-line" id="L32"></span></code></pre>
+      
+        
+        <h2 id="example-code">Example code</h2>
 
-<span class="hljs-keyword">import</span> org.apache.lucene.codecs.simpletext.SimpleTextCodec;
-<span class="hljs-keyword">import</span> org.apache.lucene.document.Field;
-<span class="hljs-keyword">import</span> org.apache.lucene.document.IntField;
-<span class="hljs-keyword">import</span> org.apache.lucene.document.TextField;
-<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexWriter;
-<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexWriterConfig;
-<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexableField;
-<span class="hljs-keyword">import</span> org.apache.lucene.store.Directory;
-<span class="hljs-keyword">import</span> org.apache.lucene.store.FSDirectory;
+        
+      
+        
+        
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 33;"><span class="line" id="L33"><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">DirectoryFileContents</span><span style="color: #24292EFF"> {</span></span>
+<span class="line empty-line" id="L34"></span>
+<span class="line empty-line" id="L35"></span></code></pre>
+      
+        
+        <h3 id="creating-documents">Creating Documents</h3>
 
-<span class="hljs-keyword">import</span> java.io.IOException;
-<span class="hljs-keyword">import</span> java.nio.file.Files;
-<span class="hljs-keyword">import</span> java.nio.file.Path;
-<span class="hljs-keyword">import</span> java.util.ArrayList;
-<span class="hljs-keyword">import</span> java.util.List;</pre></div></div>
-            
-        </li>
         
+      
         
-        <li id="section-2">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-2">&#x00a7;</a>
-              </div>
-              <h2 id="example-code">Example code</h2>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre><span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">DirectoryFileContents</span> {</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-3">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-3">&#x00a7;</a>
-              </div>
-              <h3 id="creating-documents">Creating Documents</h3>
-<p>We will mostly reuse the same documents from SimpleSearch, but we’ll also add a numeric <code>IntField</code> which will
+        <p>We will mostly reuse the same documents from SimpleSearch, but we’ll also add a numeric <code>IntField</code> which will
 write both points and doc values. Points are covered in more detail by examples in the “points” package.</p>
 <p>To make the output mildly more interesting, let’s not add the numeric field to one of the documents.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> List&lt;List&lt;IndexableField&gt;&gt; <span class="hljs-title function_">createDocuments</span><span class="hljs-params">()</span> {
-        List&lt;String&gt; texts = List.of(
-                <span class="hljs-string">&quot;The quick fox jumped over the lazy, brown dog&quot;</span>,
-                <span class="hljs-string">&quot;Lorem ipsum, dolor sit amet&quot;</span>,
-                <span class="hljs-string">&quot;She left the web, she left the loom, she made three paces through the room&quot;</span>,
-                <span class="hljs-string">&quot;The sly fox sneaks past the oblivious dog&quot;</span>
-        );
-        List&lt;List&lt;IndexableField&gt;&gt; docs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
-        <span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
-        <span class="hljs-keyword">for</span> (String text : texts) {
-            List&lt;IndexableField&gt; doc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
-            doc.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TextField</span>(<span class="hljs-string">&quot;text&quot;</span>, text, Field.Store.YES));
-            <span class="hljs-comment">/* I want one document to miss &quot;val&quot; */</span>
-            <span class="hljs-keyword">if</span> (++i != <span class="hljs-number">2</span>) {
-                doc.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">IntField</span>(<span class="hljs-string">&quot;val&quot;</span>, i, Field.Store.YES));
-            }
-            docs.add(doc);
-        }
-        <span class="hljs-keyword">return</span> docs;
-    }</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 41;"><span class="line" id="L41"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">List&lt;List&lt;</span><span style="color: #24292EFF">IndexableField</span><span style="color: #D32F2F">&gt;&gt;</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createDocuments()</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L42"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF">&gt; texts </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">List</span><span style="color: #212121">.</span><span style="color: #6F42C1">of</span><span style="color: #24292EFF">(</span></span>
+<span class="line" id="L43"><span style="color: #24292EFF">                </span><span style="color: #22863A">&quot;The quick fox jumped over the lazy, brown dog&quot;</span><span style="color: #212121">,</span></span>
+<span class="line" id="L44"><span style="color: #24292EFF">                </span><span style="color: #22863A">&quot;Lorem ipsum, dolor sit amet&quot;</span><span style="color: #212121">,</span></span>
+<span class="line" id="L45"><span style="color: #24292EFF">                </span><span style="color: #22863A">&quot;She left the web, she left the loom, she made three paces through the room&quot;</span><span style="color: #212121">,</span></span>
+<span class="line" id="L46"><span style="color: #24292EFF">                </span><span style="color: #22863A">&quot;The sly fox sneaks past the oblivious dog&quot;</span></span>
+<span class="line" id="L47"><span style="color: #24292EFF">        );</span></span>
+<span class="line" id="L48"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">IndexableField</span><span style="color: #24292EFF">&gt;&gt; docs </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">ArrayList</span><span style="color: #24292EFF">&lt;&gt;();</span></span>
+<span class="line" id="L49"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L50"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> text </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> texts) {</span></span>
+<span class="line" id="L51"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">IndexableField</span><span style="color: #24292EFF">&gt; doc </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">ArrayList</span><span style="color: #24292EFF">&lt;&gt;();</span></span>
+<span class="line" id="L52"><span style="color: #24292EFF">            </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TextField(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> text</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">Field</span><span style="color: #212121">.</span><span style="color: #1976D2">Store</span><span style="color: #212121">.</span><span style="color: #1976D2">YES</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L53"><span style="color: #24292EFF">            </span><span style="color: #C2C3C5">/* I want one document to miss &quot;val&quot; */</span></span>
+<span class="line" id="L54"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">i </span><span style="color: #D32F2F">!=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">2</span><span style="color: #24292EFF">) {</span></span>
+<span class="line" id="L55"><span style="color: #24292EFF">                </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IntField(</span><span style="color: #22863A">&quot;val&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> i</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">Field</span><span style="color: #212121">.</span><span style="color: #1976D2">Store</span><span style="color: #212121">.</span><span style="color: #1976D2">YES</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L56"><span style="color: #24292EFF">            }</span></span>
+<span class="line" id="L57"><span style="color: #24292EFF">            </span><span style="color: #1976D2">docs</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(doc);</span></span>
+<span class="line" id="L58"><span style="color: #24292EFF">        }</span></span>
+<span class="line" id="L59"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> docs;</span></span>
+<span class="line" id="L60"><span style="color: #24292EFF">    }</span></span>
+<span class="line empty-line" id="L61"></span>
+<span class="line empty-line" id="L62"></span></code></pre>
+      
         
-        
-        <li id="section-4">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-4">&#x00a7;</a>
-              </div>
-              <h3 id="create-the-lucene-index-with-simpletextcodec">Create the Lucene index with SimpleTextCodec</h3>
+        <h3 id="create-the-lucene-index-with-simpletextcodec">Create the Lucene index with SimpleTextCodec</h3>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> IOException {
-        <span class="hljs-type">Path</span> <span class="hljs-variable">tmpDir</span> <span class="hljs-operator">=</span> Files.createTempDirectory(DirectoryFileContents.class.getSimpleName());</pre></div></div>
-            
-        </li>
+        
+      
         
         
-        <li id="section-5">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-5">&#x00a7;</a>
-              </div>
-              <p>In other examples, we have been using the default <code>IndexWriterConfig</code>. This time, we construct the
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 64;"><span class="line" id="L64"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">main(</span><span style="color: #D32F2F">String</span><span style="color: #6F42C1">[] args)</span><span style="color: #24292EFF"> throws IOException {</span></span>
+<span class="line" id="L65"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF"> tmpDir </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">createTempDirectory</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">DirectoryFileContents</span><span style="color: #212121">.</span><span style="color: #1976D2">class</span><span style="color: #212121">.</span><span style="color: #6F42C1">getSimpleName</span><span style="color: #24292EFF">());</span></span>
+<span class="line empty-line" id="L66"></span>
+<span class="line empty-line" id="L67"></span></code></pre>
+      
+        
+        <p>In other examples, we have been using the default <code>IndexWriterConfig</code>. This time, we construct the
 IndexWriterConfig, but override the codec.</p>
 <p>Codecs are Lucene’s abstraction that define how low-level constructs are written as files. The default
 codecs are highly-tuned for compact size and good read/write performance, while SimpleTextCodec is designed
 to be human-readable. The JavaDoc for SimpleTextCodec (and its associated classes) says
 <strong>FOR RECREATIONAL USE ONLY</strong>.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-type">IndexWriterConfig</span> <span class="hljs-variable">conf</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexWriterConfig</span>();
-        conf.setCodec(<span class="hljs-keyword">new</span> <span class="hljs-title class_">SimpleTextCodec</span>());</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 75;"><span class="line" id="L75"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">IndexWriterConfig</span><span style="color: #24292EFF"> conf </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexWriterConfig()</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L76"><span style="color: #24292EFF">        </span><span style="color: #1976D2">conf</span><span style="color: #212121">.</span><span style="color: #6F42C1">setCodec</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">SimpleTextCodec()</span><span style="color: #24292EFF">);</span></span>
+<span class="line empty-line" id="L77"></span></code></pre>
+      
         
-        
-        <li id="section-6">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-6">&#x00a7;</a>
-              </div>
-              <p>By default, Lucene writes small segments as a single “compound” file. To make the output easier to read,
+        <p>By default, Lucene writes small segments as a single “compound” file. To make the output easier to read,
 we disable that with <code>setUseCompoundFile(false)</code>.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        conf.setUseCompoundFile(<span class="hljs-literal">false</span>);
-        <span class="hljs-keyword">try</span> (<span class="hljs-type">Directory</span> <span class="hljs-variable">directory</span> <span class="hljs-operator">=</span> FSDirectory.open(tmpDir);
-             <span class="hljs-type">IndexWriter</span> <span class="hljs-variable">writer</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexWriter</span>(directory, conf)) {
-            <span class="hljs-keyword">for</span> (List&lt;IndexableField&gt; doc : createDocuments()) {
-                writer.addDocument(doc);
-            }
-        } <span class="hljs-keyword">finally</span> {</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 79;"><span class="line" id="L79"><span style="color: #24292EFF">        </span><span style="color: #1976D2">conf</span><span style="color: #212121">.</span><span style="color: #6F42C1">setUseCompoundFile</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">false</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L80"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">Directory</span><span style="color: #24292EFF"> directory </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(tmpDir);</span></span>
+<span class="line" id="L81"><span style="color: #24292EFF">             </span><span style="color: #D32F2F">IndexWriter</span><span style="color: #24292EFF"> writer </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexWriter(directory</span><span style="color: #212121">,</span><span style="color: #6F42C1"> conf)</span><span style="color: #24292EFF">) {</span></span>
+<span class="line" id="L82"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">IndexableField</span><span style="color: #24292EFF">&gt; doc </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createDocuments()</span><span style="color: #24292EFF">) {</span></span>
+<span class="line" id="L83"><span style="color: #24292EFF">                </span><span style="color: #1976D2">writer</span><span style="color: #212121">.</span><span style="color: #6F42C1">addDocument</span><span style="color: #24292EFF">(doc);</span></span>
+<span class="line" id="L84"><span style="color: #24292EFF">            }</span></span>
+<span class="line" id="L85"><span style="color: #24292EFF">        } </span><span style="color: #D32F2F">finally</span><span style="color: #24292EFF"> {</span></span>
+<span class="line empty-line" id="L86"></span></code></pre>
+      
         
-        
-        <li id="section-7">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-7">&#x00a7;</a>
-              </div>
-              <h3 id="dump-the-index-contents">Dump the index contents</h3>
-<p>Once we’ve closed the IndexWriter, before we delete each file, we print each file name and its size.</p>
+        <h3 id="dump-the-index-contents">Dump the index contents</h3>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>            <span class="hljs-keyword">for</span> (String indexFile : FSDirectory.listAll(tmpDir)) {
-                <span class="hljs-type">Path</span> <span class="hljs-variable">path</span> <span class="hljs-operator">=</span> tmpDir.resolve(indexFile);
-                <span class="hljs-type">long</span> <span class="hljs-variable">size</span> <span class="hljs-operator">=</span> Files.size(path);
-                System.out.println(<span class="hljs-string">&quot;File &quot;</span> + indexFile + <span class="hljs-string">&quot; has size &quot;</span> + size);</pre></div></div>
-            
-        </li>
         
+      
         
-        <li id="section-8">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-8">&#x00a7;</a>
-              </div>
-              <p>Don’t output the segmentinfos (.si) file yet, because it may contain non-UTF-8 bytes.
+        <p>Once we’ve closed the IndexWriter, before we delete each file, we print each file name and its size.</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 90;"><span class="line" id="L90"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> indexFile </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">listAll</span><span style="color: #24292EFF">(tmpDir)) {</span></span>
+<span class="line" id="L91"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF"> path </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">tmpDir</span><span style="color: #212121">.</span><span style="color: #6F42C1">resolve</span><span style="color: #24292EFF">(indexFile);</span></span>
+<span class="line" id="L92"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">long</span><span style="color: #24292EFF"> size </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">size</span><span style="color: #24292EFF">(path);</span></span>
+<span class="line" id="L93"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;File &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> indexFile </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; has size &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> size);</span></span>
+<span class="line empty-line" id="L94"></span></code></pre>
+      
+        
+        <p>Don’t output the segmentinfos (.si) file yet, because it may contain non-UTF-8 bytes.
 (See <a href="https://github.com/apache/lucene/pull/12897">https://github.com/apache/lucene/pull/12897</a>.)
 Also, don’t output the “segments_1” file, because it is always a binary file, independent of the
 codec. (The <code>IndexReader</code> opens the last “segments_*”, which explains what codec was used to write
 each segment.)</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>                <span class="hljs-keyword">if</span> (!indexFile.endsWith(<span class="hljs-string">&quot;.si&quot;</span>) &amp;&amp; !indexFile.startsWith(<span class="hljs-string">&quot;segments_&quot;</span>)) {
-                    System.out.println(Files.readString(path));
-                }
-                Files.deleteIfExists(path);
-            }</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 99;"><span class="line" id="L99"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">!</span><span style="color: #1976D2">indexFile</span><span style="color: #212121">.</span><span style="color: #6F42C1">endsWith</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;.si&quot;</span><span style="color: #24292EFF">) </span><span style="color: #D32F2F">&amp;&amp;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">!</span><span style="color: #1976D2">indexFile</span><span style="color: #212121">.</span><span style="color: #6F42C1">startsWith</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;segments_&quot;</span><span style="color: #24292EFF">)) {</span></span>
+<span class="line" id="L100"><span style="color: #24292EFF">                    </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">readString</span><span style="color: #24292EFF">(path));</span></span>
+<span class="line" id="L101"><span style="color: #24292EFF">                }</span></span>
+<span class="line" id="L102"><span style="color: #24292EFF">                </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">deleteIfExists</span><span style="color: #24292EFF">(path);</span></span>
+<span class="line" id="L103"><span style="color: #24292EFF">            }</span></span>
+<span class="line empty-line" id="L104"></span></code></pre>
+      
         
-        
-        <li id="section-9">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-9">&#x00a7;</a>
-              </div>
-              <p>Then we delete the directory itself.</p>
+        <p>Then we delete the directory itself.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>            Files.deleteIfExists(tmpDir);
-        }
-    }
-}
-<span class="hljs-comment">/*
-</span></pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 105;"><span class="line" id="L105"><span style="color: #24292EFF">            </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">deleteIfExists</span><span style="color: #24292EFF">(tmpDir);</span></span>
+<span class="line" id="L106"><span style="color: #24292EFF">        }</span></span>
+<span class="line" id="L107"><span style="color: #24292EFF">    }</span></span>
+<span class="line" id="L108"><span style="color: #24292EFF">}</span></span>
+<span class="line" id="L109"><span style="color: #C2C3C5">/*</span></span>
+<span class="line empty-line" id="L110"></span></code></pre>
+      
         
+        <h2 id="program-output">Program output</h2>
+
         
-        <li id="section-10">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-10">&#x00a7;</a>
-              </div>
-              <h2 id="program-output">Program output</h2>
-<p>The program dumps the following files. Let’s explore the files one-by-one.</p>
+      
+        
+        <p>The program dumps the following files. Let’s explore the files one-by-one.</p>
 <p>Note that the SimpleTextCodec is an implementation that is conceptually similar to the real binary codecs, but
 certainly // not identical. There are compromises that SimpleTextCodec has made to implement a fully-functioning
 codec in plain text.</p>
+<h3 id="doc-values">Doc values</h3>
 
-            </div>
-            
-        </li>
         
+      
         
-        <li id="section-11">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-11">&#x00a7;</a>
-              </div>
-              <h3 id="doc-values">Doc values</h3>
-<p>The <code>.dat</code> file stores the doc values for the <code>val</code> field.</p>
+        <p>The <code>.dat</code> file stores the doc values for the <code>val</code> field.</p>
 <p>The <code>IntField</code> uses the “binary” doc values format. In this case, each value has a maximum length of 1 byte.
 The “maxlength” and “pattern” values let us efficiently seek to the start of a document’s values. Specifically,
 relative to the start of the ddc values (i.e. the byte following the newline after <code>pattern 0</code>), a given document’s
@@ -329,141 +309,129 @@ values start at <code>startOffset + (9 + pattern.length + maxlength + 2) * docNu
 each document has a single value for <code>val</code>, except the second document, which has none.</p>
 <p>Each Lucene file has a trailing <code>checksum</code> used to verify the file integrity and protect against flipped bits.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>File _0.dat has size <span class="hljs-number">136</span>
-field val
-  type BINARY
-  maxlength <span class="hljs-number">1</span>
-  pattern <span class="hljs-number">0</span>
-length <span class="hljs-number">1</span>
-<span class="hljs-number">1</span>
-T
-length <span class="hljs-number">0</span>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 133;"><span class="line" id="L133"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">dat</span><span style="color: #24292EFF"> has size </span><span style="color: #1976D2">136</span></span>
+<span class="line" id="L134"><span style="color: #24292EFF">field val</span></span>
+<span class="line" id="L135"><span style="color: #24292EFF">  type </span><span style="color: #D32F2F">BINARY</span></span>
+<span class="line" id="L136"><span style="color: #24292EFF">  maxlength </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L137"><span style="color: #24292EFF">  pattern </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L138"><span style="color: #24292EFF">length </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L139"><span style="color: #1976D2">1</span></span>
+<span class="line" id="L140"><span style="color: #D32F2F">T</span></span>
+<span class="line" id="L141"><span style="color: #24292EFF">length </span><span style="color: #1976D2">0</span></span>
+<span class="line empty-line" id="L142"></span>
+<span class="line" id="L143"><span style="color: #D32F2F">F</span></span>
+<span class="line" id="L144"><span style="color: #24292EFF">length </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L145"><span style="color: #1976D2">3</span></span>
+<span class="line" id="L146"><span style="color: #D32F2F">T</span></span>
+<span class="line" id="L147"><span style="color: #24292EFF">length </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L148"><span style="color: #1976D2">4</span></span>
+<span class="line" id="L149"><span style="color: #D32F2F">T</span></span>
+<span class="line" id="L150"><span style="color: #D32F2F">END</span></span>
+<span class="line" id="L151"><span style="color: #24292EFF">checksum </span><span style="color: #1976D2">00000000001474172410</span></span>
+<span class="line empty-line" id="L152"></span>
+<span class="line empty-line" id="L153"></span></code></pre>
+      
+        
+        <h3 id="points">Points</h3>
 
-F
-length <span class="hljs-number">1</span>
-<span class="hljs-number">3</span>
-T
-length <span class="hljs-number">1</span>
-<span class="hljs-number">4</span>
-T
-END
-checksum <span class="hljs-number">00000000001474172410</span></pre></div></div>
-            
-        </li>
         
+      
         
-        <li id="section-12">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-12">&#x00a7;</a>
-              </div>
-              <h3 id="points">Points</h3>
-<p>The <code>.dii</code> file stores an index to locate the point data for individual fields in the <code>.dim</code> file. In this case,
+        <p>The <code>.dii</code> file stores an index to locate the point data for individual fields in the <code>.dim</code> file. In this case,
 the point tree for the field <code>val</code> starts at byte 113 in the <code>.dim</code> file.</p>
 <p>That byte corresponds to the line <code>num data dims 1</code>. The contents of the file before that are the “blocks” in the
 “block K-d” tree, corresponding to leaves of the tree. In this case, since we only have 3 documents with points,
 they all fit in a single block. The offset of this leaf is specified as part of the tree definition, in the line
 <code>block fp 0</code> (i.e. the block starts at byte 0 of the file).</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>File _0.dii has size <span class="hljs-number">79</span>
-field count <span class="hljs-number">1</span>
-  field fp name val
-  field fp <span class="hljs-number">113</span>
-checksum 00000000001996750873
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 162;"><span class="line" id="L162"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">dii</span><span style="color: #24292EFF"> has size </span><span style="color: #1976D2">79</span></span>
+<span class="line" id="L163"><span style="color: #24292EFF">field count </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L164"><span style="color: #24292EFF">  field fp name val</span></span>
+<span class="line" id="L165"><span style="color: #24292EFF">  field fp </span><span style="color: #1976D2">113</span></span>
+<span class="line" id="L166"><span style="color: #24292EFF">checksum 00000000001996750873</span></span>
+<span class="line empty-line" id="L167"></span>
+<span class="line" id="L168"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">dim</span><span style="color: #24292EFF"> has size </span><span style="color: #1976D2">361</span></span>
+<span class="line" id="L169"><span style="color: #24292EFF">block count </span><span style="color: #1976D2">3</span></span>
+<span class="line" id="L170"><span style="color: #24292EFF">  doc </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L171"><span style="color: #24292EFF">  doc </span><span style="color: #1976D2">2</span></span>
+<span class="line" id="L172"><span style="color: #24292EFF">  doc </span><span style="color: #1976D2">3</span></span>
+<span class="line" id="L173"><span style="color: #24292EFF">  block value [</span><span style="color: #1976D2">80</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">1</span><span style="color: #24292EFF">]</span></span>
+<span class="line" id="L174"><span style="color: #24292EFF">  block value [</span><span style="color: #1976D2">80</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">3</span><span style="color: #24292EFF">]</span></span>
+<span class="line" id="L175"><span style="color: #24292EFF">  block value [</span><span style="color: #1976D2">80</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">4</span><span style="color: #24292EFF">]</span></span>
+<span class="line" id="L176"><span style="color: #24292EFF">num data dims </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L177"><span style="color: #24292EFF">num index dims </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L178"><span style="color: #24292EFF">bytes per dim </span><span style="color: #1976D2">4</span></span>
+<span class="line" id="L179"><span style="color: #24292EFF">max leaf points </span><span style="color: #1976D2">3</span></span>
+<span class="line" id="L180"><span style="color: #24292EFF">index count </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L181"><span style="color: #24292EFF">min value [</span><span style="color: #1976D2">80</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">1</span><span style="color: #24292EFF">]</span></span>
+<span class="line" id="L182"><span style="color: #24292EFF">max value [</span><span style="color: #1976D2">80</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">4</span><span style="color: #24292EFF">]</span></span>
+<span class="line" id="L183"><span style="color: #24292EFF">point count </span><span style="color: #1976D2">3</span></span>
+<span class="line" id="L184"><span style="color: #24292EFF">doc count </span><span style="color: #1976D2">3</span></span>
+<span class="line" id="L185"><span style="color: #24292EFF">  block fp </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L186"><span style="color: #24292EFF">split count </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L187"><span style="color: #24292EFF">  split dim </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L188"><span style="color: #24292EFF">  split value [</span><span style="color: #1976D2">0</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">]</span></span>
+<span class="line" id="L189"><span style="color: #D32F2F">END</span></span>
+<span class="line" id="L190"><span style="color: #24292EFF">checksum 00000000000107327399</span></span>
+<span class="line empty-line" id="L191"></span>
+<span class="line empty-line" id="L192"></span></code></pre>
+      
+        
+        <h3 id="stored-fields">Stored fields</h3>
 
-File _0.dim has size <span class="hljs-number">361</span>
-block count <span class="hljs-number">3</span>
-  doc <span class="hljs-number">0</span>
-  doc <span class="hljs-number">2</span>
-  doc <span class="hljs-number">3</span>
-  block value [<span class="hljs-number">80</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>]
-  block value [<span class="hljs-number">80</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">3</span>]
-  block value [<span class="hljs-number">80</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">4</span>]
-num data dims <span class="hljs-number">1</span>
-num index dims <span class="hljs-number">1</span>
-bytes per dim <span class="hljs-number">4</span>
-max leaf points <span class="hljs-number">3</span>
-index count <span class="hljs-number">1</span>
-min value [<span class="hljs-number">80</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">1</span>]
-max value [<span class="hljs-number">80</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">4</span>]
-point count <span class="hljs-number">3</span>
-doc count <span class="hljs-number">3</span>
-  block fp <span class="hljs-number">0</span>
-split count <span class="hljs-number">1</span>
-  split dim <span class="hljs-number">0</span>
-  split value [<span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span> <span class="hljs-number">0</span>]
-END
-checksum 00000000000107327399</pre></div></div>
-            
-        </li>
         
+      
         
-        <li id="section-13">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-13">&#x00a7;</a>
-              </div>
-              <h3 id="stored-fields">Stored fields</h3>
-<p>The <code>.fld</code> file keep stored field, used to retrieve the original field values as sent to the index writer.</p>
+        <p>The <code>.fld</code> file keep stored field, used to retrieve the original field values as sent to the index writer.</p>
 <p>Stored fields are organized into a hierarchy of Document -&gt; Field ordinal -&gt; Field value. A multi-valued field
 (not to be confused with a multi-dimensional point) is just the same field added to the document multiple times,
 and will be assigned multiple stored field ordinals based on the order that the fields were added.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>File _0.fld has size <span class="hljs-number">593</span>
-doc <span class="hljs-number">0</span>
-  field <span class="hljs-number">0</span>
-    name text
-    type string
-    value The quick fox jumped over the lazy, brown dog
-  field <span class="hljs-number">1</span>
-    name val
-    type <span class="hljs-type">int</span>
-    value <span class="hljs-number">1</span>
-doc <span class="hljs-number">1</span>
-  field <span class="hljs-number">0</span>
-    name text
-    type string
-    value Lorem ipsum, dolor sit amet
-doc <span class="hljs-number">2</span>
-  field <span class="hljs-number">0</span>
-    name text
-    type string
-    value She left the web, she left the loom, she made three paces through the room
-  field <span class="hljs-number">1</span>
-    name val
-    type <span class="hljs-type">int</span>
-    value <span class="hljs-number">3</span>
-doc <span class="hljs-number">3</span>
-  field <span class="hljs-number">0</span>
-    name text
-    type string
-    value The sly fox sneaks past the oblivious dog
-  field <span class="hljs-number">1</span>
-    name val
-    type <span class="hljs-type">int</span>
-    value <span class="hljs-number">4</span>
-END
-checksum 00000000000213864262</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 200;"><span class="line" id="L200"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">fld</span><span style="color: #24292EFF"> has size </span><span style="color: #1976D2">593</span></span>
+<span class="line" id="L201"><span style="color: #24292EFF">doc </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L202"><span style="color: #24292EFF">  field </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L203"><span style="color: #24292EFF">    name text</span></span>
+<span class="line" id="L204"><span style="color: #24292EFF">    type string</span></span>
+<span class="line" id="L205"><span style="color: #24292EFF">    value </span><span style="color: #D32F2F">The</span><span style="color: #24292EFF"> quick fox jumped over the lazy</span><span style="color: #212121">,</span><span style="color: #24292EFF"> brown dog</span></span>
+<span class="line" id="L206"><span style="color: #24292EFF">  field </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L207"><span style="color: #24292EFF">    name val</span></span>
+<span class="line" id="L208"><span style="color: #24292EFF">    type </span><span style="color: #D32F2F">int</span></span>
+<span class="line" id="L209"><span style="color: #24292EFF">    value </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L210"><span style="color: #24292EFF">doc </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L211"><span style="color: #24292EFF">  field </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L212"><span style="color: #24292EFF">    name text</span></span>
+<span class="line" id="L213"><span style="color: #24292EFF">    type string</span></span>
+<span class="line" id="L214"><span style="color: #24292EFF">    value </span><span style="color: #D32F2F">Lorem</span><span style="color: #24292EFF"> ipsum</span><span style="color: #212121">,</span><span style="color: #24292EFF"> dolor sit amet</span></span>
+<span class="line" id="L215"><span style="color: #24292EFF">doc </span><span style="color: #1976D2">2</span></span>
+<span class="line" id="L216"><span style="color: #24292EFF">  field </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L217"><span style="color: #24292EFF">    name text</span></span>
+<span class="line" id="L218"><span style="color: #24292EFF">    type string</span></span>
+<span class="line" id="L219"><span style="color: #24292EFF">    value </span><span style="color: #D32F2F">She</span><span style="color: #24292EFF"> left the web</span><span style="color: #212121">,</span><span style="color: #24292EFF"> she left the loom</span><span style="color: #212121">,</span><span style="color: #24292EFF"> she made three paces through the room</span></span>
+<span class="line" id="L220"><span style="color: #24292EFF">  field </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L221"><span style="color: #24292EFF">    name val</span></span>
+<span class="line" id="L222"><span style="color: #24292EFF">    type </span><span style="color: #D32F2F">int</span></span>
+<span class="line" id="L223"><span style="color: #24292EFF">    value </span><span style="color: #1976D2">3</span></span>
+<span class="line" id="L224"><span style="color: #24292EFF">doc </span><span style="color: #1976D2">3</span></span>
+<span class="line" id="L225"><span style="color: #24292EFF">  field </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L226"><span style="color: #24292EFF">    name text</span></span>
+<span class="line" id="L227"><span style="color: #24292EFF">    type string</span></span>
+<span class="line" id="L228"><span style="color: #24292EFF">    value </span><span style="color: #D32F2F">The</span><span style="color: #24292EFF"> sly fox sneaks past the oblivious dog</span></span>
+<span class="line" id="L229"><span style="color: #24292EFF">  field </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L230"><span style="color: #24292EFF">    name val</span></span>
+<span class="line" id="L231"><span style="color: #24292EFF">    type </span><span style="color: #D32F2F">int</span></span>
+<span class="line" id="L232"><span style="color: #24292EFF">    value </span><span style="color: #1976D2">4</span></span>
+<span class="line" id="L233"><span style="color: #D32F2F">END</span></span>
+<span class="line" id="L234"><span style="color: #24292EFF">checksum 00000000000213864262</span></span>
+<span class="line empty-line" id="L235"></span>
+<span class="line empty-line" id="L236"></span></code></pre>
+      
         
+        <h3 id="field-infos">Field infos</h3>
+
         
-        <li id="section-14">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-14">&#x00a7;</a>
-              </div>
-              <h3 id="field-infos">Field infos</h3>
-<p>The <code>.inf</code> file stores information about each field.</p>
+      
+        
+        <p>The <code>.inf</code> file stores information about each field.</p>
 <p>Note that many of the properties (e.g. <code>vector encoding</code> and <code>vector similarity</code>) are not applicable to the fields
 that we added. The values shown here are the field defaults. Several of the data structures are only created
 for a field if some property is set. For example, vectors are only written for fields where the
@@ -471,90 +439,82 @@ for a field if some property is set. For example, vectors are only written for f
 is not <code>NONE</code>. See the <code>IndexingChain.processField</code> method to see exactly how field type values decide what
 structures get written to an index for a field based on the field type properties.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>File _0.inf has size <span class="hljs-number">758</span>
-number of fields <span class="hljs-number">2</span>
-  name text
-  number <span class="hljs-number">0</span>
-  index options DOCS_AND_FREQS_AND_POSITIONS
-  term vectors <span class="hljs-literal">false</span>
-  payloads <span class="hljs-literal">false</span>
-  norms <span class="hljs-literal">true</span>
-  doc values NONE
-  doc values gen -<span class="hljs-number">1</span>
-  attributes <span class="hljs-number">0</span>
-  data dimensional count <span class="hljs-number">0</span>
-  index dimensional count <span class="hljs-number">0</span>
-  dimensional num bytes <span class="hljs-number">0</span>
-  vector number of dimensions <span class="hljs-number">0</span>
-  vector encoding FLOAT32
-  vector similarity EUCLIDEAN
-  soft-deletes <span class="hljs-literal">false</span>
-  name val
-  number <span class="hljs-number">1</span>
-  index options NONE
-  term vectors <span class="hljs-literal">false</span>
-  payloads <span class="hljs-literal">false</span>
-  norms <span class="hljs-literal">true</span>
-  doc values SORTED_NUMERIC
-  doc values gen -<span class="hljs-number">1</span>
-  attributes <span class="hljs-number">0</span>
-  data dimensional count <span class="hljs-number">1</span>
-  index dimensional count <span class="hljs-number">1</span>
-  dimensional num bytes <span class="hljs-number">4</span>
-  vector number of dimensions <span class="hljs-number">0</span>
-  vector encoding FLOAT32
-  vector similarity EUCLIDEAN
-  soft-deletes <span class="hljs-literal">false</span>
-checksum 00000000000798287814</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 247;"><span class="line" id="L247"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">inf</span><span style="color: #24292EFF"> has size </span><span style="color: #1976D2">758</span></span>
+<span class="line" id="L248"><span style="color: #24292EFF">number of fields </span><span style="color: #1976D2">2</span></span>
+<span class="line" id="L249"><span style="color: #24292EFF">  name text</span></span>
+<span class="line" id="L250"><span style="color: #24292EFF">  number </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L251"><span style="color: #24292EFF">  index options </span><span style="color: #D32F2F">DOCS_AND_FREQS_AND_POSITIONS</span></span>
+<span class="line" id="L252"><span style="color: #24292EFF">  term vectors </span><span style="color: #1976D2">false</span></span>
+<span class="line" id="L253"><span style="color: #24292EFF">  payloads </span><span style="color: #1976D2">false</span></span>
+<span class="line" id="L254"><span style="color: #24292EFF">  norms </span><span style="color: #1976D2">true</span></span>
+<span class="line" id="L255"><span style="color: #24292EFF">  doc values </span><span style="color: #D32F2F">NONE</span></span>
+<span class="line" id="L256"><span style="color: #24292EFF">  doc values gen </span><span style="color: #D32F2F">-</span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L257"><span style="color: #24292EFF">  attributes </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L258"><span style="color: #24292EFF">  data dimensional count </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L259"><span style="color: #24292EFF">  index dimensional count </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L260"><span style="color: #24292EFF">  dimensional num bytes </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L261"><span style="color: #24292EFF">  vector number of dimensions </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L262"><span style="color: #24292EFF">  vector encoding </span><span style="color: #D32F2F">FLOAT32</span></span>
+<span class="line" id="L263"><span style="color: #24292EFF">  vector similarity </span><span style="color: #D32F2F">EUCLIDEAN</span></span>
+<span class="line" id="L264"><span style="color: #24292EFF">  soft</span><span style="color: #D32F2F">-</span><span style="color: #24292EFF">deletes </span><span style="color: #1976D2">false</span></span>
+<span class="line" id="L265"><span style="color: #24292EFF">  name val</span></span>
+<span class="line" id="L266"><span style="color: #24292EFF">  number </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L267"><span style="color: #24292EFF">  index options </span><span style="color: #D32F2F">NONE</span></span>
+<span class="line" id="L268"><span style="color: #24292EFF">  term vectors </span><span style="color: #1976D2">false</span></span>
+<span class="line" id="L269"><span style="color: #24292EFF">  payloads </span><span style="color: #1976D2">false</span></span>
+<span class="line" id="L270"><span style="color: #24292EFF">  norms </span><span style="color: #1976D2">true</span></span>
+<span class="line" id="L271"><span style="color: #24292EFF">  doc values </span><span style="color: #D32F2F">SORTED_NUMERIC</span></span>
+<span class="line" id="L272"><span style="color: #24292EFF">  doc values gen </span><span style="color: #D32F2F">-</span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L273"><span style="color: #24292EFF">  attributes </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L274"><span style="color: #24292EFF">  data dimensional count </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L275"><span style="color: #24292EFF">  index dimensional count </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L276"><span style="color: #24292EFF">  dimensional num bytes </span><span style="color: #1976D2">4</span></span>
+<span class="line" id="L277"><span style="color: #24292EFF">  vector number of dimensions </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L278"><span style="color: #24292EFF">  vector encoding </span><span style="color: #D32F2F">FLOAT32</span></span>
+<span class="line" id="L279"><span style="color: #24292EFF">  vector similarity </span><span style="color: #D32F2F">EUCLIDEAN</span></span>
+<span class="line" id="L280"><span style="color: #24292EFF">  soft</span><span style="color: #D32F2F">-</span><span style="color: #24292EFF">deletes </span><span style="color: #1976D2">false</span></span>
+<span class="line" id="L281"><span style="color: #24292EFF">checksum 00000000000798287814</span></span>
+<span class="line empty-line" id="L282"></span>
+<span class="line empty-line" id="L283"></span></code></pre>
+      
         
+        <h3 id="norms">Norms</h3>
+
         
-        <li id="section-15">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-15">&#x00a7;</a>
-              </div>
-              <h3 id="norms">Norms</h3>
-<p>The <code>.len</code> file contains the norms for each text field in the index. The norms are the length (relative to term
+      
+        
+        <p>The <code>.len</code> file contains the norms for each text field in the index. The norms are the length (relative to term
 positions) of a text field in each document containing that field.</p>
 <p>In this case, we have a single text field called <code>text</code>. The norms are encoded as a “delta” from the shortest
 document in the segment. In this case, our shortest document is the second one with length 5 (represented as 00
 more than the <code>minvalue</code>). The longest document is the third one with length 15 (i.e. 10 more than <code>minValue</code>).</p>
 <p>Field length per document is an important value used in the tf-idf and BM25 scoring formulae.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>File _0.len has size <span class="hljs-number">106</span>
-field text
-  type NUMERIC
-  minvalue <span class="hljs-number">5</span>
-  pattern <span class="hljs-number">00</span>
-<span class="hljs-number">04</span>
-T
-<span class="hljs-number">00</span>
-T
-<span class="hljs-number">10</span>
-T
-<span class="hljs-number">03</span>
-T
-END
-checksum 00000000003850040528</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 294;"><span class="line" id="L294"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">len</span><span style="color: #24292EFF"> has size </span><span style="color: #1976D2">106</span></span>
+<span class="line" id="L295"><span style="color: #24292EFF">field text</span></span>
+<span class="line" id="L296"><span style="color: #24292EFF">  type </span><span style="color: #D32F2F">NUMERIC</span></span>
+<span class="line" id="L297"><span style="color: #24292EFF">  minvalue </span><span style="color: #1976D2">5</span></span>
+<span class="line" id="L298"><span style="color: #24292EFF">  pattern </span><span style="color: #1976D2">00</span></span>
+<span class="line" id="L299"><span style="color: #1976D2">04</span></span>
+<span class="line" id="L300"><span style="color: #D32F2F">T</span></span>
+<span class="line" id="L301"><span style="color: #1976D2">00</span></span>
+<span class="line" id="L302"><span style="color: #D32F2F">T</span></span>
+<span class="line" id="L303"><span style="color: #1976D2">10</span></span>
+<span class="line" id="L304"><span style="color: #D32F2F">T</span></span>
+<span class="line" id="L305"><span style="color: #1976D2">03</span></span>
+<span class="line" id="L306"><span style="color: #D32F2F">T</span></span>
+<span class="line" id="L307"><span style="color: #D32F2F">END</span></span>
+<span class="line" id="L308"><span style="color: #24292EFF">checksum 00000000003850040528</span></span>
+<span class="line empty-line" id="L309"></span>
+<span class="line empty-line" id="L310"></span></code></pre>
+      
         
+        <h3 id="postings">Postings</h3>
+
         
-        <li id="section-16">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-16">&#x00a7;</a>
-              </div>
-              <h3 id="postings">Postings</h3>
-<p>The postings, stored in <code>.pst</code> files, are the key data structure used for efficient text search in Lucene.</p>
+      
+        
+        <p>The postings, stored in <code>.pst</code> files, are the key data structure used for efficient text search in Lucene.</p>
 <p>Postings are organized from field to term to matching documents. In this case, since the <code>text</code> field was indexed
 with <code>DOCS_AND_FREQS_AND_POSITIONS</code> (see the “Field infos” section above), each document entry for a term encodes
 the frequency of the term in the document (used in scoring calculations), as well as the positions at which the
@@ -562,166 +522,158 @@ term can be found in the document (used for phrase and span queries).</p>
 <p>While many of the terms in our example occur in a single position in a single document, look at the postings for
 the term <code>the</code>, which appears in 3 documents, in multiple positions for each.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>File _0.pst has size <span class="hljs-number">1508</span>
-field text
-  term amet
-    doc <span class="hljs-number">1</span>
-      freq <span class="hljs-number">1</span>
-      pos <span class="hljs-number">4</span>
-  term brown
-    doc <span class="hljs-number">0</span>
-      freq <span class="hljs-number">1</span>
-      pos <span class="hljs-number">7</span>
-  term dog
-    doc <span class="hljs-number">0</span>
-      freq <span class="hljs-number">1</span>
-      pos <span class="hljs-number">8</span>
-    doc <span class="hljs-number">3</span>
-      freq <span class="hljs-number">1</span>
-      pos <span class="hljs-number">7</span>
-  term dolor
-    doc <span class="hljs-number">1</span>
-      freq <span class="hljs-number">1</span>
-      pos <span class="hljs-number">2</span>
-  term fox
-    doc <span class="hljs-number">0</span>
-      freq <span class="hljs-number">1</span>
-      pos <span class="hljs-number">2</span>
-    doc <span class="hljs-number">3</span>
-      freq <span class="hljs-number">1</span>
-      pos <span class="hljs-number">2</span>
-  term ipsum
-    doc <span class="hljs-number">1</span>
-      freq <span class="hljs-number">1</span>
-      pos <span class="hljs-number">1</span>
-  term jumped
-    doc <span class="hljs-number">0</span>
-      freq <span class="hljs-number">1</span>
-      pos <span class="hljs-number">3</span>
-  term lazy
-    doc <span class="hljs-number">0</span>
-      freq <span class="hljs-number">1</span>
-      pos <span class="hljs-number">6</span>
-  term left
-    doc <span class="hljs-number">2</span>
-      freq <span class="hljs-number">2</span>
-      pos <span class="hljs-number">1</span>
-      pos <span class="hljs-number">5</span>
-  term loom
-    doc <span class="hljs-number">2</span>
-      freq <span class="hljs-number">1</span>
-      pos <span class="hljs-number">7</span>
-  term lorem
-    doc <span class="hljs-number">1</span>
-      freq <span class="hljs-number">1</span>
-      pos <span class="hljs-number">0</span>
-  term made
-    doc <span class="hljs-number">2</span>
-      freq <span class="hljs-number">1</span>
-      pos <span class="hljs-number">9</span>
-  term oblivious
-    doc <span class="hljs-number">3</span>
-      freq <span class="hljs-number">1</span>
-      pos <span class="hljs-number">6</span>
-  term over
-    doc <span class="hljs-number">0</span>
-      freq <span class="hljs-number">1</span>
-      pos <span class="hljs-number">4</span>
-  term paces
-    doc <span class="hljs-number">2</span>
-      freq <span class="hljs-number">1</span>
-      pos <span class="hljs-number">11</span>
-  term past
-    doc <span class="hljs-number">3</span>
-      freq <span class="hljs-number">1</span>
-      pos <span class="hljs-number">4</span>
-  term quick
-    doc <span class="hljs-number">0</span>
-      freq <span class="hljs-number">1</span>
-      pos <span class="hljs-number">1</span>
-  term room
-    doc <span class="hljs-number">2</span>
-      freq <span class="hljs-number">1</span>
-      pos <span class="hljs-number">14</span>
-  term she
-    doc <span class="hljs-number">2</span>
-      freq <span class="hljs-number">3</span>
-      pos <span class="hljs-number">0</span>
-      pos <span class="hljs-number">4</span>
-      pos <span class="hljs-number">8</span>
-  term sit
-    doc <span class="hljs-number">1</span>
-      freq <span class="hljs-number">1</span>
-      pos <span class="hljs-number">3</span>
-  term sly
-    doc <span class="hljs-number">3</span>
-      freq <span class="hljs-number">1</span>
-      pos <span class="hljs-number">1</span>
-  term sneaks
-    doc <span class="hljs-number">3</span>
-      freq <span class="hljs-number">1</span>
-      pos <span class="hljs-number">3</span>
-  term the
-    doc <span class="hljs-number">0</span>
-      freq <span class="hljs-number">2</span>
-      pos <span class="hljs-number">0</span>
-      pos <span class="hljs-number">5</span>
-    doc <span class="hljs-number">2</span>
-      freq <span class="hljs-number">3</span>
-      pos <span class="hljs-number">2</span>
-      pos <span class="hljs-number">6</span>
-      pos <span class="hljs-number">13</span>
-    doc <span class="hljs-number">3</span>
-      freq <span class="hljs-number">2</span>
-      pos <span class="hljs-number">0</span>
-      pos <span class="hljs-number">5</span>
-  term three
-    doc <span class="hljs-number">2</span>
-      freq <span class="hljs-number">1</span>
-      pos <span class="hljs-number">10</span>
-  term through
-    doc <span class="hljs-number">2</span>
-      freq <span class="hljs-number">1</span>
-      pos <span class="hljs-number">12</span>
-  term web
-    doc <span class="hljs-number">2</span>
-      freq <span class="hljs-number">1</span>
-      pos <span class="hljs-number">3</span>
-END
-checksum 00000000001512782415</pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 322;"><span class="line" id="L322"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">pst</span><span style="color: #24292EFF"> has size </span><span style="color: #1976D2">1508</span></span>
+<span class="line" id="L323"><span style="color: #24292EFF">field text</span></span>
+<span class="line" id="L324"><span style="color: #24292EFF">  term amet</span></span>
+<span class="line" id="L325"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L326"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L327"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">4</span></span>
+<span class="line" id="L328"><span style="color: #24292EFF">  term brown</span></span>
+<span class="line" id="L329"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L330"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L331"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">7</span></span>
+<span class="line" id="L332"><span style="color: #24292EFF">  term dog</span></span>
+<span class="line" id="L333"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L334"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L335"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">8</span></span>
+<span class="line" id="L336"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">3</span></span>
+<span class="line" id="L337"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L338"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">7</span></span>
+<span class="line" id="L339"><span style="color: #24292EFF">  term dolor</span></span>
+<span class="line" id="L340"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L341"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L342"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">2</span></span>
+<span class="line" id="L343"><span style="color: #24292EFF">  term fox</span></span>
+<span class="line" id="L344"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L345"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L346"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">2</span></span>
+<span class="line" id="L347"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">3</span></span>
+<span class="line" id="L348"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L349"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">2</span></span>
+<span class="line" id="L350"><span style="color: #24292EFF">  term ipsum</span></span>
+<span class="line" id="L351"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L352"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L353"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L354"><span style="color: #24292EFF">  term jumped</span></span>
+<span class="line" id="L355"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L356"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L357"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">3</span></span>
+<span class="line" id="L358"><span style="color: #24292EFF">  term lazy</span></span>
+<span class="line" id="L359"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L360"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L361"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">6</span></span>
+<span class="line" id="L362"><span style="color: #24292EFF">  term left</span></span>
+<span class="line" id="L363"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">2</span></span>
+<span class="line" id="L364"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">2</span></span>
+<span class="line" id="L365"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L366"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">5</span></span>
+<span class="line" id="L367"><span style="color: #24292EFF">  term loom</span></span>
+<span class="line" id="L368"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">2</span></span>
+<span class="line" id="L369"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L370"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">7</span></span>
+<span class="line" id="L371"><span style="color: #24292EFF">  term lorem</span></span>
+<span class="line" id="L372"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L373"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L374"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L375"><span style="color: #24292EFF">  term made</span></span>
+<span class="line" id="L376"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">2</span></span>
+<span class="line" id="L377"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L378"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">9</span></span>
+<span class="line" id="L379"><span style="color: #24292EFF">  term oblivious</span></span>
+<span class="line" id="L380"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">3</span></span>
+<span class="line" id="L381"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L382"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">6</span></span>
+<span class="line" id="L383"><span style="color: #24292EFF">  term over</span></span>
+<span class="line" id="L384"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L385"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L386"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">4</span></span>
+<span class="line" id="L387"><span style="color: #24292EFF">  term paces</span></span>
+<span class="line" id="L388"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">2</span></span>
+<span class="line" id="L389"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L390"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">11</span></span>
+<span class="line" id="L391"><span style="color: #24292EFF">  term past</span></span>
+<span class="line" id="L392"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">3</span></span>
+<span class="line" id="L393"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L394"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">4</span></span>
+<span class="line" id="L395"><span style="color: #24292EFF">  term quick</span></span>
+<span class="line" id="L396"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L397"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L398"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L399"><span style="color: #24292EFF">  term room</span></span>
+<span class="line" id="L400"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">2</span></span>
+<span class="line" id="L401"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L402"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">14</span></span>
+<span class="line" id="L403"><span style="color: #24292EFF">  term she</span></span>
+<span class="line" id="L404"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">2</span></span>
+<span class="line" id="L405"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">3</span></span>
+<span class="line" id="L406"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L407"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">4</span></span>
+<span class="line" id="L408"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">8</span></span>
+<span class="line" id="L409"><span style="color: #24292EFF">  term sit</span></span>
+<span class="line" id="L410"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L411"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L412"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">3</span></span>
+<span class="line" id="L413"><span style="color: #24292EFF">  term sly</span></span>
+<span class="line" id="L414"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">3</span></span>
+<span class="line" id="L415"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L416"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L417"><span style="color: #24292EFF">  term sneaks</span></span>
+<span class="line" id="L418"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">3</span></span>
+<span class="line" id="L419"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L420"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">3</span></span>
+<span class="line" id="L421"><span style="color: #24292EFF">  term the</span></span>
+<span class="line" id="L422"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L423"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">2</span></span>
+<span class="line" id="L424"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L425"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">5</span></span>
+<span class="line" id="L426"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">2</span></span>
+<span class="line" id="L427"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">3</span></span>
+<span class="line" id="L428"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">2</span></span>
+<span class="line" id="L429"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">6</span></span>
+<span class="line" id="L430"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">13</span></span>
+<span class="line" id="L431"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">3</span></span>
+<span class="line" id="L432"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">2</span></span>
+<span class="line" id="L433"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">0</span></span>
+<span class="line" id="L434"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">5</span></span>
+<span class="line" id="L435"><span style="color: #24292EFF">  term three</span></span>
+<span class="line" id="L436"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">2</span></span>
+<span class="line" id="L437"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L438"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">10</span></span>
+<span class="line" id="L439"><span style="color: #24292EFF">  term through</span></span>
+<span class="line" id="L440"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">2</span></span>
+<span class="line" id="L441"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L442"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">12</span></span>
+<span class="line" id="L443"><span style="color: #24292EFF">  term web</span></span>
+<span class="line" id="L444"><span style="color: #24292EFF">    doc </span><span style="color: #1976D2">2</span></span>
+<span class="line" id="L445"><span style="color: #24292EFF">      freq </span><span style="color: #1976D2">1</span></span>
+<span class="line" id="L446"><span style="color: #24292EFF">      pos </span><span style="color: #1976D2">3</span></span>
+<span class="line" id="L447"><span style="color: #D32F2F">END</span></span>
+<span class="line" id="L448"><span style="color: #24292EFF">checksum 00000000001512782415</span></span>
+<span class="line empty-line" id="L449"></span>
+<span class="line empty-line" id="L450"></span></code></pre>
+      
         
+        <h3 id="segment-info">Segment info</h3>
+
         
-        <li id="section-17">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-17">&#x00a7;</a>
-              </div>
-              <h3 id="segment-info">Segment info</h3>
-<p>The segment info file <code>.si</code> stores information about all the other files involved in a segment.</p>
+      
+        
+        <p>The segment info file <code>.si</code> stores information about all the other files involved in a segment.</p>
 <p>While the segment info file is managed by the codec, the SimpleTextSegmentInfoFormat implementation currently
 outputs the raw bytes for the segment’s unique ID, so it is not a valid UTF-8 encoding.
 See <a href="https://github.com/apache/lucene/pull/12897">https://github.com/apache/lucene/pull/12897</a>.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>File _0.si has size <span class="hljs-number">739</span></pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 457;"><span class="line" id="L457"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">si</span><span style="color: #24292EFF"> has size </span><span style="color: #1976D2">739</span></span>
+<span class="line empty-line" id="L458"></span>
+<span class="line empty-line" id="L459"></span></code></pre>
+      
         
+        <h3 id="commit-file">Commit file</h3>
+
         
-        <li id="section-18">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-18">&#x00a7;</a>
-              </div>
-              <h3 id="commit-file">Commit file</h3>
-<p>Each commit increments the commit generation and writes a <code>segments_&lt;generation&gt;</code> file. When indexing from a single
+      
+        
+        <p>Each commit increments the commit generation and writes a <code>segments_&lt;generation&gt;</code> file. When indexing from a single
 thread with regular commits, the commit generation will often match the ordinal of the last segment (since each
 counts up by one on each commit). If segments are flushed without committing or flushed from multiple threads,
 the segment numbers will usually be higher than the commit generation.</p>
@@ -729,33 +681,32 @@ the segment numbers will usually be higher than the commit generation.</p>
 about what segments are part of the given commit and which codecs were used to write each segment. Since the
 file was not written by SimpleTextCodec, it is a binary file, so we don’t output it here.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>File segments_1 has size <span class="hljs-number">156</span></pre></div></div>
-            
-        </li>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 469;"><span class="line" id="L469"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> segments_1 has size </span><span style="color: #1976D2">156</span></span>
+<span class="line empty-line" id="L470"></span>
+<span class="line empty-line" id="L471"></span></code></pre>
+      
         
+        <h3 id="write-lock">Write lock</h3>
+
         
-        <li id="section-19">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-19">&#x00a7;</a>
-              </div>
-              <h3 id="write-lock">Write lock</h3>
-<p>On creation of the <code>IndexWriter</code>, a <code>write.lock</code> file is created and locked. The lock implementation is configurable,
+      
+        
+        <p>On creation of the <code>IndexWriter</code>, a <code>write.lock</code> file is created and locked. The lock implementation is configurable,
 but is usually based on a <code>java.nio.channels.FileLock</code>.</p>
 <p>The write lock ensures that no more than one IndexWriter is ever writing to the same directory.</p>
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>File write.lock has size <span class="hljs-number">0</span>
-
- */</pre></div></div>
-            
-        </li>
-        
-    </ul>
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 477;"><span class="line" id="L477"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">write</span><span style="color: #212121">.</span><span style="color: #1976D2">lock</span><span style="color: #24292EFF"> has size </span><span style="color: #1976D2">0</span></span>
+<span class="line empty-line" id="L478"></span>
+<span class="line" id="L479"><span style="color: #24292EFF"> </span><span style="color: #D32F2F">*/</span></span>
+<span class="line empty-line" id="L480"></span>
+<span class="line empty-line" id="L481"></span></code></pre>
+      
+    </div>
+    <footer>
+      <div>
+        Generated by <a href="https://github.com/mercmobily/docco">Docco</a>
+      </div>
+    </footer>
   </div>
 </body>
 </html>

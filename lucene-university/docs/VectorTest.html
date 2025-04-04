@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>VectorTest.java</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="main">
+
+      <div class="header">
+        <h1>VectorTest.java</h1>
+
+        
+          <div class="toc">
+            <h3>Table of Contents</h3>
+            <ol>
+              
+                
+                <li>
+                  <a class="source" href="AnalyzerBasics.html">
+                    AnalyzerBasics.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BooleanQueryANDInternals.html">
+                    BooleanQueryANDInternals.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BooleanQueryIntro.html">
+                    BooleanQueryIntro.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BottomUpIndexReader.html">
+                    BottomUpIndexReader.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DirectoryFileContents.html">
+                    DirectoryFileContents.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DocValuesSearchExample.html">
+                    DocValuesSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="FunctionQuerySearchExample.html">
+                    FunctionQuerySearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="KnnSearchExample.html">
+                    KnnSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="PointTreeRangeQuery.html">
+                    PointTreeRangeQuery.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SearchWithTermsEnum.html">
+                    SearchWithTermsEnum.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SimpleSearch.html">
+                    SimpleSearch.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="VectorTest.html">
+                    VectorTest.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="VisualizePointTree.html">
+                    VisualizePointTree.java
+                  </a>
+                </li>
+              
+            </ol>
+          </div>
+        
+      </div>
+      
+        
+        
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 1;"><span class="line" id="L1"><span style="color: #D32F2F">package</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">vectorization</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L2"></span>
+<span class="line" id="L3"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">jdk</span><span style="color: #212121">.</span><span style="color: #D32F2F">incubator</span><span style="color: #212121">.</span><span style="color: #D32F2F">vector</span><span style="color: #212121">.</span><span style="color: #D32F2F">IntVector</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L4"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">jdk</span><span style="color: #212121">.</span><span style="color: #D32F2F">incubator</span><span style="color: #212121">.</span><span style="color: #D32F2F">vector</span><span style="color: #212121">.</span><span style="color: #D32F2F">VectorOperators</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L5"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">jdk</span><span style="color: #212121">.</span><span style="color: #D32F2F">incubator</span><span style="color: #212121">.</span><span style="color: #D32F2F">vector</span><span style="color: #212121">.</span><span style="color: #D32F2F">VectorSpecies</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L6"></span>
+<span class="line" id="L7"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">concurrent</span><span style="color: #212121">.</span><span style="color: #D32F2F">ThreadLocalRandom</span><span style="color: #24292EFF">;</span></span>
+<span class="line empty-line" id="L8"></span>
+<span class="line" id="L9"><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">VectorTest</span><span style="color: #24292EFF"> {</span></span>
+<span class="line" id="L10"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">final</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">VectorSpecies</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">Integer</span><span style="color: #24292EFF">&gt; INTEGER_VECTOR_SPECIES </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">VectorSpecies</span><span style="color: #212121">.</span><span style="color: #6F42C1">ofPreferred</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">int</span><span style="color: #212121">.</span><span style="color: #1976D2">class</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L11"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">main</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF">[] args) {</span></span>
+<span class="line" id="L12"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> size </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">20_0000</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L13"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> a[] </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF">[size];</span></span>
+<span class="line" id="L14"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> b[] </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF">[size];</span></span>
+<span class="line" id="L15"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">; i </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> size; i</span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">) {</span></span>
+<span class="line" id="L16"><span style="color: #24292EFF">            a[i] </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">ThreadLocalRandom</span><span style="color: #212121">.</span><span style="color: #6F42C1">current</span><span style="color: #24292EFF">()</span><span style="color: #212121">.</span><span style="color: #6F42C1">nextInt</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">10000</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L17"><span style="color: #24292EFF">            b[i] </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">ThreadLocalRandom</span><span style="color: #212121">.</span><span style="color: #6F42C1">current</span><span style="color: #24292EFF">()</span><span style="color: #212121">.</span><span style="color: #6F42C1">nextInt</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">10000</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L18"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L19"></span>
+<span class="line" id="L20"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">; i </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> size; i</span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">) {</span></span>
+<span class="line" id="L21"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> scalarSum </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">scalarMinSum(a</span><span style="color: #212121">,</span><span style="color: #6F42C1"> b)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L22"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> vectorSum </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">vectorMinSum(a</span><span style="color: #212121">,</span><span style="color: #6F42C1"> b)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L23"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (scalarSum </span><span style="color: #D32F2F">!=</span><span style="color: #24292EFF"> vectorSum) {</span></span>
+<span class="line" id="L24"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">throw</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IllegalStateException(</span><span style="color: #22863A">&quot;Mismatch between vector sums&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L25"><span style="color: #24292EFF">            }</span></span>
+<span class="line" id="L26"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L27"></span>
+<span class="line" id="L28"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">long</span><span style="color: #24292EFF"> start </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #6F42C1">nanoTime</span><span style="color: #24292EFF">();</span></span>
+<span class="line" id="L29"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">; i </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> size; i</span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">) {</span></span>
+<span class="line" id="L30"><span style="color: #24292EFF">            </span><span style="color: #6F42C1">scalarMinSum(a</span><span style="color: #212121">,</span><span style="color: #6F42C1"> b)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L31"><span style="color: #24292EFF">        }</span></span>
+<span class="line" id="L32"><span style="color: #24292EFF">        </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;Scalar operations took &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> (</span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #6F42C1">nanoTime</span><span style="color: #24292EFF">() </span><span style="color: #D32F2F">-</span><span style="color: #24292EFF"> start) </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; ns&quot;</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L33"><span style="color: #24292EFF">        start </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #6F42C1">nanoTime</span><span style="color: #24292EFF">();</span></span>
+<span class="line" id="L34"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">; i </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> size; i</span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">) {</span></span>
+<span class="line" id="L35"><span style="color: #24292EFF">            </span><span style="color: #6F42C1">vectorMinSum(a</span><span style="color: #212121">,</span><span style="color: #6F42C1"> b)</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L36"><span style="color: #24292EFF">        }</span></span>
+<span class="line" id="L37"><span style="color: #24292EFF">        </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;Vector operations took &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> (</span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #6F42C1">nanoTime</span><span style="color: #24292EFF">() </span><span style="color: #D32F2F">-</span><span style="color: #24292EFF"> start) </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; ns&quot;</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L38"><span style="color: #24292EFF">    }</span></span>
+<span class="line empty-line" id="L39"></span>
+<span class="line empty-line" id="L40"></span>
+<span class="line" id="L41"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">scalarMinSum</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">int</span><span style="color: #24292EFF">[] a</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF">[] b) {</span></span>
+<span class="line" id="L42"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> sum </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L43"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">; i </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">a</span><span style="color: #212121">.</span><span style="color: #1976D2">length</span><span style="color: #24292EFF">; i</span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">) {</span></span>
+<span class="line" id="L44"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> min </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Math</span><span style="color: #212121">.</span><span style="color: #6F42C1">min</span><span style="color: #24292EFF">(a[i]</span><span style="color: #212121">,</span><span style="color: #24292EFF"> b[i]);</span></span>
+<span class="line" id="L45"><span style="color: #24292EFF">            sum </span><span style="color: #D32F2F">+=</span><span style="color: #24292EFF"> min;</span></span>
+<span class="line" id="L46"><span style="color: #24292EFF">        }</span></span>
+<span class="line" id="L47"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> sum;</span></span>
+<span class="line" id="L48"><span style="color: #24292EFF">    }</span></span>
+<span class="line empty-line" id="L49"></span>
+<span class="line" id="L50"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">vectorMinSum</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">int</span><span style="color: #24292EFF">[] a</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF">[] b) {</span></span>
+<span class="line" id="L51"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L52"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> sum </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">;</span></span>
+<span class="line" id="L53"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (; i </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">a</span><span style="color: #212121">.</span><span style="color: #1976D2">length</span><span style="color: #24292EFF">; i</span><span style="color: #D32F2F">+=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">INTEGER_VECTOR_SPECIES</span><span style="color: #212121">.</span><span style="color: #6F42C1">length</span><span style="color: #24292EFF">()) {</span></span>
+<span class="line" id="L54"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">IntVector</span><span style="color: #24292EFF"> va </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">IntVector</span><span style="color: #212121">.</span><span style="color: #6F42C1">fromArray</span><span style="color: #24292EFF">(INTEGER_VECTOR_SPECIES</span><span style="color: #212121">,</span><span style="color: #24292EFF"> a</span><span style="color: #212121">,</span><span style="color: #24292EFF"> i);</span></span>
+<span class="line" id="L55"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">IntVector</span><span style="color: #24292EFF"> vb </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">IntVector</span><span style="color: #212121">.</span><span style="color: #6F42C1">fromArray</span><span style="color: #24292EFF">(INTEGER_VECTOR_SPECIES</span><span style="color: #212121">,</span><span style="color: #24292EFF"> b</span><span style="color: #212121">,</span><span style="color: #24292EFF"> i);</span></span>
+<span class="line" id="L56"><span style="color: #24292EFF">            sum </span><span style="color: #D32F2F">+=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">va</span><span style="color: #212121">.</span><span style="color: #6F42C1">min</span><span style="color: #24292EFF">(vb)</span><span style="color: #212121">.</span><span style="color: #6F42C1">reduceLanes</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">VectorOperators</span><span style="color: #212121">.</span><span style="color: #1976D2">ADD</span><span style="color: #24292EFF">);</span></span>
+<span class="line" id="L57"><span style="color: #24292EFF">        }</span></span>
+<span class="line empty-line" id="L58"></span></code></pre>
+      
+        
+        <p>Scalar tail</p>
+
+        <pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 59;"><span class="line" id="L59"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (; i </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">a</span><span style="color: #212121">.</span><span style="color: #1976D2">length</span><span style="color: #24292EFF">; i</span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">) {</span></span>
+<span class="line" id="L60"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> min </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Math</span><span style="color: #212121">.</span><span style="color: #6F42C1">min</span><span style="color: #24292EFF">(a[i]</span><span style="color: #212121">,</span><span style="color: #24292EFF"> b[i]);</span></span>
+<span class="line" id="L61"><span style="color: #24292EFF">            sum </span><span style="color: #D32F2F">+=</span><span style="color: #24292EFF"> min;</span></span>
+<span class="line" id="L62"><span style="color: #24292EFF">        }</span></span>
+<span class="line" id="L63"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> sum;</span></span>
+<span class="line" id="L64"><span style="color: #24292EFF">    }</span></span>
+<span class="line empty-line" id="L65"></span>
+<span class="line" id="L66"><span style="color: #24292EFF">}</span></span>
+<span class="line empty-line" id="L67"></span>
+<span class="line empty-line" id="L68"></span></code></pre>
+      
+    </div>
+    <footer>
+      <div>
+        Generated by <a href="https://github.com/mercmobily/docco">Docco</a>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
