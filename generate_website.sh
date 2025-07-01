@@ -10,7 +10,7 @@ mkdir docs
 for f in $(find . -name '*.java'); do 
   mv $f .
 done
-docco -l parallel *.java
+docco -l linear *.java
 cd ..
 cp -r tmp/docs lucene-university
 rm -rf tmp

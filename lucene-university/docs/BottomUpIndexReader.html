@@ -4,117 +4,18 @@
 <head>
   <title>Bottom-up explanation of how Lucene reads index data</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
   <link rel="stylesheet" media="all" href="docco.css" />
 </head>
 <body>
-  <div id="container">
-    <div id="background"></div>
-    
-      <ul id="jump_to">
-        <li>
-          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
-          <a class="small" href="javascript:void(0);">+</a>
-          <div id="jump_wrapper">
-          <div id="jump_page_wrapper">
-            <div id="jump_page">
-              
-                
-                <a class="source" href="AnalyzerBasics.html">
-                  AnalyzerBasics.java
-                </a>
-              
-                
-                <a class="source" href="BooleanQueryANDInternals.html">
-                  BooleanQueryANDInternals.java
-                </a>
-              
-                
-                <a class="source" href="BooleanQueryIntro.html">
-                  BooleanQueryIntro.java
-                </a>
-              
-                
-                <a class="source" href="BottomUpIndexReader.html">
-                  BottomUpIndexReader.java
-                </a>
-              
-                
-                <a class="source" href="BytesRefHashExample.html">
-                  BytesRefHashExample.java
-                </a>
-              
-                
-                <a class="source" href="CombinedFieldQueryExample.html">
-                  CombinedFieldQueryExample.java
-                </a>
-              
-                
-                <a class="source" href="DirectoryFileContents.html">
-                  DirectoryFileContents.java
-                </a>
-              
-                
-                <a class="source" href="DocValuesSearchExample.html">
-                  DocValuesSearchExample.java
-                </a>
-              
-                
-                <a class="source" href="FunctionQuerySearchExample.html">
-                  FunctionQuerySearchExample.java
-                </a>
-              
-                
-                <a class="source" href="KnnSearchExample.html">
-                  KnnSearchExample.java
-                </a>
-              
-                
-                <a class="source" href="PointTreeRangeQuery.html">
-                  PointTreeRangeQuery.java
-                </a>
-              
-                
-                <a class="source" href="PrimitivesRef.html">
-                  PrimitivesRef.java
-                </a>
-              
-                
-                <a class="source" href="SearchWithTermsEnum.html">
-                  SearchWithTermsEnum.java
-                </a>
-              
-                
-                <a class="source" href="SimpleSearch.html">
-                  SimpleSearch.java
-                </a>
-              
-                
-                <a class="source" href="TextVectorSearchExample.html">
-                  TextVectorSearchExample.java
-                </a>
-              
-                
-                <a class="source" href="VisualizePointTree.html">
-                  VisualizePointTree.java
-                </a>
-              
-            </div>
-          </div>
-        </li>
-      </ul>
-    
-    <ul class="sections">
+  <div class="container">
+    <div class="page">
+
+      <div class="header">
         
-        
-        
-        <li id="section-1">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-1">&#x00a7;</a>
-              </div>
-              <p>This example will more or less bridge the gap between DirectoryFileContents (which looks at the Lucene files on disk)
+          
+          <h1 id="bottom-up-explanation-of-how-lucene-reads-index-data">Bottom-up explanation of how Lucene reads index data</h1>
+<p>This example will more or less bridge the gap between DirectoryFileContents (which looks at the Lucene files on disk)
 and SearchWithTermsEnum (which looks at how a TermQuery runs against an IndexReader, the layer below IndexSearcher).</p>
 <p>The example will cover the following:</p>
 <ul>
@@ -132,513 +33,438 @@ implement the data structure’s interface, so navigating the data structure mak
 through the IndexInput, which is usually a memory-mapped file supplied by MMapDirectory.</li>
 </ul>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 20;"><span class="line" id="L20"><span style="color: #D32F2F">package</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">basic</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L21"></span>
-<span class="line" id="L22"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">codecs</span><span style="color: #212121">.</span><span style="color: #D32F2F">Codec</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L23"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">codecs</span><span style="color: #212121">.</span><span style="color: #D32F2F">CodecUtil</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L24"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">codecs</span><span style="color: #212121">.</span><span style="color: #D32F2F">CompoundDirectory</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L25"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">codecs</span><span style="color: #212121">.</span><span style="color: #D32F2F">FieldsProducer</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L26"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">Field</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L27"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">IntField</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L28"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">TextField</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L29"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">FieldInfos</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L30"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexWriter</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L31"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexWriterConfig</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L32"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexableField</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L33"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">SegmentCommitInfo</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L34"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">SegmentInfo</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L35"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">SegmentInfos</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L36"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">SegmentReadState</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L37"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">Terms</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L38"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">TermsEnum</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L39"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">store</span><span style="color: #212121">.</span><span style="color: #D32F2F">ChecksumIndexInput</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L40"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">store</span><span style="color: #212121">.</span><span style="color: #D32F2F">Directory</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L41"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">store</span><span style="color: #212121">.</span><span style="color: #D32F2F">FSDirectory</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L42"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">store</span><span style="color: #212121">.</span><span style="color: #D32F2F">IOContext</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L43"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">store</span><span style="color: #212121">.</span><span style="color: #D32F2F">Lock</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L44"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">BytesRef</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L45"></span>
-<span class="line" id="L46"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">io</span><span style="color: #212121">.</span><span style="color: #D32F2F">IOException</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L47"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">nio</span><span style="color: #212121">.</span><span style="color: #D32F2F">file</span><span style="color: #212121">.</span><span style="color: #D32F2F">Files</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L48"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">nio</span><span style="color: #212121">.</span><span style="color: #D32F2F">file</span><span style="color: #212121">.</span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L49"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">ArrayList</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L50"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L51"></span>
-<span class="line" id="L52"><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BottomUpIndexReader</span><span style="color: #24292EFF"> {</span></span>
-<span class="line empty-line" id="L53"></span></code></pre></div>
-            
-        </li>
-        
-        
-        <li id="section-2">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-2">&#x00a7;</a>
-              </div>
-              <h2 id="index-setup">Index setup</h2>
+          
+            <div class='highlight'><pre><span class="hljs-keyword">package</span> example.basic;
 
-            </div>
-            
-        </li>
+<span class="hljs-keyword">import</span> org.apache.lucene.codecs.Codec;
+<span class="hljs-keyword">import</span> org.apache.lucene.codecs.CodecUtil;
+<span class="hljs-keyword">import</span> org.apache.lucene.codecs.CompoundDirectory;
+<span class="hljs-keyword">import</span> org.apache.lucene.codecs.FieldsProducer;
+<span class="hljs-keyword">import</span> org.apache.lucene.document.Field;
+<span class="hljs-keyword">import</span> org.apache.lucene.document.IntField;
+<span class="hljs-keyword">import</span> org.apache.lucene.document.TextField;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.FieldInfos;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexWriter;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexWriterConfig;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexableField;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.SegmentCommitInfo;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.SegmentInfo;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.SegmentInfos;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.SegmentReadState;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.Terms;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.TermsEnum;
+<span class="hljs-keyword">import</span> org.apache.lucene.store.ChecksumIndexInput;
+<span class="hljs-keyword">import</span> org.apache.lucene.store.Directory;
+<span class="hljs-keyword">import</span> org.apache.lucene.store.FSDirectory;
+<span class="hljs-keyword">import</span> org.apache.lucene.store.IOContext;
+<span class="hljs-keyword">import</span> org.apache.lucene.store.Lock;
+<span class="hljs-keyword">import</span> org.apache.lucene.util.BytesRef;
+
+<span class="hljs-keyword">import</span> java.io.IOException;
+<span class="hljs-keyword">import</span> java.nio.file.Files;
+<span class="hljs-keyword">import</span> java.nio.file.Path;
+<span class="hljs-keyword">import</span> java.util.ArrayList;
+<span class="hljs-keyword">import</span> java.util.List;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">BottomUpIndexReader</span> {</pre></div>
+          
         
+
         
-        <li id="section-3">
-            <div class="annotation">
+          <div class="toc">
+            <h3>Table of Contents</h3>
+            <ol>
               
-              <div class="sswrap ">
-                <a class="ss" href="#section-3">&#x00a7;</a>
-              </div>
-              <p>We’ll create a similar index to DirectoryFileContents, but we’ll stick with the default codec, since we’re
+                
+                <li>
+                  <a class="source" href="AnalyzerBasics.html">
+                    AnalyzerBasics.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BooleanQueryANDInternals.html">
+                    BooleanQueryANDInternals.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BooleanQueryIntro.html">
+                    BooleanQueryIntro.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BottomUpIndexReader.html">
+                    BottomUpIndexReader.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BytesRefHashExample.html">
+                    BytesRefHashExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="CombinedFieldQueryExample.html">
+                    CombinedFieldQueryExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DirectoryFileContents.html">
+                    DirectoryFileContents.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DocValuesSearchExample.html">
+                    DocValuesSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="FiniteStateTransducers.html">
+                    FiniteStateTransducers.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="FunctionQuerySearchExample.html">
+                    FunctionQuerySearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="KnnSearchExample.html">
+                    KnnSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="PointTreeRangeQuery.html">
+                    PointTreeRangeQuery.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="PrimitivesRef.html">
+                    PrimitivesRef.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SearchWithTermsEnum.html">
+                    SearchWithTermsEnum.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SimpleSearch.html">
+                    SimpleSearch.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="TextVectorSearchExample.html">
+                    TextVectorSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="VisualizePointTree.html">
+                    VisualizePointTree.java
+                  </a>
+                </li>
+              
+            </ol>
+          </div>
+        
+      </div>
+
+      
+        
+        <h2 id="index-setup">Index setup</h2>
+<p>We’ll create a similar index to DirectoryFileContents, but we’ll stick with the default codec, since we’re
 going to explore how the codec is used to decode the index files (since codec is short for “coder and decoder”).</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 58;"><span class="line" id="L58"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createLuceneIndex()</span><span style="color: #24292EFF"> throws IOException {</span></span>
-<span class="line" id="L59"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF"> indexDir </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">createTempDirectory</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">DirectoryFileContents</span><span style="color: #212121">.</span><span style="color: #1976D2">class</span><span style="color: #212121">.</span><span style="color: #6F42C1">getSimpleName</span><span style="color: #24292EFF">());</span></span>
-<span class="line empty-line" id="L60"></span>
-<span class="line" id="L61"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">FSDirectory</span><span style="color: #24292EFF"> directory </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(indexDir);</span></span>
-<span class="line" id="L62"><span style="color: #24292EFF">             </span><span style="color: #D32F2F">IndexWriter</span><span style="color: #24292EFF"> indexWriter </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexWriter(directory</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> IndexWriterConfig())</span><span style="color: #24292EFF">) {</span></span>
-<span class="line" id="L63"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF">&gt; texts </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">List</span><span style="color: #212121">.</span><span style="color: #6F42C1">of</span><span style="color: #24292EFF">(</span></span>
-<span class="line" id="L64"><span style="color: #24292EFF">                    </span><span style="color: #22863A">&quot;The quick fox jumped over the lazy, brown dog&quot;</span><span style="color: #212121">,</span></span>
-<span class="line" id="L65"><span style="color: #24292EFF">                    </span><span style="color: #22863A">&quot;Lorem ipsum, dolor sit amet&quot;</span><span style="color: #212121">,</span></span>
-<span class="line" id="L66"><span style="color: #24292EFF">                    </span><span style="color: #22863A">&quot;She left the web, she left the loom, she made three paces through the room&quot;</span><span style="color: #212121">,</span></span>
-<span class="line" id="L67"><span style="color: #24292EFF">                    </span><span style="color: #22863A">&quot;The sly fox sneaks past the oblivious dog&quot;</span></span>
-<span class="line" id="L68"><span style="color: #24292EFF">            );</span></span>
-<span class="line" id="L69"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L70"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> text </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> texts) {</span></span>
-<span class="line" id="L71"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">IndexableField</span><span style="color: #24292EFF">&gt; doc </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">ArrayList</span><span style="color: #24292EFF">&lt;&gt;();</span></span>
-<span class="line" id="L72"><span style="color: #24292EFF">                </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TextField(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> text</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">Field</span><span style="color: #212121">.</span><span style="color: #1976D2">Store</span><span style="color: #212121">.</span><span style="color: #1976D2">YES</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L73"><span style="color: #24292EFF">                </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IntField(</span><span style="color: #22863A">&quot;val&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> i</span><span style="color: #D32F2F">++</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">Field</span><span style="color: #212121">.</span><span style="color: #1976D2">Store</span><span style="color: #212121">.</span><span style="color: #1976D2">YES</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L74"><span style="color: #24292EFF">                </span><span style="color: #1976D2">indexWriter</span><span style="color: #212121">.</span><span style="color: #6F42C1">addDocument</span><span style="color: #24292EFF">(doc);</span></span>
-<span class="line" id="L75"><span style="color: #24292EFF">            }</span></span>
-<span class="line" id="L76"><span style="color: #24292EFF">        }</span></span>
-<span class="line" id="L77"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> indexDir;</span></span>
-<span class="line" id="L78"><span style="color: #24292EFF">    }</span></span>
-<span class="line empty-line" id="L79"></span>
-<span class="line empty-line" id="L80"></span></code></pre></div>
-            
-        </li>
         
-        
-        <li id="section-4">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-4">&#x00a7;</a>
-              </div>
-              <h2 id="reading-the-directory-contents">Reading the directory contents</h2>
+          <div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Path <span class="hljs-title function_">createLuceneIndex</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> IOException {
+        <span class="hljs-type">Path</span> <span class="hljs-variable">indexDir</span> <span class="hljs-operator">=</span> Files.createTempDirectory(DirectoryFileContents.class.getSimpleName());
 
-            </div>
-            
-        </li>
+        <span class="hljs-keyword">try</span> (<span class="hljs-type">FSDirectory</span> <span class="hljs-variable">directory</span> <span class="hljs-operator">=</span> FSDirectory.open(indexDir);
+             <span class="hljs-type">IndexWriter</span> <span class="hljs-variable">indexWriter</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexWriter</span>(directory, <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexWriterConfig</span>())) {
+            List&lt;String&gt; texts = List.of(
+                    <span class="hljs-string">&quot;The quick fox jumped over the lazy, brown dog&quot;</span>,
+                    <span class="hljs-string">&quot;Lorem ipsum, dolor sit amet&quot;</span>,
+                    <span class="hljs-string">&quot;She left the web, she left the loom, she made three paces through the room&quot;</span>,
+                    <span class="hljs-string">&quot;The sly fox sneaks past the oblivious dog&quot;</span>
+            );
+            <span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+            <span class="hljs-keyword">for</span> (String text : texts) {
+                List&lt;IndexableField&gt; doc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+                doc.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TextField</span>(<span class="hljs-string">&quot;text&quot;</span>, text, Field.Store.YES));
+                doc.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">IntField</span>(<span class="hljs-string">&quot;val&quot;</span>, i++, Field.Store.YES));
+                indexWriter.addDocument(doc);
+            }
+        }
+        <span class="hljs-keyword">return</span> indexDir;
+    }</pre></div>
         
+      
         
-        <li id="section-5">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-5">&#x00a7;</a>
-              </div>
-              
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 82;"><span class="line" id="L82"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">main(</span><span style="color: #D32F2F">String</span><span style="color: #6F42C1">[] args)</span><span style="color: #24292EFF"> throws IOException {</span></span>
-<span class="line" id="L83"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF"> indexDir </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createLuceneIndex()</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L84"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Lock</span><span style="color: #24292EFF"> lock </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">null</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L85"></span></code></pre></div>
-            
-        </li>
+        <h2 id="reading-the-directory-contents">Reading the directory contents</h2>
+
         
+          <div class='highlight'><pre>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> IOException {
+        <span class="hljs-type">Path</span> <span class="hljs-variable">indexDir</span> <span class="hljs-operator">=</span> createLuceneIndex();
+        <span class="hljs-type">Lock</span> <span class="hljs-variable">lock</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;</pre></div>
         
-        <li id="section-6">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-6">&#x00a7;</a>
-              </div>
-              <p>The Lucene <code>Directory</code> class provides an abstraction matching a filesystem directory (with no
+      
+        
+        <p>The Lucene <code>Directory</code> class provides an abstraction matching a filesystem directory (with no
 subdirectories). In our case, the Lucene directory really is a filesystem directory corresponding to the
 path of <code>indexDir</code>.</p>
 <p>Note that on most 64-bit Java runtime environments, <code>FSDirectory.open(path)</code> just calls
 <code>new MMapDirectory(path)</code>. Using <code>FSDirectory.open</code> is the more portable choice, though.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 91;"><span class="line" id="L91"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">Directory</span><span style="color: #24292EFF"> dir </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(indexDir)) {</span></span>
-<span class="line empty-line" id="L92"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>        <span class="hljs-keyword">try</span> (<span class="hljs-type">Directory</span> <span class="hljs-variable">dir</span> <span class="hljs-operator">=</span> FSDirectory.open(indexDir)) {</pre></div>
         
-        <li id="section-7">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-7">&#x00a7;</a>
-              </div>
-              <p>The following snippet outputs the files in the directory and their sizes:</p>
-<pre><code><pre class="shiki" style="background-color: transparent"><code ><span class="line"><span style="color: #D32F2F">Directory</span><span style="color: #24292EFF"> contents</span><span style="color: #D32F2F">:</span></span>
-<span class="line"><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">cfe</span><span style="color: #24292EFF">   size </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">479</span></span>
-<span class="line"><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">cfs</span><span style="color: #24292EFF">   size </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">2337</span></span>
-<span class="line"><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">si</span><span style="color: #24292EFF">   size </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">348</span></span>
-<span class="line"><span style="color: #24292EFF">segments_1   size </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">154</span></span>
-<span class="line"><span style="color: #1976D2">write</span><span style="color: #212121">.</span><span style="color: #1976D2">lock</span><span style="color: #24292EFF">   size </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span></span></code></pre>
+      
+        
+        <p>The following snippet outputs the files in the directory and their sizes:</p>
+<pre><code>Directory contents:
+_0.<span class="hljs-type">cfe</span>   <span class="hljs-variable">size</span> <span class="hljs-operator">=</span> <span class="hljs-number">479</span>
+_0.<span class="hljs-type">cfs</span>   <span class="hljs-variable">size</span> <span class="hljs-operator">=</span> <span class="hljs-number">2337</span>
+_0.<span class="hljs-type">si</span>   <span class="hljs-variable">size</span> <span class="hljs-operator">=</span> <span class="hljs-number">348</span>
+<span class="hljs-type">segments_1</span>   <span class="hljs-variable">size</span> <span class="hljs-operator">=</span> <span class="hljs-number">154</span>
+write.<span class="hljs-type">lock</span>   <span class="hljs-variable">size</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>
 </code></pre>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 102;"><span class="line" id="L102"><span style="color: #24292EFF">            </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;Directory contents:&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L103"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> file </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">dir</span><span style="color: #212121">.</span><span style="color: #6F42C1">listAll</span><span style="color: #24292EFF">()) {</span></span>
-<span class="line" id="L104"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot; &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> file </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;   size = &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">dir</span><span style="color: #212121">.</span><span style="color: #6F42C1">fileLength</span><span style="color: #24292EFF">(file));</span></span>
-<span class="line" id="L105"><span style="color: #24292EFF">            }</span></span>
-<span class="line empty-line" id="L106"></span>
-<span class="line empty-line" id="L107"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>            System.out.println(<span class="hljs-string">&quot;Directory contents:&quot;</span>);
+            <span class="hljs-keyword">for</span> (String file : dir.listAll()) {
+                System.out.println(<span class="hljs-string">&quot; &quot;</span> + file + <span class="hljs-string">&quot;   size = &quot;</span> + dir.fileLength(file));
+            }</pre></div>
         
-        <li id="section-8">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-8">&#x00a7;</a>
-              </div>
-              <p>The <code>write.lock</code> file is there to make sure that only one <code>IndexWriter</code> can operate on the directory
+      
+        
+        <p>The <code>write.lock</code> file is there to make sure that only one <code>IndexWriter</code> can operate on the directory
 at a time. For fun, let’s lock the directory, to make extra sure that another <code>IndexWriter</code> can’t mess
 with our files. We’ll release it in the <code>finally</code> block.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 110;"><span class="line" id="L110"><span style="color: #24292EFF">            lock </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">dir</span><span style="color: #212121">.</span><span style="color: #6F42C1">obtainLock</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;write.lock&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line empty-line" id="L111"></span>
-<span class="line empty-line" id="L112"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>            lock = dir.obtainLock(<span class="hljs-string">&quot;write.lock&quot;</span>);</pre></div>
         
-        <li id="section-9">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-9">&#x00a7;</a>
-              </div>
-              <p>The next file of interest is <code>segments_1</code>. An <code>IndexWriter</code> or <code>IndexReader</code> looks at these <code>segments_N</code>
+      
+        
+        <p>The next file of interest is <code>segments_1</code>. An <code>IndexWriter</code> or <code>IndexReader</code> looks at these <code>segments_N</code>
 files to determine the current “commit generation” and understand what segments are in the index.
 That is, each time we commit, this number is incremented by 1 and written (in base 36, so 0-9a-z) as a
 suffix to this “segment infos” file. We’re currently on generation 1.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 116;"><span class="line" id="L116"><span style="color: #24292EFF">            </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;Commit generation is &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">SegmentInfos</span><span style="color: #212121">.</span><span style="color: #6F42C1">getLastCommitGeneration</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">dir</span><span style="color: #212121">.</span><span style="color: #6F42C1">listAll</span><span style="color: #24292EFF">()));</span></span>
-<span class="line empty-line" id="L117"></span>
-<span class="line empty-line" id="L118"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>            System.out.println(<span class="hljs-string">&quot;Commit generation is &quot;</span> + SegmentInfos.getLastCommitGeneration(dir.listAll()));</pre></div>
         
-        <li id="section-10">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-10">&#x00a7;</a>
-              </div>
-              <p>Unlike most Lucene files, the segment infos file needs a relatively stable format to be understood by
+      
+        
+        <p>Unlike most Lucene files, the segment infos file needs a relatively stable format to be understood by
 different versions of Lucene. Instead of digging into the specific bytes in this file, we’ll use
 <code>SegmentInfos.readCommit</code> to load it and call some methods to output its contents. Note that the
 <code>SegmentInfos</code> instance maintains a list of <code>SegmentCommitInfo</code>.</p>
-<pre><code><pre class="shiki" style="background-color: transparent"><code ><span class="line"><span style="color: #D32F2F">Segment</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">_0</span><span style="color: #24292EFF"> has the following files</span><span style="color: #D32F2F">:</span></span>
-<span class="line"><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">cfe</span></span>
-<span class="line"><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">si</span></span>
-<span class="line"><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">cfs</span></span></code></pre>
+<pre><code>Segment _0 has the following files:
+_0.cfe
+_0.si
+_0.cfs
 </code></pre>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 129;"><span class="line" id="L129"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">SegmentInfos</span><span style="color: #24292EFF"> segmentInfos </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">SegmentInfos</span><span style="color: #212121">.</span><span style="color: #6F42C1">readCommit</span><span style="color: #24292EFF">(dir</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;segments_1&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L130"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">SegmentCommitInfo</span><span style="color: #24292EFF"> sci </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> segmentInfos) {</span></span>
-<span class="line" id="L131"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">SegmentInfo</span><span style="color: #24292EFF"> segmentInfo </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">sci</span><span style="color: #212121">.</span><span style="color: #1976D2">info</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L132"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;Segment &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">segmentInfo</span><span style="color: #212121">.</span><span style="color: #1976D2">name</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; has the following files:&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L133"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> segmentfile </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">sci</span><span style="color: #212121">.</span><span style="color: #6F42C1">files</span><span style="color: #24292EFF">()) {</span></span>
-<span class="line" id="L134"><span style="color: #24292EFF">                    </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(segmentfile);</span></span>
-<span class="line" id="L135"><span style="color: #24292EFF">                }</span></span>
-<span class="line" id="L136"><span style="color: #24292EFF">            }</span></span>
-<span class="line empty-line" id="L137"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>            <span class="hljs-type">SegmentInfos</span> <span class="hljs-variable">segmentInfos</span> <span class="hljs-operator">=</span> SegmentInfos.readCommit(dir, <span class="hljs-string">&quot;segments_1&quot;</span>);
+            <span class="hljs-keyword">for</span> (SegmentCommitInfo sci : segmentInfos) {
+                <span class="hljs-type">SegmentInfo</span> <span class="hljs-variable">segmentInfo</span> <span class="hljs-operator">=</span> sci.info;
+                System.out.println(<span class="hljs-string">&quot;Segment &quot;</span> + segmentInfo.name + <span class="hljs-string">&quot; has the following files:&quot;</span>);
+                <span class="hljs-keyword">for</span> (String segmentfile : sci.files()) {
+                    System.out.println(segmentfile);
+                }
+            }</pre></div>
         
-        <li id="section-11">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-11">&#x00a7;</a>
-              </div>
-              <h3 id="what-are-these-segmentcommitinfos">What are these SegmentCommitInfos?</h3>
-
-            </div>
-            
-        </li>
+      
         
-        
-        <li id="section-12">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-12">&#x00a7;</a>
-              </div>
-              <p>Since Lucene segments are written once, documents are never “deleted” from a segment. Instead, a
+        <h3 id="what-are-these-segmentcommitinfos">What are these SegmentCommitInfos?</h3>
+<p>Since Lucene segments are written once, documents are never “deleted” from a segment. Instead, a
 subsequent commit writes another file (with a suffix with the commit generation and a .liv extension,
 like <code>_0_9.liv</code>), which is a bit set indicating what documents are still “live” (i.e. not deleted).
 A <code>SegmentCommitInfo</code> holds a reference to the (written-once) <code>SegmentInfo</code> and a reference to the live
 docs for the current commit. If the index uses updatable doc values, it will also reference (per-commit)
 doc value updates.</p>
-<h3 id="reading-a-single-segment">Reading a single segment</h3>
 
-            </div>
-            
-        </li>
         
+      
         
-        <li id="section-13">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-13">&#x00a7;</a>
-              </div>
-              <p>The files in each segment start with an underscore and the segment generation (also a base 36 counter,
+        <h3 id="reading-a-single-segment">Reading a single segment</h3>
+<p>The files in each segment start with an underscore and the segment generation (also a base 36 counter,
 but separate from the commit generation). The file extensions indicate what they contain. In this case,
 the <code>_0.si</code> file contains the <code>SegmentInfo</code> for the segment. We already loaded this file when we called
 <code>SegmentInfos.readCommit</code>. Among other things, the <code>SegmentInfo</code> knows what <code>Codec</code> to use to read the
 other files in the segment. (Technically, the <code>Codec</code> class name is stored in the <code>segments_1</code> file,
 since<code>SegmentInfos.readCommit()</code> uses the <code>Codec</code> to read the <code>.si</code> file.)</p>
 <p>At the time of writing (and subject to change with new versions), this outputs:</p>
-<pre><code><pre class="shiki" style="background-color: transparent"><code ><span class="line"><span style="color: #D32F2F">Segment</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">_0</span><span style="color: #24292EFF"> was written with the </span><span style="color: #D32F2F">Lucene99</span><span style="color: #24292EFF"> codec</span></span></code></pre>
+<pre><code>Segment _0 was written with the Lucene99 codec
 </code></pre>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 162;"><span class="line" id="L162"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">SegmentCommitInfo</span><span style="color: #24292EFF"> seg0commitInfo </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">segmentInfos</span><span style="color: #212121">.</span><span style="color: #6F42C1">info</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">0</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L163"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">SegmentInfo</span><span style="color: #24292EFF"> seg0info </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">seg0commitInfo</span><span style="color: #212121">.</span><span style="color: #1976D2">info</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L164"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">Codec</span><span style="color: #24292EFF"> codec </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">seg0info</span><span style="color: #212121">.</span><span style="color: #6F42C1">getCodec</span><span style="color: #24292EFF">();</span></span>
-<span class="line" id="L165"><span style="color: #24292EFF">            </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;Segment _0 was written with the &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">codec</span><span style="color: #212121">.</span><span style="color: #6F42C1">getName</span><span style="color: #24292EFF">() </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; codec.&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line empty-line" id="L166"></span>
-<span class="line empty-line" id="L167"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>
+            <span class="hljs-type">SegmentCommitInfo</span> <span class="hljs-variable">seg0commitInfo</span> <span class="hljs-operator">=</span> segmentInfos.info(<span class="hljs-number">0</span>);
+            <span class="hljs-type">SegmentInfo</span> <span class="hljs-variable">seg0info</span> <span class="hljs-operator">=</span> seg0commitInfo.info;
+            <span class="hljs-type">Codec</span> <span class="hljs-variable">codec</span> <span class="hljs-operator">=</span> seg0info.getCodec();
+            System.out.println(<span class="hljs-string">&quot;Segment _0 was written with the &quot;</span> + codec.getName() + <span class="hljs-string">&quot; codec.&quot;</span>);</pre></div>
         
-        <li id="section-14">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-14">&#x00a7;</a>
-              </div>
-              <h3 id="compound-file-segments">Compound file segments</h3>
-
-            </div>
-            
-        </li>
+      
         
-        
-        <li id="section-15">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-15">&#x00a7;</a>
-              </div>
-              <p>Since our single segment is small, Lucene chose to stick all the individual files into the file <code>_0.cfs</code>,
+        <h3 id="compound-file-segments">Compound file segments</h3>
+<p>Since our single segment is small, Lucene chose to stick all the individual files into the file <code>_0.cfs</code>,
 to avoid consuming many operating system file handles for a bunch of even smaller files. (It’s not a
 problem with a single small segment, but can become a problem with many small segments or many small
 Lucene indices open on the same machine.) The <code>_0.cfe</code> file holds the “compound file entries”, which
 store the start and end offsets for each file stored within the <code>.cfs</code> file.</p>
 <p>The compound file segment is modeled as a directory itself.</p>
-<pre><code><pre class="shiki" style="background-color: transparent"><code ><span class="line"><span style="color: #D32F2F">Compound</span><span style="color: #24292EFF"> file segment </span><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">cfs</span><span style="color: #24292EFF"> has the following contents</span><span style="color: #D32F2F">:</span></span>
-<span class="line"><span style="color: #1976D2">_0_Lucene99_0</span><span style="color: #212121">.</span><span style="color: #1976D2">tip</span></span>
-<span class="line"><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">nvm</span></span>
-<span class="line"><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">fnm</span></span>
-<span class="line"><span style="color: #1976D2">_0_Lucene99_0</span><span style="color: #212121">.</span><span style="color: #1976D2">doc</span></span>
-<span class="line"><span style="color: #1976D2">_0_Lucene99_0</span><span style="color: #212121">.</span><span style="color: #1976D2">tim</span></span>
-<span class="line"><span style="color: #1976D2">_0_Lucene99_0</span><span style="color: #212121">.</span><span style="color: #1976D2">pos</span></span>
-<span class="line"><span style="color: #1976D2">_0_Lucene90_0</span><span style="color: #212121">.</span><span style="color: #1976D2">dvd</span></span>
-<span class="line"><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">kdd</span></span>
-<span class="line"><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">kdm</span></span>
-<span class="line"><span style="color: #1976D2">_0_Lucene99_0</span><span style="color: #212121">.</span><span style="color: #1976D2">tmd</span></span>
-<span class="line"><span style="color: #1976D2">_0_Lucene90_0</span><span style="color: #212121">.</span><span style="color: #1976D2">dvm</span></span>
-<span class="line"><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">kdi</span></span>
-<span class="line"><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">fdm</span></span>
-<span class="line"><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">nvd</span></span>
-<span class="line"><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">fdx</span></span>
-<span class="line"><span style="color: #1976D2">_0</span><span style="color: #212121">.</span><span style="color: #1976D2">fdt</span></span></code></pre>
+<pre><code>Compound file segment _0.cfs has the following contents:
+_0_Lucene99_0.tip
+_0.nvm
+_0.fnm
+_0_Lucene99_0.doc
+_0_Lucene99_0.tim
+_0_Lucene99_0.pos
+_0_Lucene90_0.dvd
+_0.kdd
+_0.kdm
+_0_Lucene99_0.tmd
+_0_Lucene90_0.dvm
+_0.kdi
+_0.fdm
+_0.nvd
+_0.fdx
+_0.fdt
 </code></pre>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 196;"><span class="line" id="L196"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">CompoundDirectory</span><span style="color: #24292EFF"> seg0dir </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">codec</span><span style="color: #212121">.</span><span style="color: #6F42C1">compoundFormat</span><span style="color: #24292EFF">()</span><span style="color: #212121">.</span><span style="color: #6F42C1">getCompoundReader</span><span style="color: #24292EFF">(dir</span><span style="color: #212121">,</span><span style="color: #24292EFF"> seg0info);</span></span>
-<span class="line" id="L197"><span style="color: #24292EFF">            </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;Compound file segment _0.cfs has the following contents:&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L198"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> innerFile </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">seg0dir</span><span style="color: #212121">.</span><span style="color: #6F42C1">listAll</span><span style="color: #24292EFF">()) {</span></span>
-<span class="line" id="L199"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot; &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> innerFile);</span></span>
-<span class="line" id="L200"><span style="color: #24292EFF">            }</span></span>
-<span class="line empty-line" id="L201"></span>
-<span class="line empty-line" id="L202"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>            <span class="hljs-type">CompoundDirectory</span> <span class="hljs-variable">seg0dir</span> <span class="hljs-operator">=</span> codec.compoundFormat().getCompoundReader(dir, seg0info);
+            System.out.println(<span class="hljs-string">&quot;Compound file segment _0.cfs has the following contents:&quot;</span>);
+            <span class="hljs-keyword">for</span> (String innerFile : seg0dir.listAll()) {
+                System.out.println(<span class="hljs-string">&quot; &quot;</span> + innerFile);
+            }</pre></div>
         
-        <li id="section-16">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-16">&#x00a7;</a>
-              </div>
-              <h3 id="compound-file-internals">Compound file internals</h3>
-
-            </div>
-            
-        </li>
+      
         
-        
-        <li id="section-17">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-17">&#x00a7;</a>
-              </div>
-              <p>Let’s decode that <code>.cfe</code> file ourselves.</p>
+        <h3 id="compound-file-internals">Compound file internals</h3>
+<p>Let’s decode that <code>.cfe</code> file ourselves.</p>
 <p>DON’T TRY THIS AT HOME. (Or at least don’t ever do this in a real application.)</p>
 <p>Reading the Lucene90CompoundFormat source code, we see that the <code>.cfe</code> file has the following format:</p>
-<pre><code><pre class="shiki" style="background-color: transparent"><code ><span class="line"><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF">header</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> validates file integrity</span><span style="color: #D32F2F">&gt;</span></span>
-<span class="line"><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF">numfiles</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> VInt</span><span style="color: #D32F2F">&gt;</span></span>
-<span class="line"><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF">file </span><span style="color: #1976D2">0</span><span style="color: #24292EFF"> suffix</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> string</span><span style="color: #D32F2F">&gt;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF">file </span><span style="color: #1976D2">0</span><span style="color: #24292EFF"> start offset</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">long&gt;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF">file </span><span style="color: #1976D2">0</span><span style="color: #24292EFF"> end offset</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">long&gt;</span></span>
-<span class="line"><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF">file </span><span style="color: #1976D2">1</span><span style="color: #24292EFF"> suffix</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> string</span><span style="color: #D32F2F">&gt;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF">file </span><span style="color: #1976D2">1</span><span style="color: #24292EFF"> start offset</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">long&gt;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF">file </span><span style="color: #1976D2">1</span><span style="color: #24292EFF"> end offset</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">long&gt;</span></span>
-<span class="line"><span style="color: #212121">...</span></span>
-<span class="line"><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF">file </span><span style="color: #D32F2F">N</span><span style="color: #24292EFF"> suffix</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> string</span><span style="color: #D32F2F">&gt;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF">file </span><span style="color: #D32F2F">N</span><span style="color: #24292EFF"> start offset</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">long&gt;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF">file </span><span style="color: #D32F2F">N</span><span style="color: #24292EFF"> end offset</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">long&gt;</span></span>
-<span class="line"><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF">footer</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> validates file integrity</span><span style="color: #D32F2F">&gt;</span></span></code></pre>
+<pre><code>&lt;header: validates file integrity&gt;
+&lt;numfiles: VInt&gt;
+&lt;file <span class="hljs-number">0</span> suffix: string&gt; &lt;file <span class="hljs-number">0</span> start offset: <span class="hljs-type">long</span>&gt; &lt;file <span class="hljs-number">0</span> end offset: <span class="hljs-type">long</span>&gt;
+&lt;file <span class="hljs-number">1</span> suffix: string&gt; &lt;file <span class="hljs-number">1</span> start offset: <span class="hljs-type">long</span>&gt; &lt;file <span class="hljs-number">1</span> end offset: <span class="hljs-type">long</span>&gt;
+...
+&lt;file N suffix: string&gt; &lt;file N start offset: <span class="hljs-type">long</span>&gt; &lt;file N end offset: <span class="hljs-type">long</span>&gt;
+&lt;footer: validates file integrity&gt;
 </code></pre>
 <p>This assumes we wrote the index using the Lucene90CompoundFormat. If it doesn’t work for you,
 you can delete or comment out this code. The higher-level APIs should continue to compile and work,
 but low-level details are subject to changes.</p>
-<pre><code><pre class="shiki" style="background-color: transparent"><code ><span class="line"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> with </span><span style="color: #1976D2">suffix</span><span style="color: #24292EFF"> </span><span style="color: #212121">.</span><span style="color: #1976D2">nvd</span><span style="color: #24292EFF"> starts at offset </span><span style="color: #1976D2">48</span><span style="color: #24292EFF"> and has length </span><span style="color: #1976D2">63</span></span>
-<span class="line"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> with </span><span style="color: #1976D2">suffix</span><span style="color: #24292EFF"> </span><span style="color: #212121">.</span><span style="color: #1976D2">fdx</span><span style="color: #24292EFF"> starts at offset </span><span style="color: #1976D2">112</span><span style="color: #24292EFF"> and has length </span><span style="color: #1976D2">64</span></span>
-<span class="line"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> with </span><span style="color: #1976D2">suffix</span><span style="color: #24292EFF"> </span><span style="color: #212121">.</span><span style="color: #1976D2">kdi</span><span style="color: #24292EFF"> starts at offset </span><span style="color: #1976D2">176</span><span style="color: #24292EFF"> and has length </span><span style="color: #1976D2">68</span></span>
-<span class="line"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> with suffix </span><span style="color: #1976D2">_Lucene99_0</span><span style="color: #212121">.</span><span style="color: #1976D2">tip</span><span style="color: #24292EFF"> starts at offset </span><span style="color: #1976D2">248</span><span style="color: #24292EFF"> and has length </span><span style="color: #1976D2">72</span></span>
-<span class="line"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> with suffix </span><span style="color: #1976D2">_Lucene90_0</span><span style="color: #212121">.</span><span style="color: #1976D2">dvd</span><span style="color: #24292EFF"> starts at offset </span><span style="color: #1976D2">320</span><span style="color: #24292EFF"> and has length </span><span style="color: #1976D2">74</span></span>
-<span class="line"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> with </span><span style="color: #1976D2">suffix</span><span style="color: #24292EFF"> </span><span style="color: #212121">.</span><span style="color: #1976D2">kdd</span><span style="color: #24292EFF"> starts at offset </span><span style="color: #1976D2">400</span><span style="color: #24292EFF"> and has length </span><span style="color: #1976D2">82</span></span>
-<span class="line"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> with suffix </span><span style="color: #1976D2">_Lucene99_0</span><span style="color: #212121">.</span><span style="color: #1976D2">doc</span><span style="color: #24292EFF"> starts at offset </span><span style="color: #1976D2">488</span><span style="color: #24292EFF"> and has length </span><span style="color: #1976D2">87</span></span>
-<span class="line"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> with </span><span style="color: #1976D2">suffix</span><span style="color: #24292EFF"> </span><span style="color: #212121">.</span><span style="color: #1976D2">nvm</span><span style="color: #24292EFF"> starts at offset </span><span style="color: #1976D2">576</span><span style="color: #24292EFF"> and has length </span><span style="color: #1976D2">103</span></span>
-<span class="line"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> with suffix </span><span style="color: #1976D2">_Lucene99_0</span><span style="color: #212121">.</span><span style="color: #1976D2">pos</span><span style="color: #24292EFF"> starts at offset </span><span style="color: #1976D2">680</span><span style="color: #24292EFF"> and has length </span><span style="color: #1976D2">114</span></span>
-<span class="line"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> with </span><span style="color: #1976D2">suffix</span><span style="color: #24292EFF"> </span><span style="color: #212121">.</span><span style="color: #1976D2">kdm</span><span style="color: #24292EFF"> starts at offset </span><span style="color: #1976D2">800</span><span style="color: #24292EFF"> and has length </span><span style="color: #1976D2">135</span></span>
-<span class="line"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> with </span><span style="color: #1976D2">suffix</span><span style="color: #24292EFF"> </span><span style="color: #212121">.</span><span style="color: #1976D2">fdm</span><span style="color: #24292EFF"> starts at offset </span><span style="color: #1976D2">936</span><span style="color: #24292EFF"> and has length </span><span style="color: #1976D2">157</span></span>
-<span class="line"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> with suffix </span><span style="color: #1976D2">_Lucene90_0</span><span style="color: #212121">.</span><span style="color: #1976D2">dvm</span><span style="color: #24292EFF"> starts at offset </span><span style="color: #1976D2">1096</span><span style="color: #24292EFF"> and has length </span><span style="color: #1976D2">162</span></span>
-<span class="line"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> with suffix </span><span style="color: #1976D2">_Lucene99_0</span><span style="color: #212121">.</span><span style="color: #1976D2">tmd</span><span style="color: #24292EFF"> starts at offset </span><span style="color: #1976D2">1264</span><span style="color: #24292EFF"> and has length </span><span style="color: #1976D2">190</span></span>
-<span class="line"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> with </span><span style="color: #1976D2">suffix</span><span style="color: #24292EFF"> </span><span style="color: #212121">.</span><span style="color: #1976D2">fnm</span><span style="color: #24292EFF"> starts at offset </span><span style="color: #1976D2">1456</span><span style="color: #24292EFF"> and has length </span><span style="color: #1976D2">250</span></span>
-<span class="line"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> with suffix </span><span style="color: #1976D2">_Lucene99_0</span><span style="color: #212121">.</span><span style="color: #1976D2">tim</span><span style="color: #24292EFF"> starts at offset </span><span style="color: #1976D2">1712</span><span style="color: #24292EFF"> and has length </span><span style="color: #1976D2">290</span></span>
-<span class="line"><span style="color: #D32F2F">File</span><span style="color: #24292EFF"> with </span><span style="color: #1976D2">suffix</span><span style="color: #24292EFF"> </span><span style="color: #212121">.</span><span style="color: #1976D2">fdt</span><span style="color: #24292EFF"> starts at offset </span><span style="color: #1976D2">2008</span><span style="color: #24292EFF"> and has length </span><span style="color: #1976D2">313</span></span>
-<span class="line"><span style="color: #D32F2F">These</span><span style="color: #24292EFF"> should be equal</span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">479</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">==</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">479</span></span></code></pre>
+<pre><code>File with suffix .nvd starts at offset <span class="hljs-number">48</span> and has length <span class="hljs-number">63</span>
+File with suffix .fdx starts at offset <span class="hljs-number">112</span> and has length <span class="hljs-number">64</span>
+File with suffix .kdi starts at offset <span class="hljs-number">176</span> and has length <span class="hljs-number">68</span>
+File with suffix _Lucene99_0.tip starts at offset <span class="hljs-number">248</span> and has length <span class="hljs-number">72</span>
+File with suffix _Lucene90_0.dvd starts at offset <span class="hljs-number">320</span> and has length <span class="hljs-number">74</span>
+File with suffix .kdd starts at offset <span class="hljs-number">400</span> and has length <span class="hljs-number">82</span>
+File with suffix _Lucene99_0.doc starts at offset <span class="hljs-number">488</span> and has length <span class="hljs-number">87</span>
+File with suffix .nvm starts at offset <span class="hljs-number">576</span> and has length <span class="hljs-number">103</span>
+File with suffix _Lucene99_0.pos starts at offset <span class="hljs-number">680</span> and has length <span class="hljs-number">114</span>
+File with suffix .kdm starts at offset <span class="hljs-number">800</span> and has length <span class="hljs-number">135</span>
+File with suffix .fdm starts at offset <span class="hljs-number">936</span> and has length <span class="hljs-number">157</span>
+File with suffix _Lucene90_0.dvm starts at offset <span class="hljs-number">1096</span> and has length <span class="hljs-number">162</span>
+File with suffix _Lucene99_0.tmd starts at offset <span class="hljs-number">1264</span> and has length <span class="hljs-number">190</span>
+File with suffix .fnm starts at offset <span class="hljs-number">1456</span> and has length <span class="hljs-number">250</span>
+File with suffix _Lucene99_0.tim starts at offset <span class="hljs-number">1712</span> and has length <span class="hljs-number">290</span>
+File with suffix .fdt starts at offset <span class="hljs-number">2008</span> and has length <span class="hljs-number">313</span>
+These should be equal: <span class="hljs-number">479</span> == <span class="hljs-number">479</span>
 </code></pre>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 242;"><span class="line" id="L242"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">ChecksumIndexInput</span><span style="color: #24292EFF"> cfeInput </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">dir</span><span style="color: #212121">.</span><span style="color: #6F42C1">openChecksumInput</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;_0.cfe&quot;</span><span style="color: #24292EFF">)) {</span></span>
-<span class="line" id="L243"><span style="color: #24292EFF">                </span><span style="color: #C2C3C5">/* If/when Lucene changes this file format, this header check should fail. */</span></span>
-<span class="line" id="L244"><span style="color: #24292EFF">                </span><span style="color: #1976D2">CodecUtil</span><span style="color: #212121">.</span><span style="color: #6F42C1">checkIndexHeader</span><span style="color: #24292EFF">(cfeInput</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;Lucene90CompoundEntries&quot;</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">seg0info</span><span style="color: #212121">.</span><span style="color: #6F42C1">getId</span><span style="color: #24292EFF">()</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L245"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> numFiles </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">cfeInput</span><span style="color: #212121">.</span><span style="color: #6F42C1">readVInt</span><span style="color: #24292EFF">();</span></span>
-<span class="line" id="L246"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF"> ; i </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> numFiles; i</span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">) {</span></span>
-<span class="line" id="L247"><span style="color: #24292EFF">                    </span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> fileSuffix </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">cfeInput</span><span style="color: #212121">.</span><span style="color: #6F42C1">readString</span><span style="color: #24292EFF">();</span></span>
-<span class="line" id="L248"><span style="color: #24292EFF">                    </span><span style="color: #D32F2F">long</span><span style="color: #24292EFF"> start </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">cfeInput</span><span style="color: #212121">.</span><span style="color: #6F42C1">readLong</span><span style="color: #24292EFF">();</span></span>
-<span class="line" id="L249"><span style="color: #24292EFF">                    </span><span style="color: #D32F2F">long</span><span style="color: #24292EFF"> end </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">cfeInput</span><span style="color: #212121">.</span><span style="color: #6F42C1">readLong</span><span style="color: #24292EFF">();</span></span>
-<span class="line" id="L250"><span style="color: #24292EFF">                    </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">printf</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;File with suffix %s starts at offset %d and has length %d%n&quot;</span><span style="color: #212121">,</span><span style="color: #24292EFF"> fileSuffix</span><span style="color: #212121">,</span><span style="color: #24292EFF"> start</span><span style="color: #212121">,</span><span style="color: #24292EFF"> end);</span></span>
-<span class="line" id="L251"><span style="color: #24292EFF">                }</span></span>
-<span class="line" id="L252"><span style="color: #24292EFF">                </span><span style="color: #1976D2">CodecUtil</span><span style="color: #212121">.</span><span style="color: #6F42C1">checkFooter</span><span style="color: #24292EFF">(cfeInput);</span></span>
-<span class="line" id="L253"><span style="color: #24292EFF">                </span><span style="color: #C2C3C5">/* Check that we actually reached the end of the file */</span></span>
-<span class="line" id="L254"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;These should be equal: &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">cfeInput</span><span style="color: #212121">.</span><span style="color: #6F42C1">getFilePointer</span><span style="color: #24292EFF">() </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; == &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">dir</span><span style="color: #212121">.</span><span style="color: #6F42C1">fileLength</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;_0.cfe&quot;</span><span style="color: #24292EFF">));</span></span>
-<span class="line" id="L255"><span style="color: #24292EFF">            }</span></span>
-<span class="line empty-line" id="L256"></span>
-<span class="line empty-line" id="L257"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>            <span class="hljs-keyword">try</span> (<span class="hljs-type">ChecksumIndexInput</span> <span class="hljs-variable">cfeInput</span> <span class="hljs-operator">=</span> dir.openChecksumInput(<span class="hljs-string">&quot;_0.cfe&quot;</span>)) {
+                <span class="hljs-comment">/* If/when Lucene changes this file format, this header check should fail. */</span>
+                CodecUtil.checkIndexHeader(cfeInput, <span class="hljs-string">&quot;Lucene90CompoundEntries&quot;</span>, <span class="hljs-number">0</span>, <span class="hljs-number">0</span>, seg0info.getId(), <span class="hljs-string">&quot;&quot;</span>);
+                <span class="hljs-type">int</span> <span class="hljs-variable">numFiles</span> <span class="hljs-operator">=</span> cfeInput.readVInt();
+                <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span> ; i &lt; numFiles; i++) {
+                    <span class="hljs-type">String</span> <span class="hljs-variable">fileSuffix</span> <span class="hljs-operator">=</span> cfeInput.readString();
+                    <span class="hljs-type">long</span> <span class="hljs-variable">start</span> <span class="hljs-operator">=</span> cfeInput.readLong();
+                    <span class="hljs-type">long</span> <span class="hljs-variable">end</span> <span class="hljs-operator">=</span> cfeInput.readLong();
+                    System.out.printf(<span class="hljs-string">&quot;File with suffix %s starts at offset %d and has length %d%n&quot;</span>, fileSuffix, start, end);
+                }
+                CodecUtil.checkFooter(cfeInput);
+                <span class="hljs-comment">/* Check that we actually reached the end of the file */</span>
+                System.out.println(<span class="hljs-string">&quot;These should be equal: &quot;</span> + cfeInput.getFilePointer() + <span class="hljs-string">&quot; == &quot;</span> + dir.fileLength(<span class="hljs-string">&quot;_0.cfe&quot;</span>));
+            }</pre></div>
         
-        <li id="section-18">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-18">&#x00a7;</a>
-              </div>
-              <h3 id="reading-terms-from-the-index">Reading terms from the index</h3>
-
-            </div>
-            
-        </li>
+      
         
-        
-        <li id="section-19">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-19">&#x00a7;</a>
-              </div>
-              <p>We’ve previously covered term queries from a high level in SimpleSearch, then a slightly lower level in
+        <h3 id="reading-terms-from-the-index">Reading terms from the index</h3>
+<p>We’ve previously covered term queries from a high level in SimpleSearch, then a slightly lower level in
 SearchWithTermsEnum. Let’s close the gap by reading the terms directly from this segment (essentially
 what the LeafReader did for us in SearchWithTermsEnum).</p>
 <p>First we need the information about the fields in the index, available via FieldInfos, which we read from
 the <code>.fnm</code> file in our compound file segment. Then we get a <code>FieldsProducer</code> using the codec’s postings
 format. That lets us load the <code>Terms</code> (and therefore <code>TermsEnum</code>) for a given field.</p>
 <p>The code outputs the following terms:</p>
-<pre><code><pre class="shiki" style="background-color: transparent"><code ><span class="line"><span style="color: #D32F2F">The</span><span style="color: #24292EFF"> field </span><span style="color: #22863A">&#39;text&#39;</span><span style="color: #24292EFF"> has the following terms</span><span style="color: #D32F2F">:</span></span>
-<span class="line"><span style="color: #24292EFF">amet brown dog dolor fox ipsum jumped lazy left loom lorem made oblivious over paces past quick room</span></span>
-<span class="line"><span style="color: #24292EFF">she sit sly sneaks the three through web</span></span></code></pre>
+<pre><code>The field <span class="hljs-string">&#x27;text&#x27;</span> has the following terms:
+amet brown dog dolor fox ipsum jumped lazy left loom lorem made oblivious over paces past quick room
+she sit sly sneaks the three through web
 </code></pre>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 274;"><span class="line" id="L274"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">FieldInfos</span><span style="color: #24292EFF"> fieldInfos </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">codec</span><span style="color: #212121">.</span><span style="color: #6F42C1">fieldInfosFormat</span><span style="color: #24292EFF">()</span><span style="color: #212121">.</span><span style="color: #6F42C1">read</span><span style="color: #24292EFF">(seg0dir</span><span style="color: #212121">,</span><span style="color: #24292EFF"> seg0info</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;&quot;</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">IOContext</span><span style="color: #212121">.</span><span style="color: #1976D2">DEFAULT</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L275"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">SegmentReadState</span><span style="color: #24292EFF"> segmentReadState </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">SegmentReadState(seg0dir</span><span style="color: #212121">,</span><span style="color: #6F42C1"> seg0info</span><span style="color: #212121">,</span><span style="color: #6F42C1"> fieldInfos</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">IOContext</span><span style="color: #212121">.</span><span style="color: #1976D2">DEFAULT</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L276"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">FieldsProducer</span><span style="color: #24292EFF"> fieldsProducer </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">codec</span><span style="color: #212121">.</span><span style="color: #6F42C1">postingsFormat</span><span style="color: #24292EFF">()</span><span style="color: #212121">.</span><span style="color: #6F42C1">fieldsProducer</span><span style="color: #24292EFF">(segmentReadState)) {</span></span>
-<span class="line" id="L277"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">Terms</span><span style="color: #24292EFF"> terms </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">fieldsProducer</span><span style="color: #212121">.</span><span style="color: #6F42C1">terms</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L278"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">TermsEnum</span><span style="color: #24292EFF"> termsEnum </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">terms</span><span style="color: #212121">.</span><span style="color: #6F42C1">iterator</span><span style="color: #24292EFF">();</span></span>
-<span class="line" id="L279"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">BytesRef</span><span style="color: #24292EFF"> termBytesRef;</span></span>
-<span class="line" id="L280"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;The field &#39;text&#39; has the following terms:&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L281"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">StringBuilder</span><span style="color: #24292EFF"> builder </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">StringBuilder()</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L282"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> lineLength </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L283"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">while</span><span style="color: #24292EFF"> ((termBytesRef </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">termsEnum</span><span style="color: #212121">.</span><span style="color: #6F42C1">next</span><span style="color: #24292EFF">()) </span><span style="color: #D32F2F">!=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">null</span><span style="color: #24292EFF">) {</span></span>
-<span class="line" id="L284"><span style="color: #24292EFF">                    </span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> termString </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">termBytesRef</span><span style="color: #212121">.</span><span style="color: #6F42C1">utf8ToString</span><span style="color: #24292EFF">();</span></span>
-<span class="line" id="L285"><span style="color: #24292EFF">                    </span><span style="color: #1976D2">builder</span><span style="color: #212121">.</span><span style="color: #6F42C1">append</span><span style="color: #24292EFF">(termString)</span><span style="color: #212121">.</span><span style="color: #6F42C1">append</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#39; &#39;</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L286"><span style="color: #24292EFF">                    lineLength </span><span style="color: #D32F2F">+=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">termString</span><span style="color: #212121">.</span><span style="color: #6F42C1">length</span><span style="color: #24292EFF">();</span></span>
-<span class="line" id="L287"><span style="color: #24292EFF">                    </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (lineLength </span><span style="color: #D32F2F">&gt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">80</span><span style="color: #24292EFF">) {</span></span>
-<span class="line" id="L288"><span style="color: #24292EFF">                        </span><span style="color: #1976D2">builder</span><span style="color: #212121">.</span><span style="color: #6F42C1">append</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&#39;\n&#39;</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L289"><span style="color: #24292EFF">                        lineLength </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L290"><span style="color: #24292EFF">                    }</span></span>
-<span class="line" id="L291"><span style="color: #24292EFF">                }</span></span>
-<span class="line" id="L292"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(builder);</span></span>
-<span class="line" id="L293"><span style="color: #24292EFF">            }</span></span>
-<span class="line empty-line" id="L294"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>            <span class="hljs-type">FieldInfos</span> <span class="hljs-variable">fieldInfos</span> <span class="hljs-operator">=</span> codec.fieldInfosFormat().read(seg0dir, seg0info, <span class="hljs-string">&quot;&quot;</span>, IOContext.DEFAULT);
+            <span class="hljs-type">SegmentReadState</span> <span class="hljs-variable">segmentReadState</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">SegmentReadState</span>(seg0dir, seg0info, fieldInfos, IOContext.DEFAULT);
+            <span class="hljs-keyword">try</span> (<span class="hljs-type">FieldsProducer</span> <span class="hljs-variable">fieldsProducer</span> <span class="hljs-operator">=</span> codec.postingsFormat().fieldsProducer(segmentReadState)) {
+                <span class="hljs-type">Terms</span> <span class="hljs-variable">terms</span> <span class="hljs-operator">=</span> fieldsProducer.terms(<span class="hljs-string">&quot;text&quot;</span>);
+                <span class="hljs-type">TermsEnum</span> <span class="hljs-variable">termsEnum</span> <span class="hljs-operator">=</span> terms.iterator();
+                BytesRef termBytesRef;
+                System.out.println(<span class="hljs-string">&quot;The field &#x27;text&#x27; has the following terms:&quot;</span>);
+                <span class="hljs-type">StringBuilder</span> <span class="hljs-variable">builder</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuilder</span>();
+                <span class="hljs-type">int</span> <span class="hljs-variable">lineLength</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+                <span class="hljs-keyword">while</span> ((termBytesRef = termsEnum.next()) != <span class="hljs-literal">null</span>) {
+                    <span class="hljs-type">String</span> <span class="hljs-variable">termString</span> <span class="hljs-operator">=</span> termBytesRef.utf8ToString();
+                    builder.append(termString).append(<span class="hljs-string">&#x27; &#x27;</span>);
+                    lineLength += termString.length();
+                    <span class="hljs-keyword">if</span> (lineLength &gt; <span class="hljs-number">80</span>) {
+                        builder.append(<span class="hljs-string">&#x27;\n&#x27;</span>);
+                        lineLength = <span class="hljs-number">0</span>;
+                    }
+                }
+                System.out.println(builder);
+            }</pre></div>
         
-        <li id="section-20">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-20">&#x00a7;</a>
-              </div>
-              <h3 id="memory-mapped-files">Memory-mapped files</h3>
-
-            </div>
-            
-        </li>
+      
         
-        
-        <li id="section-21">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-21">&#x00a7;</a>
-              </div>
-              <p>In the above example, we initialized a <code>FieldsProducer</code>, which first opened an <code>IndexInput</code> “slice” of the
+        <h3 id="memory-mapped-files">Memory-mapped files</h3>
+<p>In the above example, we initialized a <code>FieldsProducer</code>, which first opened an <code>IndexInput</code> “slice” of the
 <code>_0.cfs</code> <code>IndexInput</code> corresponding to the <code>_0_Lucene99_0.doc</code> file (for the postings – the doc ids for
 each term). Then it opened another <code>IndexInput</code> slice in the CFS file for <code>_0_Lucene99_0.tim</code> (the terms),
 as well as slices for <code>_0_Lucene99_0.tip</code> (the terms index), and <code>_0_Lucene99_0.tmd</code> (the term metadata).</p>
@@ -652,28 +478,25 @@ retrieved above.</p>
 file. The file is probably fully paged into memory (since the whole <code>_0.cfs</code> file is only 2337
 bytes), so it’s really not much worse than reading values out of objects in the JVM heap.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 311;"><span class="line" id="L311"><span style="color: #24292EFF">        } </span><span style="color: #D32F2F">finally</span><span style="color: #24292EFF"> {</span></span>
-<span class="line" id="L312"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> indexFile </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">listAll</span><span style="color: #24292EFF">(indexDir)) {</span></span>
-<span class="line" id="L313"><span style="color: #24292EFF">                </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">deleteIfExists</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">indexDir</span><span style="color: #212121">.</span><span style="color: #6F42C1">resolve</span><span style="color: #24292EFF">(indexFile));</span></span>
-<span class="line" id="L314"><span style="color: #24292EFF">            }</span></span>
-<span class="line" id="L315"><span style="color: #24292EFF">            </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">delete</span><span style="color: #24292EFF">(indexDir);</span></span>
-<span class="line" id="L316"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (lock </span><span style="color: #D32F2F">!=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">null</span><span style="color: #24292EFF">) {</span></span>
-<span class="line" id="L317"><span style="color: #24292EFF">                </span><span style="color: #1976D2">lock</span><span style="color: #212121">.</span><span style="color: #6F42C1">close</span><span style="color: #24292EFF">();</span></span>
-<span class="line" id="L318"><span style="color: #24292EFF">            }</span></span>
-<span class="line" id="L319"><span style="color: #24292EFF">        }</span></span>
-<span class="line empty-line" id="L320"></span>
-<span class="line empty-line" id="L321"></span>
-<span class="line" id="L322"><span style="color: #24292EFF">    }</span></span>
-<span class="line empty-line" id="L323"></span>
-<span class="line" id="L324"><span style="color: #24292EFF">}</span></span>
-<span class="line empty-line" id="L325"></span>
-<span class="line empty-line" id="L326"></span></code></pre></div>
-            
-        </li>
         
-    </ul>
+          <div class='highlight'><pre>        } <span class="hljs-keyword">finally</span> {
+            <span class="hljs-keyword">for</span> (String indexFile : FSDirectory.listAll(indexDir)) {
+                Files.deleteIfExists(indexDir.resolve(indexFile));
+            }
+            Files.delete(indexDir);
+            <span class="hljs-keyword">if</span> (lock != <span class="hljs-literal">null</span>) {
+                lock.close();
+            }
+        }
+
+
+    }
+
+}</pre></div>
+        
+      
+      <div class="fleur">h</div>
+    </div>
   </div>
 </body>
 </html>

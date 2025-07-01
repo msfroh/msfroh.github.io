@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>Finite State Transducers</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
+  <link rel="stylesheet" media="all" href="docco.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="page">
+
+      <div class="header">
+        
+          
+          <h1 id="finite-state-transducers">Finite State Transducers</h1>
+<p>The Java source for this lesson is available at
+<a href="http://github.com/msfroh/lucene-university/tree/main/src/main/java/example/foundations/FiniteStateTransducers.java">http://github.com/msfroh/lucene-university/tree/main/src/main/java/example/foundations/FiniteStateTransducers.java</a>.</p>
+<p>Lucene’s term dictionary is implemented using “finite state transducers” (FSTs). This is a compact way of representing
+the dictionary of terms in the index. A finite state transducer is like a finite state automaton, but it can also
+point to some output. If a finite state automaton is like a “set” that identifies whether a given input is included
+in the dictionary, a finite state transducer is like a “map” that points to the postings for a given term in the
+dictionary.</p>
+<p>For details on how Lucene uses FSTs, check out Mike McCandless’s blog post at
+<a href="https://blog.mikemccandless.com/2010/12/using-finite-state-transducers-in.html">https://blog.mikemccandless.com/2010/12/using-finite-state-transducers-in.html</a>.</p>
+<p>The FST implementation in Lucene is inspired by the paper “Direct Construction of Minimal Acyclic Subsequential
+Transducers” by Mihov and Maurel (available from Mihov’s website at <a href="https://lml.bas.bg/~stoyan/lmd/Publications.html">https://lml.bas.bg/~stoyan/lmd/Publications.html</a>).</p>
+<p>That paper builds on the earlier paper, “Incremental Construction of Minimal Acyclic Finite-State
+Automata” by Daciuk, Mihov, Watson, and Watson (<a href="https://aclanthology.org/J00-1002.pdf">https://aclanthology.org/J00-1002.pdf</a>). This lesson will follow
+the approach from this earlier paper, including starting with a trie data structure and then moving on to the
+algorithm they use to construct a minimal automaton. From there, we’ll generalize from finite state automata to
+finite state transducers, following the approach from the Mihov and Maurel paper.</p>
+
+          
+            <div class='highlight'><pre><span class="hljs-keyword">package</span> example.foundations;
+
+<span class="hljs-keyword">import</span> java.util.ArrayList;
+<span class="hljs-keyword">import</span> java.util.Collections;
+<span class="hljs-keyword">import</span> java.util.Comparator;
+<span class="hljs-keyword">import</span> java.util.HashMap;
+<span class="hljs-keyword">import</span> java.util.HashSet;
+<span class="hljs-keyword">import</span> java.util.Iterator;
+<span class="hljs-keyword">import</span> java.util.List;
+<span class="hljs-keyword">import</span> java.util.Map;
+<span class="hljs-keyword">import</span> java.util.Objects;
+<span class="hljs-keyword">import</span> java.util.Set;
+<span class="hljs-keyword">import</span> java.util.SortedMap;
+<span class="hljs-keyword">import</span> java.util.TreeMap;
+<span class="hljs-keyword">import</span> java.util.function.Supplier;
+<span class="hljs-keyword">import</span> java.util.stream.Collectors;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">FiniteStateTransducers</span> {</pre></div>
+          
+        
+
+        
+          <div class="toc">
+            <h3>Table of Contents</h3>
+            <ol>
+              
+                
+                <li>
+                  <a class="source" href="AnalyzerBasics.html">
+                    AnalyzerBasics.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BooleanQueryANDInternals.html">
+                    BooleanQueryANDInternals.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BooleanQueryIntro.html">
+                    BooleanQueryIntro.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BottomUpIndexReader.html">
+                    BottomUpIndexReader.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BytesRefHashExample.html">
+                    BytesRefHashExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="CombinedFieldQueryExample.html">
+                    CombinedFieldQueryExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DirectoryFileContents.html">
+                    DirectoryFileContents.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DocValuesSearchExample.html">
+                    DocValuesSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="FiniteStateTransducers.html">
+                    FiniteStateTransducers.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="FunctionQuerySearchExample.html">
+                    FunctionQuerySearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="KnnSearchExample.html">
+                    KnnSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="PointTreeRangeQuery.html">
+                    PointTreeRangeQuery.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="PrimitivesRef.html">
+                    PrimitivesRef.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SearchWithTermsEnum.html">
+                    SearchWithTermsEnum.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SimpleSearch.html">
+                    SimpleSearch.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="TextVectorSearchExample.html">
+                    TextVectorSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="VisualizePointTree.html">
+                    VisualizePointTree.java
+                  </a>
+                </li>
+              
+            </ol>
+          </div>
+        
+      </div>
+
+      
+        
+        <h2 id="helper-classes">Helper classes</h2>
+<p>The examples below will construct acyclic graphs that operate on strings. At a foundation, the graphs will
+have nodes representing states, with edges representing transitions between states. Each edge will be labeled
+with a character that triggers the transition. You look up a string in the graph by traversing character by
+character until you either find a character with no valid transition or you reach the end of the string. Reaching
+the end of the string doesn’t necessarily mean that the string is in the graph, because we may just have reached
+a prefix of a longer string that is in the graph. If the last state we reach has a value associated with it,
+we’ll assume it’s an accepting state, meaning that the string is in the graph.</p>
+<p>We will be able to use the following Node class to represent a node in any digraph. We will reuse it across
+multiple examples.</p>
+
+        
+          <div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Node</span>&lt;T&gt; {
+        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> nodeNum;
+        <span class="hljs-keyword">private</span> <span class="hljs-type">boolean</span> acceptingState;
+        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> List&lt;T&gt; values;
+        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> SortedMap&lt;Character, Node&lt;T&gt;&gt; outboundEdges;
+
+        <span class="hljs-keyword">public</span> <span class="hljs-title function_">Node</span><span class="hljs-params">(<span class="hljs-type">int</span> nodeNum, <span class="hljs-type">boolean</span> acceptingState, List&lt;T&gt; values)</span> {
+            <span class="hljs-built_in">this</span>.nodeNum = nodeNum;
+            <span class="hljs-built_in">this</span>.outboundEdges = <span class="hljs-keyword">new</span> <span class="hljs-title class_">TreeMap</span>&lt;&gt;();
+            <span class="hljs-built_in">this</span>.acceptingState = acceptingState;
+            <span class="hljs-built_in">this</span>.values = values;
+        }
+
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">equals</span><span class="hljs-params">(Object o)</span> {
+            <span class="hljs-keyword">if</span> (o == <span class="hljs-literal">null</span> || getClass() != o.getClass()) <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+            Node&lt;T&gt; node = (Node&lt;T&gt;) o;
+            <span class="hljs-keyword">if</span> (outboundEdges.size() != node.outboundEdges.size()) {
+                <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+            }
+            Iterator&lt;Map.Entry&lt;Character, Node&lt;T&gt;&gt;&gt; iterator = outboundEdges.entrySet().iterator();
+            Iterator&lt;Map.Entry&lt;Character, Node&lt;T&gt;&gt;&gt; otherIterator = node.outboundEdges.entrySet().iterator();
+
+            <span class="hljs-keyword">while</span> (iterator.hasNext()) {</pre></div>
+        
+      
+        
+        <p>Nodes have keys in order, so we can compare them directly.</p>
+
+        
+          <div class='highlight'><pre>                Map.Entry&lt;Character, Node&lt;T&gt;&gt; childEntry = iterator.next();
+                Map.Entry&lt;Character, Node&lt;T&gt;&gt; otherEntry = otherIterator.next();
+
+                <span class="hljs-keyword">if</span> (childEntry.getKey().equals(otherEntry.getKey()) == <span class="hljs-literal">false</span> ||
+                        childEntry.getValue().nodeNum != otherEntry.getValue().nodeNum) {
+                    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>; <span class="hljs-comment">// Mismatch found</span>
+                }
+            }
+            <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+        }
+
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">hashCode</span><span class="hljs-params">()</span> {
+            <span class="hljs-keyword">return</span> Objects.hash(values, outboundEdges.keySet());
+        }
+    }</pre></div>
+        
+      
+        
+        <p>The following class will handle common functionality for directed acyclic graphs (DAGs) that we will implement
+below. In particular, the search logic will be common across all implementations, so we can reuse that. Also,
+we include the <code>toDot</code> method to generate a DOT representation of the graph, which can be used for visualization.</p>
+
+        
+          <div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">DirectedAcyclicGraph</span>&lt;T&gt; {
+        <span class="hljs-keyword">private</span> <span class="hljs-type">int</span> <span class="hljs-variable">counter</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; <span class="hljs-comment">// Used to assign unique node numbers</span>
+        <span class="hljs-keyword">protected</span> <span class="hljs-keyword">final</span> Node&lt;T&gt; root;
+
+        <span class="hljs-keyword">protected</span> <span class="hljs-title function_">DirectedAcyclicGraph</span><span class="hljs-params">()</span> {
+            <span class="hljs-built_in">this</span>.root = createNode();
+        }
+
+        <span class="hljs-keyword">protected</span> Node&lt;T&gt; <span class="hljs-title function_">createNode</span><span class="hljs-params">()</span> {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Node</span>&lt;&gt;(counter++, <span class="hljs-literal">false</span>, <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;());
+        }
+
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">abstract</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">insert</span><span class="hljs-params">(String key, T value)</span>;
+
+        <span class="hljs-keyword">public</span> List&lt;T&gt; <span class="hljs-title function_">search</span><span class="hljs-params">(String key)</span> {
+            Node&lt;T&gt; currentNode = root;
+            <span class="hljs-keyword">for</span> (<span class="hljs-type">char</span> c : key.toCharArray()) {
+                currentNode = currentNode.outboundEdges.get(c);
+                <span class="hljs-keyword">if</span> (currentNode == <span class="hljs-literal">null</span>) {
+                    <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>; <span class="hljs-comment">// Key not found</span>
+                }
+            }
+            <span class="hljs-keyword">if</span> (currentNode.acceptingState) {
+                <span class="hljs-keyword">return</span> currentNode.values;
+            }
+            <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>; <span class="hljs-comment">// Key found, but not an accepting state</span>
+        }
+
+        <span class="hljs-keyword">public</span> String <span class="hljs-title function_">toDot</span><span class="hljs-params">()</span> {
+            <span class="hljs-type">StringBuilder</span> <span class="hljs-variable">sb</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuilder</span>();
+            sb.append(<span class="hljs-string">&quot;digraph Trie {\n&quot;</span>);
+            toDotHelper(root, sb, <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashSet</span>&lt;&gt;());
+            sb.append(<span class="hljs-string">&quot;}\n&quot;</span>);
+            <span class="hljs-keyword">return</span> sb.toString();
+        }
+
+        <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> &lt;T&gt; <span class="hljs-keyword">void</span> <span class="hljs-title function_">toDotHelper</span><span class="hljs-params">(Node&lt;T&gt; node, StringBuilder sb, Set&lt;Integer&gt; visited)</span> {
+            <span class="hljs-keyword">if</span> (visited.contains(node.nodeNum)) {
+                <span class="hljs-keyword">return</span>; <span class="hljs-comment">// Avoid adding redundant edges.</span>
+            }
+            visited.add(node.nodeNum);
+            <span class="hljs-keyword">if</span> (node.acceptingState) {
+                String[] values = node.values.stream()
+                        .map(Object::toString)
+                        .toArray(String[]::<span class="hljs-keyword">new</span>);
+                sb.append(<span class="hljs-string">&quot;  \&quot;&quot;</span>).append(node.nodeNum).append(<span class="hljs-string">&quot;\&quot; [shape=doublecircle,label=\&quot;&quot;</span>).append(String.join(<span class="hljs-string">&quot;,&quot;</span>, values)).append(<span class="hljs-string">&quot;\&quot;];\n&quot;</span>);
+            } <span class="hljs-keyword">else</span> {
+                sb.append(<span class="hljs-string">&quot;  \&quot;&quot;</span>).append(node.nodeNum).append(<span class="hljs-string">&quot;\&quot; [shape=circle,label=\&quot;\&quot;];\n&quot;</span>);
+            }
+            <span class="hljs-keyword">for</span> (Map.Entry&lt;Character, Node&lt;T&gt;&gt; entry : node.outboundEdges.entrySet()) {
+                <span class="hljs-type">char</span> <span class="hljs-variable">c</span> <span class="hljs-operator">=</span> entry.getKey();
+                Node&lt;T&gt; nextNode = entry.getValue();
+                sb.append(<span class="hljs-string">&quot;  \&quot;&quot;</span>).append(node.nodeNum).append(<span class="hljs-string">&quot;\&quot; -&gt; \&quot;&quot;</span>).append(nextNode.nodeNum).append(<span class="hljs-string">&quot;\&quot; [label=\&quot;&quot;</span>)
+                        .append(c).append(<span class="hljs-string">&quot;\&quot;];\n&quot;</span>);
+                toDotHelper(nextNode, sb, visited);
+            }
+        }
+    }</pre></div>
+        
+      
+        
+        <h2 id="tries">Tries</h2>
+<p>A trie is a tree-like data structure that stores a dynamic set of strings, where each edge represents a character
+in the string. Tries are particularly useful for prefix matching and can be used to implement autocomplete. They
+were also used for the T9 text input system on older mobile phones, where each key corresponds to multiple
+letters.</p>
+<p>For demonstration purposes, I’ll take the object-oriented approach to implement a simple trie in Java. We can
+more efficiently pack the trie into arrays of states and transitions, but this implementation should be easier
+to read.</p>
+<p>Note that tries will reuse common prefixes, regardless of the order in which the keys are inserted. For each
+inserted string, we add prefixes that are not present and reuse prefixes that are. (That’s essentially what
+the computeIfAbsent call is doing.)</p>
+
+        
+          <div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">Trie</span>&lt;T&gt; <span class="hljs-keyword">extends</span> <span class="hljs-title class_">DirectedAcyclicGraph</span>&lt;T&gt; {
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">insert</span><span class="hljs-params">(String key, T value)</span> {
+            Node&lt;T&gt; currentNode = root;
+            <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; key.length(); i++) {
+                <span class="hljs-type">char</span> <span class="hljs-variable">c</span> <span class="hljs-operator">=</span> key.charAt(i);</pre></div>
+        
+      
+        
+        <p>If the character is not present, create a new node for it.</p>
+
+        
+          <div class='highlight'><pre>                currentNode = currentNode.outboundEdges.computeIfAbsent(c, k -&gt; createNode());
+                <span class="hljs-keyword">if</span> (i == key.length() - <span class="hljs-number">1</span>) {</pre></div>
+        
+      
+        
+        <p>If this is the last character in the key, mark the node as an accepting state and set its value.</p>
+
+        
+          <div class='highlight'><pre>                    currentNode.acceptingState = <span class="hljs-literal">true</span>;
+                    currentNode.values.add(value);
+                }
+            }
+        }
+    }</pre></div>
+        
+      
+        
+        <p>We can test out the trie implementation by inserting some keys and values, then searching for them.</p>
+
+        
+          <div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">trieMain</span><span class="hljs-params">()</span> {</pre></div>
+        
+      
+        
+        <p>Insert months of the year into the trie, with the number of days in each month as the value.</p>
+
+        
+          <div class='highlight'><pre>        Trie&lt;Integer&gt; trie = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Trie</span>&lt;&gt;();
+        trie.insert(<span class="hljs-string">&quot;January&quot;</span>, <span class="hljs-number">31</span>);
+        trie.insert(<span class="hljs-string">&quot;February&quot;</span>, <span class="hljs-number">28</span>);
+        trie.insert(<span class="hljs-string">&quot;February&quot;</span>, <span class="hljs-number">29</span>);
+        trie.insert(<span class="hljs-string">&quot;March&quot;</span>, <span class="hljs-number">31</span>);
+        trie.insert(<span class="hljs-string">&quot;April&quot;</span>, <span class="hljs-number">30</span>);
+        trie.insert(<span class="hljs-string">&quot;May&quot;</span>, <span class="hljs-number">31</span>);
+        trie.insert(<span class="hljs-string">&quot;June&quot;</span>, <span class="hljs-number">30</span>);
+        trie.insert(<span class="hljs-string">&quot;July&quot;</span>, <span class="hljs-number">31</span>);
+        trie.insert(<span class="hljs-string">&quot;August&quot;</span>, <span class="hljs-number">31</span>);
+        trie.insert(<span class="hljs-string">&quot;September&quot;</span>, <span class="hljs-number">30</span>);
+        trie.insert(<span class="hljs-string">&quot;October&quot;</span>, <span class="hljs-number">31</span>);
+        trie.insert(<span class="hljs-string">&quot;November&quot;</span>, <span class="hljs-number">30</span>);
+        trie.insert(<span class="hljs-string">&quot;December&quot;</span>, <span class="hljs-number">31</span>);</pre></div>
+        
+      
+        
+        <p>Search for some keys</p>
+
+        
+          <div class='highlight'><pre>        System.out.println(<span class="hljs-string">&quot;Search for &#x27;March&#x27;: &quot;</span> + trie.search(<span class="hljs-string">&quot;March&quot;</span>)); <span class="hljs-comment">// Should print [31]</span>
+        System.out.println(<span class="hljs-string">&quot;Search for &#x27;February&#x27;: &quot;</span> + trie.search(<span class="hljs-string">&quot;February&quot;</span>)); <span class="hljs-comment">// Should print [28,29]</span>
+        System.out.println(<span class="hljs-string">&quot;Search for &#x27;Smarch&#x27;: &quot;</span> + trie.search(<span class="hljs-string">&quot;Smarch&quot;</span>)); <span class="hljs-comment">// Should print null (not found)</span></pre></div>
+        
+      
+        
+        <p>Print the trie in DOT format for visualization
+If you have Graphviz installed, you can visualize the trie by running:</p>
+<pre><code>dot -Tpng trie.dot -o trie.png
+</code></pre>
+
+        
+          <div class='highlight'><pre>        System.out.println(trie.toDot());
+    }</pre></div>
+        
+      
+        
+        <p>The rendered trie will look like this:
+<img src="resources/trie.svg" alt=""></p>
+
+        
+      
+        
+        <h2 id="constructing-a-minimal-acyclic-finite-state-automaton-fsa">Constructing a minimal acyclic finite-state automaton (FSA)</h2>
+<p>Let’s look at the approach from the paper “Incremental Construction of Minimal Acyclic Finite-State Automata” by
+Daciuk, Mihov, Watson, and Watson. In that paper, they describe two algorithms – one that acts on sorted input
+and one that acts on unsorted input. The sorted input algorithm is simpler, so we’ll focus on that.</p>
+<p>Note that this algorithm only produces a finite-state automaton (FSA), not a finite-state transducer (FST). So,
+our insert method will not store any values associated with the keys. It will only build the structure of the automaton.</p>
+<p>Before diving into the algorithm, let’s look at the graph for the months of the year and compare to the output
+of the trie above. Note that we are able to reuse the common suffixes of the months, such as “ember” in
+“September”, “November”, and “December”. The shape of the graph is more compact than the trie.</p>
+<p><img src="resources/daciukMihovFSA.svg" alt=""></p>
+
+        
+          <div class='highlight'><pre>
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">DaciukMihovFiniteAutomaton</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">DirectedAcyclicGraph</span>&lt;Boolean&gt; {
+        <span class="hljs-keyword">private</span> <span class="hljs-type">String</span> <span class="hljs-variable">previousWord</span> <span class="hljs-operator">=</span> <span class="hljs-literal">null</span>;
+        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Map&lt;Node&lt;Boolean&gt;, Node&lt;Boolean&gt;&gt; registry = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();
+
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">insert</span><span class="hljs-params">(String key, Boolean value)</span> {
+            <span class="hljs-keyword">if</span> (previousWord != <span class="hljs-literal">null</span> &amp;&amp; key.compareTo(previousWord) &lt; <span class="hljs-number">0</span>) {
+                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalArgumentException</span>(<span class="hljs-string">&quot;Keys must be inserted in sorted order.&quot;</span>);
+            }
+            <span class="hljs-type">String</span> <span class="hljs-variable">commonPrefix</span> <span class="hljs-operator">=</span> commonPrefix(key);
+            Node&lt;Boolean&gt; commonPrefixState = getState(commonPrefix);
+            <span class="hljs-keyword">if</span> (commonPrefixState.outboundEdges.isEmpty() == <span class="hljs-literal">false</span>) {</pre></div>
+        
+      
+        
+        <p>The most important piece of this algorithm is that we minimize the automaton as we build it.
+When we add a new key, we minimize the suffix of the previously-inserted key, but only starting from
+the end of the common prefix. Basically, we reuse prefixes first (with the code above), and then we
+reuse suffixes via this replaceOrRegister method.</p>
+<p>There are three cases where commonPrefixState’s outbound edges <strong>are</strong> empty:</p>
+<ol>
+<li>This is the first time we’re inserting into the tree, so commonPrefixState is the root, which
+has no outbound edges.</li>
+<li>We are inserting the same key again, so commonPrefixState is the last state we inserted, which
+has no outbound edges.</li>
+<li>We are inserting a key that has the previous key as a prefix. So, the new “branch” that we’re
+adding is just extending the branch created by the previous key.</li>
+</ol>
+<p>All three of these cases can be thought of as variants of the last case. The first one can be
+thought of as though we previously inserted the empty string, which is a prefix of everything.
+In the second case, any string is a prefix of itself.</p>
+<p>What makes these three cases interesting is that they’re also the cases that result in a new
+accepting state being created. If the second and third cases don’t happen (i.e. no input
+is a prefix of any other input), then the automaton will have a single accepting state created
+on the first insert.</p>
+
+        
+          <div class='highlight'><pre>                replaceOrRegister(commonPrefixState);
+            }</pre></div>
+        
+      
+        
+        <p>Append the newly-added suffix to the end of the common prefix without any further reuse. We will find
+opportunities to reuse nodes for this suffix either on the next insert or when we call finish().</p>
+<p>Essentially, we’re growing a new straight-line branch from the end of the common prefix (which is what
+a trie does all the time). On the later call to replaceOrRegister, we’ll (potentially) fold the end of
+the branch back into the automaton, reusing nodes that have the same suffix.</p>
+
+        
+          <div class='highlight'><pre>            <span class="hljs-type">String</span> <span class="hljs-variable">currentSuffix</span> <span class="hljs-operator">=</span> key.substring(commonPrefix.length());
+
+            Node&lt;Boolean&gt; lastState = commonPrefixState;
+            <span class="hljs-keyword">for</span> (<span class="hljs-type">char</span> c : currentSuffix.toCharArray()) {
+                Node&lt;Boolean&gt; newState = createNode();
+                lastState.outboundEdges.put(c, newState);
+                lastState = newState;
+            }</pre></div>
+        
+      
+        
+        <p>Mark the last state as an accepting state</p>
+
+        
+          <div class='highlight'><pre>            lastState.acceptingState = <span class="hljs-literal">true</span>;
+
+            previousWord = key;
+        }
+
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">finish</span><span class="hljs-params">()</span> {</pre></div>
+        
+      
+        
+        <p>We need to make sure that the last state that we inserted gets minimized as well. For example, when
+inserting the months of the year in sorted order, the last string will be “September”, which has no
+common prefix with any other months. In that case, the insert method would have added it as a long
+skinny branch from the root. By calling replaceOrRegister, we’re able to find the common “ember” suffix
+that can be shared with “November” and “December”.</p>
+
+        
+          <div class='highlight'><pre>            replaceOrRegister(root);
+        }
+
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">insert</span><span class="hljs-params">(String key)</span> {</pre></div>
+        
+      
+        
+        <p>Overloaded method to insert without a value, defaulting to true</p>
+
+        
+          <div class='highlight'><pre>            insert(key, <span class="hljs-literal">true</span>);
+        }</pre></div>
+        
+      
+        
+        <p>Find the longest prefix of the key that is already in the automaton. If the automaton is empty or the first
+character of the key is not present, we’ll return an empty string.</p>
+
+        
+          <div class='highlight'><pre>        <span class="hljs-keyword">private</span> String <span class="hljs-title function_">commonPrefix</span><span class="hljs-params">(String key)</span> {
+            <span class="hljs-type">StringBuilder</span> <span class="hljs-variable">sb</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuilder</span>();
+            Node&lt;Boolean&gt; currentNode = root;
+            <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; key.length(); i++) {
+                <span class="hljs-type">char</span> <span class="hljs-variable">c</span> <span class="hljs-operator">=</span> key.charAt(i);
+                Node&lt;Boolean&gt; nextNode = currentNode.outboundEdges.get(c);
+                <span class="hljs-keyword">if</span> (nextNode == <span class="hljs-literal">null</span>) {
+                    <span class="hljs-keyword">break</span>; <span class="hljs-comment">// No more common prefix</span>
+                }
+                sb.append(c);
+                currentNode = nextNode; <span class="hljs-comment">// Move to the next node</span>
+            }
+            <span class="hljs-keyword">return</span> sb.toString();
+        }</pre></div>
+        
+      
+        
+        <p>Given some prefix present in the automaton, return the node that corresponds to that prefix.
+If the prefix is not present in the automaton, we’ll throw an exception. In other words, this method must
+only be called using the value returned by the commonPrefix above.</p>
+
+        
+          <div class='highlight'><pre>        <span class="hljs-keyword">private</span> Node&lt;Boolean&gt; <span class="hljs-title function_">getState</span><span class="hljs-params">(String prefix)</span> {
+            Node&lt;Boolean&gt; currentNode = root;
+            <span class="hljs-keyword">for</span> (<span class="hljs-type">char</span> c : prefix.toCharArray()) {
+                currentNode = currentNode.outboundEdges.get(c);
+                <span class="hljs-keyword">if</span> (currentNode == <span class="hljs-literal">null</span>) {</pre></div>
+        
+      
+        
+        <p>Since we always call this method after computing the common prefix, we should never
+reach a point where the prefix is not found.</p>
+
+        
+          <div class='highlight'><pre>                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalStateException</span>(<span class="hljs-string">&quot;Prefix not found: &quot;</span> + prefix);
+                }
+            }
+            <span class="hljs-keyword">return</span> currentNode;
+        }</pre></div>
+        
+      
+        
+        <p>This method is the key to the algorithm. While the insert method reuses prefix nodes, just like in a trie,
+this method reuses common suffix nodes. For example, the first string we insert generates an
+“accept” node that has no outbound edges. We can reuse that node as the accept state for all inputs that
+are not substrings of other inputs. Working backwards, any node that points to the accept node can be
+reused for any string that has the same final character. In the case of the months of the year, several
+strings end with “y”, so we can reuse the node that transitions to the accept node on input “y” on the
+paths for “January”, “February”, and “July”.</p>
+<p>To understand the method, note the recursive call at the beginning. We work from the end of the automaton
+back toward the root.</p>
+
+        
+          <div class='highlight'><pre>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">replaceOrRegister</span><span class="hljs-params">(Node&lt;Boolean&gt; state)</span> {
+            <span class="hljs-type">Character</span> <span class="hljs-variable">lastChar</span> <span class="hljs-operator">=</span> state.outboundEdges.lastKey();
+            Node&lt;Boolean&gt; child = state.outboundEdges.get(lastChar);
+            <span class="hljs-keyword">if</span> (child.outboundEdges.isEmpty() == <span class="hljs-literal">false</span>) {
+                replaceOrRegister(child);
+            }
+            Node&lt;Boolean&gt; canonicalChild =  registry.computeIfAbsent(child, _ -&gt; child);
+            <span class="hljs-keyword">if</span> (canonicalChild != child) {</pre></div>
+        
+      
+        
+        <p>Replace the child with its canonical representation</p>
+
+        
+          <div class='highlight'><pre>                state.outboundEdges.put(lastChar, canonicalChild);
+            }
+        }
+    }
+
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">daciukMihovFSAMain</span><span class="hljs-params">()</span> {</pre></div>
+        
+      
+        
+        <p>Insert months of the year into the automaton – but must insert them in sorted order!</p>
+
+        
+          <div class='highlight'><pre>        List&lt;String&gt; monthsList = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+        monthsList.add(<span class="hljs-string">&quot;January&quot;</span>);
+        monthsList.add(<span class="hljs-string">&quot;February&quot;</span>);
+        monthsList.add(<span class="hljs-string">&quot;March&quot;</span>);
+        monthsList.add(<span class="hljs-string">&quot;April&quot;</span>);
+        monthsList.add(<span class="hljs-string">&quot;May&quot;</span>);
+        monthsList.add(<span class="hljs-string">&quot;June&quot;</span>);
+        monthsList.add(<span class="hljs-string">&quot;July&quot;</span>);
+        monthsList.add(<span class="hljs-string">&quot;August&quot;</span>);
+        monthsList.add(<span class="hljs-string">&quot;September&quot;</span>);
+        monthsList.add(<span class="hljs-string">&quot;October&quot;</span>);
+        monthsList.add(<span class="hljs-string">&quot;November&quot;</span>);
+        monthsList.add(<span class="hljs-string">&quot;December&quot;</span>);
+        Collections.sort(monthsList);
+        <span class="hljs-type">DaciukMihovFiniteAutomaton</span> <span class="hljs-variable">automaton</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">DaciukMihovFiniteAutomaton</span>();
+        <span class="hljs-keyword">for</span> (String month : monthsList) {
+            automaton.insert(month);
+        }
+        automaton.finish();</pre></div>
+        
+      
+        
+        <p>Search for some keys</p>
+
+        
+          <div class='highlight'><pre>        System.out.println(<span class="hljs-string">&quot;Search for &#x27;March&#x27;: &quot;</span> + (automaton.search(<span class="hljs-string">&quot;March&quot;</span>) != <span class="hljs-literal">null</span>)); <span class="hljs-comment">// Should print true</span>
+        System.out.println(<span class="hljs-string">&quot;Search for &#x27;Smarch&#x27;: &quot;</span> + (automaton.search(<span class="hljs-string">&quot;Smarch&quot;</span>) != <span class="hljs-literal">null</span>)); <span class="hljs-comment">// Should print false</span></pre></div>
+        
+      
+        
+        <p>Print the automaton in DOT format for visualization
+If you have Graphviz installed, you can visualize the automaton by saving the output in a file named
+<code>automaton.dot</code>, then running the following:</p>
+<pre><code>dot -Tpng automaton.dot -o automaton.png
+</code></pre>
+
+        
+          <div class='highlight'><pre>        System.out.println(automaton.toDot());
+    }</pre></div>
+        
+      
+        
+        <h2 id="constructing-a-minimal-finite-state-transducer-fst">Constructing a minimal finite-state transducer (FST)</h2>
+<p>The previous example constructed a minimal FSA, but it did not store any values associated with the inserted
+keys. (Technically it did, but the only valid value was <code>true</code>, and only in the single accepting state.)</p>
+<p>We need to move on to the work of Mihov and Maurel in their paper “Direct Construction of Minimal Acyclic
+Subsequential Transducers”, which I was able to find linked from Mihov’s website at
+<a href="https://lml.bas.bg/~stoyan/lmd/Publications.html">https://lml.bas.bg/~stoyan/lmd/Publications.html</a>. While the approach has some similarities to the FSA algorithm
+implemented above, the paper specifically says, “We cannot directly use the minimization algorithms developed
+automata because in some cases by moving the output labels (or parts of them) along the paths we can get a
+smaller transducer.”</p>
+<p>From my reading of the paper, it follows somewhat similar approach to the FSA algorithm to guarantee that
+at each step, the transducer is minimal except for the word that we added last. As we add each new word, we
+minimize the path to the previous word. This minimization may involve moving the output labels to later
+states and edges in the path.</p>
+<p>The paper has a somewhat more programmer-friendly algorithm than the FSA paper, which takes a more mathematical
+approach. The algorithm is presented in a Pascal-like pseudocode, which I will translate into Java, while trying
+to reuse nomenclature from the FSA algorithm above. For example, the FST paper replaces the “registry” variable
+with one called “dictionary”, but I’m going to stick with “registry”, since they’re doing the same thing.</p>
+
+        
+      
+        
+        <h3 id="helper-classes">Helper classes</h3>
+<p>While I was able to use arbitrary types for the values in the above implementations, the FST paper specifically
+assumes that output values can be concatenated. We’ll mostly be focused on strings, but this could be any
+concatenable type. So, I’m going to specify an interface that captures the “string-like” behavior that the
+algorithm requires.</p>
+<p>We’re going to go in a decidedly non-string-like direction later on, but this abstraction should help us follow
+along with the algorithm in the paper.</p>
+
+        
+          <div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">interface</span> <span class="hljs-title class_">Concatenable</span>&lt;T&gt; {
+
+        <span class="hljs-comment">/**
+         * <span class="hljs-doctag">@param</span> other the value to be added as a suffix to this value
+         * <span class="hljs-doctag">@return</span> the concatenation produced by appending the other value to this value.
+         */</span>
+        T <span class="hljs-title function_">concatenate</span><span class="hljs-params">(T other)</span>;
+
+        <span class="hljs-comment">/**
+         * <span class="hljs-doctag">@param</span> other the value to be compared with this value
+         * <span class="hljs-doctag">@return</span> the longest common prefix of this value and the other value.
+         */</span>
+        T <span class="hljs-title function_">commonPrefix</span><span class="hljs-params">(T other)</span>;
+
+        <span class="hljs-comment">/**
+         * <span class="hljs-doctag">@return</span> the length of this value.
+         */</span>
+        <span class="hljs-type">int</span> <span class="hljs-title function_">length</span><span class="hljs-params">()</span>;
+
+        <span class="hljs-comment">/**
+         * <span class="hljs-doctag">@param</span> start the starting index of the substring to be returned
+         * <span class="hljs-doctag">@return</span> the substring of this value starting from the specified index.
+         */</span>
+        T <span class="hljs-title function_">substring</span><span class="hljs-params">(<span class="hljs-type">int</span> start)</span>;</pre></div>
+        
+      
+        
+        <p>Must implement valid versions of equals and hashCode, since we will use this type as part of our
+deduplication logic in the node registry.</p>
+
+        
+          <div class='highlight'><pre>        <span class="hljs-type">int</span> <span class="hljs-title function_">hashCode</span><span class="hljs-params">()</span>;
+
+        <span class="hljs-type">boolean</span> <span class="hljs-title function_">equals</span><span class="hljs-params">(Object obj)</span>;
+    }</pre></div>
+        
+      
+        
+        <p>The FST paper adds output to the edges of the automaton, so the previous graph implementation above doesn’t
+quite work. For consistency with the Lucene implementation, I’m going to refer to edges as “arcs”, which is
+also common in graph theory, when talking about directed graphs.</p>
+
+        
+          <div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">record</span> <span class="hljs-title class_">Arc</span>&lt;T <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Concatenable</span>&lt;T&gt;&gt;(FSTNode&lt;T&gt; node, T output) {
+    }</pre></div>
+        
+      
+        
+        <p>Our earlier Node implementation didn’t use the above Arc class for edges, so we’ll need a slightly different
+version here. Also, the algorithm will need our value type to be concatenable, so we’ll add that as a bound on
+the value type.</p>
+
+        
+          <div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">FSTNode</span>&lt;T <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Concatenable</span>&lt;T&gt;&gt; {
+        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> nodeNum;
+        <span class="hljs-keyword">private</span> List&lt;T&gt; output = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> SortedMap&lt;Character, Arc&lt;T&gt;&gt; outboundEdges = <span class="hljs-keyword">new</span> <span class="hljs-title class_">TreeMap</span>&lt;&gt;();
+        <span class="hljs-keyword">private</span> <span class="hljs-type">boolean</span> acceptingState;
+
+        <span class="hljs-keyword">public</span> <span class="hljs-title function_">FSTNode</span><span class="hljs-params">(<span class="hljs-type">int</span> nodeNum)</span> {
+            <span class="hljs-built_in">this</span>.nodeNum = nodeNum;
+        }
+
+        <span class="hljs-meta">@SuppressWarnings(&quot;unchecked&quot;)</span>
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">equals</span><span class="hljs-params">(Object o)</span> {
+            <span class="hljs-keyword">if</span> (o == <span class="hljs-literal">null</span> || getClass() != o.getClass()) <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+            FSTNode&lt;T&gt; node = (FSTNode&lt;T&gt;) o;
+            <span class="hljs-keyword">if</span> (outboundEdges.size() != node.outboundEdges.size()) {
+                <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+            }
+            Iterator&lt;Map.Entry&lt;Character, Arc&lt;T&gt;&gt;&gt; iterator = outboundEdges.entrySet().iterator();
+            Iterator&lt;Map.Entry&lt;Character, Arc&lt;T&gt;&gt;&gt; otherIterator = node.outboundEdges.entrySet().iterator();
+
+            <span class="hljs-keyword">while</span> (iterator.hasNext()) {</pre></div>
+        
+      
+        
+        <p>Nodes have keys in order, so we can compare them directly.</p>
+
+        
+          <div class='highlight'><pre>                Map.Entry&lt;Character, Arc&lt;T&gt;&gt; childEntry = iterator.next();
+                Map.Entry&lt;Character, Arc&lt;T&gt;&gt; otherEntry = otherIterator.next();
+
+                <span class="hljs-keyword">if</span> (childEntry.getKey().equals(otherEntry.getKey()) == <span class="hljs-literal">false</span> ||
+                        childEntry.getValue().node.nodeNum != otherEntry.getValue().node.nodeNum ||
+                        Objects.equals(childEntry.getValue().output, otherEntry.getValue().output) == <span class="hljs-literal">false</span>) {
+                    <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>; <span class="hljs-comment">// Mismatch found</span>
+                }
+            }
+            <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span>;
+        }
+
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">hashCode</span><span class="hljs-params">()</span> {
+            <span class="hljs-keyword">return</span> Objects.hash(output, outboundEdges.keySet());
+        }
+    }</pre></div>
+        
+      
+        
+        <h3 id="the-fst-algorithm">The FST algorithm</h3>
+<p>Skip ahead to the “insert” method below to see that a lot of the logic is shared with the FSA algorithm.
+We have some more logic at the end of that method to handle outputs. The key idea of the algorithm is that
+we push as much of the output toward the root as possible, and only push it away from the root to resolve
+output conflicts between keys that share a common prefix.</p>
+
+        
+          <div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">MihovMaurelFiniteStateTransducer</span>&lt;T <span class="hljs-keyword">extends</span> <span class="hljs-title class_">Concatenable</span>&lt;T&gt;&gt; {</pre></div>
+        
+      
+        
+        <p>We need a method that outputs “empty” values for type T, since we’ll attach the empty value to
+various edges and nodes.</p>
+
+        
+          <div class='highlight'><pre>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Supplier&lt;T&gt; emptySupplier;</pre></div>
+        
+      
+        
+        <p>Otherwise, the the fields are identical to the FSA implementation above.</p>
+
+        
+          <div class='highlight'><pre>        <span class="hljs-keyword">private</span> <span class="hljs-type">int</span> <span class="hljs-variable">counter</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> FSTNode&lt;T&gt; root = createNode();
+        <span class="hljs-keyword">private</span> <span class="hljs-type">String</span> <span class="hljs-variable">previousKey</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;&quot;</span>;
+        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> Map&lt;FSTNode&lt;T&gt;, FSTNode&lt;T&gt;&gt; registry = <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashMap</span>&lt;&gt;();
+
+        <span class="hljs-keyword">private</span> <span class="hljs-title function_">MihovMaurelFiniteStateTransducer</span><span class="hljs-params">(Supplier&lt;T&gt; emptySupplier)</span> {
+            <span class="hljs-built_in">this</span>.emptySupplier = emptySupplier;
+        }
+
+        <span class="hljs-keyword">private</span> FSTNode&lt;T&gt; <span class="hljs-title function_">createNode</span><span class="hljs-params">()</span> {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">FSTNode</span>&lt;&gt;(counter++);
+        }</pre></div>
+        
+      
+        
+        <p>Just like in the FSA implementation, almost all the logic to construct the FST is in the insert method.</p>
+
+        
+          <div class='highlight'><pre>        <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">insert</span><span class="hljs-params">(String key, T value)</span> {
+            <span class="hljs-keyword">if</span> (previousKey != <span class="hljs-literal">null</span> &amp;&amp; key.compareTo(previousKey) &lt; <span class="hljs-number">0</span>) {
+                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalArgumentException</span>(<span class="hljs-string">&quot;Keys must be inserted in sorted order.&quot;</span>);
+            }</pre></div>
+        
+      
+        
+        <p>The beginning of the algorithm is the same as in the FSA algorithm. We find the common prefix to reuse
+it, run replaceOrRegister to minimize the suffix of the previous key, and then we build a new
+straight line branch from the end of the common prefix with the rest of the new key.</p>
+
+        
+          <div class='highlight'><pre>            <span class="hljs-type">String</span> <span class="hljs-variable">commonPrefix</span> <span class="hljs-operator">=</span> commonPrefix(key);
+            FSTNode&lt;T&gt; commonPrefixState = getState(commonPrefix);
+            <span class="hljs-keyword">if</span> (commonPrefixState.outboundEdges.isEmpty() == <span class="hljs-literal">false</span>) {
+                replaceOrRegister(commonPrefixState);
+            }
+            <span class="hljs-type">String</span> <span class="hljs-variable">keySuffix</span> <span class="hljs-operator">=</span> key.substring(commonPrefix.length());
+            FSTNode&lt;T&gt; lastState = commonPrefixState;
+            <span class="hljs-keyword">for</span> (<span class="hljs-type">char</span> c : keySuffix.toCharArray()) {
+                FSTNode&lt;T&gt; newState = createNode();
+                lastState.outboundEdges.put(c, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Arc</span>&lt;&gt;(newState, emptySupplier.get()));
+                lastState = newState;
+            }</pre></div>
+        
+      
+        
+        <p>Mark the last state as an accepting state</p>
+
+        
+          <div class='highlight'><pre>            lastState.acceptingState = <span class="hljs-literal">true</span>;</pre></div>
+        
+      
+        
+        <p>Now the algorithm diverges a little bit from the FSA implementation, because we need to move the
+outputs along the common prefix to maximize reuse.</p>
+
+        
+          <div class='highlight'><pre>
+            <span class="hljs-keyword">if</span> (keySuffix.isEmpty() == <span class="hljs-literal">false</span>) {</pre></div>
+        
+      
+        
+        <p>It’s important that we add the empty output to any accepting state. In our search implementation
+below, we concatenate outputs from the edges that we traverse, but then use the final accepting
+state as the set of possible suffixes. By appending the empty output, we simply output the value
+that we’ve constructed during the traversal.</p>
+
+        
+          <div class='highlight'><pre>                lastState.output.add(emptySupplier.get());
+            }</pre></div>
+        
+      
+        
+        <p>The following is the output-specific logic added to support the FST.
+We go into more detail on the pushOutputsDownCommonPrefix method below, but it’s worth noting that it
+strips off prefix characters from the output value, if those characters are already present in
+transitions that are part of the common prefix.</p>
+
+        
+          <div class='highlight'><pre>            <span class="hljs-type">T</span> <span class="hljs-variable">remainingValue</span> <span class="hljs-operator">=</span> pushOutputsDownCommonPrefix(commonPrefix, value);</pre></div>
+        
+      
+        
+        <p>Now we need to handle the remaining “new” output values that we not already emitted along the common
+prefix. Initially, we place it as close to the root as possible.</p>
+
+        
+          <div class='highlight'><pre>            <span class="hljs-keyword">if</span> (key.equals(previousKey)) {</pre></div>
+        
+      
+        
+        <p>Duplicate keys are guaranteed to be inserted consecutively, since keys are sorted before insert.
+We’re guaranteed that lastState points to the same accepting state as the previous key.</p>
+
+        
+          <div class='highlight'><pre>                lastState.output.add(remainingValue);
+            } <span class="hljs-keyword">else</span> {</pre></div>
+        
+      
+        
+        <p>Otherwise the new key created a fresh branch starting at end of the common prefix.
+We can associate the remaining output value with the transition that starts the branch.</p>
+<p>We already added the transition itself above, but now we need to update the output value.
+On subsequent inserts, we may break this newly-added output apart during calls to
+pushOutputsDownCommonPrefix.</p>
+
+        
+          <div class='highlight'><pre>                Arc&lt;T&gt; newlyAddedArc = commonPrefixState.outboundEdges.get(keySuffix.charAt(<span class="hljs-number">0</span>));
+                commonPrefixState.outboundEdges.put(keySuffix.charAt(<span class="hljs-number">0</span>), <span class="hljs-keyword">new</span> <span class="hljs-title class_">Arc</span>&lt;&gt;(newlyAddedArc.node, remainingValue));
+            }
+            previousKey = key;
+        }</pre></div>
+        
+      
+        
+        <p>This is method is the main change compared to the FSA algorithm. We’re trying to add the new output value,
+but it may be incompatible with the existing outputs along the common prefix. While the algorithm tries
+to keep outputs as close to the root as possible, we need to reconcile these incompatibilities by pushing
+the differences away from the root.</p>
+<p>Using our example of months of the year, we insert “January” with the value 31, and it’s the first month
+starting with “J”, so the automaton says that any string starting with “J” will output 31. Then we insert
+“July” with the value 31, so it still looks like any string starting with “J” will output 31. Finally, we
+insert “June” with the value 30, so now we have a conflict. To resolve it, we can modify the first Arc to
+say that any string starting with J emits output starting with 3 (since that’s still true). If it’s followed
+by “a”, the next output character is 1. For “Ju”, we still have a conflict between 30 and 31, so we push
+it back again, this time saying that “n” will emit 0, while “l” will emit 1.</p>
+
+        
+          <div class='highlight'><pre>        <span class="hljs-keyword">private</span> T <span class="hljs-title function_">pushOutputsDownCommonPrefix</span><span class="hljs-params">(String commonPrefix, T value)</span> {
+            FSTNode&lt;T&gt; currentNode = root;</pre></div>
+        
+      
+        
+        <p>We iterate from the root toward the end of the common prefix. Along the way, we look at the existing
+outputs along the arcs. We may split an arc’s output into the common prefix and the remaining suffix.
+In that case, we need to push the remaining suffix into the next node’s outputs, potentially to get
+processed in the next iteration of this for-loop.</p>
+
+        
+          <div class='highlight'><pre>            <span class="hljs-keyword">for</span> (<span class="hljs-type">char</span> c : commonPrefix.toCharArray()) {
+                Arc&lt;T&gt; transition = currentNode.outboundEdges.get(c);
+                <span class="hljs-type">T</span> <span class="hljs-variable">commonOutputPrefix</span> <span class="hljs-operator">=</span> transition.output.commonPrefix(value);
+                <span class="hljs-type">T</span> <span class="hljs-variable">transitionOutputSuffix</span> <span class="hljs-operator">=</span> transition.output.substring(commonOutputPrefix.length());</pre></div>
+        
+      
+        
+        <p>Update the transition output to only include the common prefix. Then we’ll push the remaining suffix
+down the line.</p>
+
+        
+          <div class='highlight'><pre>                currentNode.outboundEdges.put(c, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Arc</span>&lt;&gt;(transition.node, commonOutputPrefix));
+                currentNode = transition.node;</pre></div>
+        
+      
+        
+        <p>This is the loop where we push the remaining suffix (i.e. the stuff that differs from the new output)
+into the next node’s outputs.</p>
+
+        
+          <div class='highlight'><pre>                <span class="hljs-keyword">for</span> (<span class="hljs-type">char</span> cc : currentNode.outboundEdges.keySet()) {
+                    Arc&lt;T&gt; otherTransition = currentNode.outboundEdges.get(cc);</pre></div>
+        
+      
+        
+        <p>Prepend otherTransition’s output with the suffix that we just stripped from the
+previous transition’s output.</p>
+
+        
+          <div class='highlight'><pre>                    <span class="hljs-type">T</span> <span class="hljs-variable">newOutput</span> <span class="hljs-operator">=</span> transitionOutputSuffix.concatenate(otherTransition.output);
+                    currentNode.outboundEdges.put(cc, <span class="hljs-keyword">new</span> <span class="hljs-title class_">Arc</span>&lt;&gt;(otherTransition.node, newOutput));
+                }</pre></div>
+        
+      
+        
+        <p>Similarly, we need to push the remaining suffix into the node-level outputs if we’ve landed on an
+accepting state.</p>
+
+        
+          <div class='highlight'><pre>                <span class="hljs-keyword">if</span> (currentNode.acceptingState) {
+                    currentNode.output = currentNode.output.stream()
+                            .map(transitionOutputSuffix::concatenate)
+                            .collect(Collectors.toList());
+                }
+                value = value.substring(commonOutputPrefix.length());
+            }
+            <span class="hljs-keyword">return</span> value;
+        }</pre></div>
+        
+      
+        
+        <p>Find the longest prefix of the key that is already in the automaton. If the automaton is empty or the first
+character of the key is not present, we’ll return an empty string.</p>
+<p>This method is essentially the same as in the FSA algorithm.</p>
+
+        
+          <div class='highlight'><pre>        <span class="hljs-keyword">private</span> String <span class="hljs-title function_">commonPrefix</span><span class="hljs-params">(String key)</span> {
+            <span class="hljs-type">StringBuilder</span> <span class="hljs-variable">sb</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuilder</span>();
+            FSTNode&lt;T&gt; currentNode = root;
+            <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; key.length(); i++) {
+                <span class="hljs-type">char</span> <span class="hljs-variable">c</span> <span class="hljs-operator">=</span> key.charAt(i);
+                Arc&lt;T&gt; nextNode = currentNode.outboundEdges.get(c);
+                <span class="hljs-keyword">if</span> (nextNode == <span class="hljs-literal">null</span>) {
+                    <span class="hljs-keyword">break</span>; <span class="hljs-comment">// No more common prefix</span>
+                }
+                sb.append(c);
+                currentNode = nextNode.node; <span class="hljs-comment">// Move to the next node</span>
+            }
+            <span class="hljs-keyword">return</span> sb.toString();
+        }</pre></div>
+        
+      
+        
+        <p>Given some prefix present in the automaton, return the node that corresponds to that prefix.
+If the prefix is not present in the automaton, we’ll throw an exception. In other words, this method must
+only be called using the value returned by the commonPrefix above.</p>
+<p>This method is essentially the same as in the FSA algorithm.</p>
+
+        
+          <div class='highlight'><pre>        <span class="hljs-keyword">private</span> FSTNode&lt;T&gt; <span class="hljs-title function_">getState</span><span class="hljs-params">(String prefix)</span> {
+            FSTNode&lt;T&gt; currentNode = root;
+            <span class="hljs-keyword">for</span> (<span class="hljs-type">char</span> c : prefix.toCharArray()) {
+                Arc&lt;T&gt; transition = currentNode.outboundEdges.get(c);
+                <span class="hljs-keyword">if</span> (transition == <span class="hljs-literal">null</span>) {
+                    <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalStateException</span>(<span class="hljs-string">&quot;Prefix not found: &quot;</span> + prefix);
+                }
+                currentNode = transition.node;
+            }
+            <span class="hljs-keyword">return</span> currentNode;
+        }</pre></div>
+        
+      
+        
+        <p>The replaceOrRegister method is essentially the same as in the FSA algorithm, but we have the extra layer
+of indirection with the Arc class.</p>
+
+        
+          <div class='highlight'><pre>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">replaceOrRegister</span><span class="hljs-params">(FSTNode&lt;T&gt; state)</span> {
+            <span class="hljs-type">Character</span> <span class="hljs-variable">lastChar</span> <span class="hljs-operator">=</span> state.outboundEdges.lastKey();
+            Arc&lt;T&gt; childArc = state.outboundEdges.get(lastChar);
+            FSTNode&lt;T&gt; child = childArc.node;
+            <span class="hljs-keyword">if</span> (child.outboundEdges.isEmpty() == <span class="hljs-literal">false</span>) {
+                replaceOrRegister(child);
+            }</pre></div>
+        
+      
+        
+        <p>If the child is already registered, we can replace it with its canonical representation.
+Otherwise, we register it as a new canonical representation.</p>
+
+        
+          <div class='highlight'><pre>            FSTNode&lt;T&gt; canonicalChild = registry.computeIfAbsent(child, _ -&gt; child);
+            <span class="hljs-keyword">if</span> (canonicalChild != child) {</pre></div>
+        
+      
+        
+        <p>We’re replacing the target node, but want to preserve the output from the edge.</p>
+
+        
+          <div class='highlight'><pre>                Arc&lt;T&gt; newArc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Arc</span>&lt;&gt;(canonicalChild, childArc.output);
+                state.outboundEdges.put(lastChar, newArc);
+            }
+        }</pre></div>
+        
+      
+        
+        <p>We’re not able to reuse the search method from the FSA and Trie implementations because we need to collect
+the outputs that are associated with individual arcs, rather than just the accepting state.</p>
+
+        
+          <div class='highlight'><pre>        <span class="hljs-keyword">public</span> List&lt;T&gt; <span class="hljs-title function_">search</span><span class="hljs-params">(String key)</span> {
+            FSTNode&lt;T&gt; currentNode = root;
+            <span class="hljs-type">T</span> <span class="hljs-variable">prefixBuilder</span> <span class="hljs-operator">=</span> emptySupplier.get();
+            <span class="hljs-keyword">for</span> (<span class="hljs-type">char</span> c : key.toCharArray()) {
+                Arc&lt;T&gt; nextNode = currentNode.outboundEdges.get(c);
+                <span class="hljs-keyword">if</span> (nextNode == <span class="hljs-literal">null</span>) {
+                    <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>; <span class="hljs-comment">// Key not found</span>
+                }
+                prefixBuilder = prefixBuilder.concatenate(nextNode.output);
+                currentNode = nextNode.node;
+            }
+            <span class="hljs-type">T</span> <span class="hljs-variable">prefix</span> <span class="hljs-operator">=</span> prefixBuilder;
+            <span class="hljs-keyword">if</span> (currentNode.acceptingState) {</pre></div>
+        
+      
+        
+        <p>Return all outputs with the prefix prepended.
+Note that in many cases, the node’s output is empty because the path that we took to reach this state
+already constructed the full output. This is why it’s important that the node’s output is a list
+containing the empty output, rather than an empty list.</p>
+
+        
+          <div class='highlight'><pre>                <span class="hljs-keyword">return</span> currentNode.output.stream().map(prefix::concatenate).toList();
+            }
+            <span class="hljs-keyword">return</span> <span class="hljs-literal">null</span>; <span class="hljs-comment">// Key found, but not an accepting state</span>
+        }
+
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">finish</span><span class="hljs-params">()</span> {
+            replaceOrRegister(root);
+        }
+
+        <span class="hljs-keyword">public</span> String <span class="hljs-title function_">toDot</span><span class="hljs-params">()</span> {
+            <span class="hljs-type">StringBuilder</span> <span class="hljs-variable">sb</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuilder</span>();
+            sb.append(<span class="hljs-string">&quot;digraph FST {\n&quot;</span>);
+            toDotHelper(root, sb, <span class="hljs-keyword">new</span> <span class="hljs-title class_">HashSet</span>&lt;&gt;());
+            sb.append(<span class="hljs-string">&quot;}\n&quot;</span>);
+            <span class="hljs-keyword">return</span> sb.toString();
+        }</pre></div>
+        
+      
+        
+        <p>This method is similar to the generic toDotHelper method in the DirectedAcyclicGraph class, but we output
+the values associated with arcs as well (if the output is not empty).</p>
+
+        
+          <div class='highlight'><pre>        <span class="hljs-keyword">private</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">toDotHelper</span><span class="hljs-params">(FSTNode&lt;T&gt; root, StringBuilder sb, Set&lt;Integer&gt; visited)</span> {
+            <span class="hljs-keyword">if</span> (visited.contains(root.nodeNum)) {
+                <span class="hljs-keyword">return</span>; <span class="hljs-comment">// Avoid adding redundant edges.</span>
+            }
+            visited.add(root.nodeNum);
+            <span class="hljs-keyword">if</span> (root.acceptingState) {
+                String[] values = root.output.stream()
+                        .map(Object::toString)
+                        .toArray(String[]::<span class="hljs-keyword">new</span>);
+                sb.append(<span class="hljs-string">&quot;  \&quot;&quot;</span>).append(root.nodeNum).append(<span class="hljs-string">&quot;\&quot; [shape=doublecircle,label=\&quot;&quot;</span>)
+                        .append(String.join(<span class="hljs-string">&quot;,&quot;</span>, values)).append(<span class="hljs-string">&quot;\&quot;];\n&quot;</span>);
+            } <span class="hljs-keyword">else</span> {
+                sb.append(<span class="hljs-string">&quot;  \&quot;&quot;</span>).append(root.nodeNum).append(<span class="hljs-string">&quot;\&quot; [shape=circle,label=\&quot;\&quot;];\n&quot;</span>);
+            }
+            <span class="hljs-keyword">for</span> (Map.Entry&lt;Character, Arc&lt;T&gt;&gt; entry : root.outboundEdges.entrySet()) {
+                <span class="hljs-type">char</span> <span class="hljs-variable">c</span> <span class="hljs-operator">=</span> entry.getKey();
+                FSTNode&lt;T&gt; nextNode = entry.getValue().node;
+                sb.append(<span class="hljs-string">&quot;  \&quot;&quot;</span>).append(root.nodeNum).append(<span class="hljs-string">&quot;\&quot; -&gt; \&quot;&quot;</span>).append(nextNode.nodeNum)
+                        .append(<span class="hljs-string">&quot;\&quot; [label=\&quot;&quot;</span>).append(c);
+                <span class="hljs-keyword">if</span> (entry.getValue().output.length() &gt; <span class="hljs-number">0</span>) {
+                    sb.append(<span class="hljs-string">&quot;|&quot;</span>).append(entry.getValue().output);
+                }
+                sb.append(<span class="hljs-string">&quot;\&quot;]\n&quot;</span>);
+                toDotHelper(nextNode, sb, visited);
+            }
+        }
+    }</pre></div>
+        
+      
+        
+        <p>In order to test the FST implementation, let’s create a simple implementation of the Concatenable interface
+that just delegates to the equivalent String methods.</p>
+
+        
+          <div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">record</span> <span class="hljs-title class_">StringConcatenable</span><span class="hljs-params">(String value)</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">Concatenable</span>&lt;StringConcatenable&gt; {
+        <span class="hljs-keyword">private</span> StringConcatenable {
+            <span class="hljs-keyword">if</span> (value == <span class="hljs-literal">null</span>) {
+                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalArgumentException</span>(<span class="hljs-string">&quot;Value cannot be null&quot;</span>);
+            }
+        }
+
+        <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">StringConcatenable</span> <span class="hljs-variable">EMPTY</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringConcatenable</span>(<span class="hljs-string">&quot;&quot;</span>);
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Supplier&lt;StringConcatenable&gt; <span class="hljs-title function_">empty</span><span class="hljs-params">()</span> {
+            <span class="hljs-keyword">return</span> () -&gt; EMPTY;
+        }
+
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> StringConcatenable <span class="hljs-title function_">of</span><span class="hljs-params">(String value)</span> {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringConcatenable</span>(value);
+        }
+
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-keyword">public</span> StringConcatenable <span class="hljs-title function_">concatenate</span><span class="hljs-params">(StringConcatenable other)</span> {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringConcatenable</span>(<span class="hljs-built_in">this</span>.value + other.value);
+        }
+
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-keyword">public</span> StringConcatenable <span class="hljs-title function_">commonPrefix</span><span class="hljs-params">(StringConcatenable other)</span> {
+            <span class="hljs-type">int</span> <span class="hljs-variable">minLength</span> <span class="hljs-operator">=</span> Math.min(<span class="hljs-built_in">this</span>.value.length(), other.value.length());
+            <span class="hljs-type">StringBuilder</span> <span class="hljs-variable">sb</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuilder</span>();
+            <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; minLength; i++) {
+                <span class="hljs-keyword">if</span> (<span class="hljs-built_in">this</span>.value.charAt(i) == other.value.charAt(i)) {
+                    sb.append(<span class="hljs-built_in">this</span>.value.charAt(i));
+                } <span class="hljs-keyword">else</span> {
+                    <span class="hljs-keyword">break</span>;
+                }
+            }
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringConcatenable</span>(sb.toString());
+        }
+
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">length</span><span class="hljs-params">()</span> {
+            <span class="hljs-keyword">return</span> value.length();
+        }
+
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-keyword">public</span> StringConcatenable <span class="hljs-title function_">substring</span><span class="hljs-params">(<span class="hljs-type">int</span> start)</span> {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringConcatenable</span>(<span class="hljs-built_in">this</span>.value.substring(start));
+        }
+
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-keyword">public</span> String <span class="hljs-title function_">toString</span><span class="hljs-params">()</span> {
+            <span class="hljs-keyword">return</span> value;
+        }
+
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">equals</span><span class="hljs-params">(Object o)</span> {
+            <span class="hljs-keyword">if</span> (o == <span class="hljs-literal">null</span> || getClass() != o.getClass()) <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+            <span class="hljs-type">StringConcatenable</span> <span class="hljs-variable">that</span> <span class="hljs-operator">=</span> (StringConcatenable) o;
+            <span class="hljs-keyword">return</span> Objects.equals(value, that.value);
+        }
+
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">hashCode</span><span class="hljs-params">()</span> {
+            <span class="hljs-keyword">return</span> Objects.hashCode(value);
+        }
+    }
+
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">record</span> <span class="hljs-title class_">Pair</span>&lt;T, U&gt;(T first, U second) {
+    }</pre></div>
+        
+      
+        
+        <p>Let’s test out the FST implementation. Just like with the Trie above, we’ll insert the months of the year
+with the number of days.</p>
+<p>The resulting FST looks like:
+<img src="resources/mihovMaurelFST.svg" alt=""></p>
+<p>To understand the output, you collect the outputs from the arcs that you traverse and concatenate them.</p>
+
+        
+          <div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">mihovMaurelFSTMain</span><span class="hljs-params">()</span> {</pre></div>
+        
+      
+        
+        <p>Insert months of the year into the transducer, with number of days in each month.</p>
+
+        
+          <div class='highlight'><pre>        List&lt;Pair&lt;String, StringConcatenable&gt;&gt; pairs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;January&quot;</span>, StringConcatenable.of(<span class="hljs-string">&quot;31&quot;</span>)));
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;February&quot;</span>, StringConcatenable.of(<span class="hljs-string">&quot;28&quot;</span>)));
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;February&quot;</span>, StringConcatenable.of(<span class="hljs-string">&quot;29&quot;</span>)));
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;March&quot;</span>, StringConcatenable.of(<span class="hljs-string">&quot;31&quot;</span>)));
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;April&quot;</span>, StringConcatenable.of(<span class="hljs-string">&quot;30&quot;</span>)));
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;May&quot;</span>, StringConcatenable.of(<span class="hljs-string">&quot;31&quot;</span>)));
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;June&quot;</span>, StringConcatenable.of(<span class="hljs-string">&quot;30&quot;</span>)));
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;July&quot;</span>, StringConcatenable.of(<span class="hljs-string">&quot;31&quot;</span>)));
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;August&quot;</span>, StringConcatenable.of(<span class="hljs-string">&quot;31&quot;</span>)));
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;September&quot;</span>, StringConcatenable.of(<span class="hljs-string">&quot;30&quot;</span>)));
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;October&quot;</span>, StringConcatenable.of(<span class="hljs-string">&quot;31&quot;</span>)));
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;November&quot;</span>, StringConcatenable.of(<span class="hljs-string">&quot;30&quot;</span>)));
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;December&quot;</span>, StringConcatenable.of(<span class="hljs-string">&quot;31&quot;</span>)));
+        pairs.sort(Comparator.comparing(a -&gt; a.first));
+
+        MihovMaurelFiniteStateTransducer&lt;StringConcatenable&gt; transducer =
+                <span class="hljs-keyword">new</span> <span class="hljs-title class_">MihovMaurelFiniteStateTransducer</span>&lt;&gt;(StringConcatenable.empty());
+        <span class="hljs-keyword">for</span> (Pair&lt;String, StringConcatenable&gt; pair : pairs) {
+            transducer.insert(pair.first, pair.second);
+        }
+        transducer.finish();
+
+        System.out.println(<span class="hljs-string">&quot;Search for &#x27;March&#x27;: &quot;</span> + transducer.search(<span class="hljs-string">&quot;March&quot;</span>)); <span class="hljs-comment">// Should print [31]</span>
+        System.out.println(<span class="hljs-string">&quot;Search for &#x27;February&#x27;: &quot;</span> + transducer.search(<span class="hljs-string">&quot;February&quot;</span>)); <span class="hljs-comment">// Should print [28,29]</span>
+        System.out.println(<span class="hljs-string">&quot;Search for &#x27;Smarch&#x27;: &quot;</span> + transducer.search(<span class="hljs-string">&quot;Smarch&quot;</span>)); <span class="hljs-comment">// Should print null</span>
+
+        System.out.println(transducer.toDot());
+    }</pre></div>
+        
+      
+        
+        <p>To justify the effort put into wrapping things up in the Concatenable interface, let’s also implement
+a version of the transducer that uses integers as the output values. In this case, we’ll pretend that an integer
+like n is the string 1+1+1+1+…+1 (n times). The length of “n” is the value of n. For k &lt; n, the common prefix
+of k and n is just k.</p>
+<p>Interestingly, this is what Lucene uses FSTs for in the term dictionary. The goal is to be able to map from
+a term to the ordinal of the term, in order to access the term’s postings list. The term’s ordinal serves as
+an index into the set of all postings for the field.</p>
+
+        
+          <div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">IntegerConcatenable</span> <span class="hljs-keyword">implements</span> <span class="hljs-title class_">Concatenable</span>&lt;IntegerConcatenable&gt; {
+        <span class="hljs-keyword">private</span> <span class="hljs-keyword">final</span> <span class="hljs-type">int</span> value;
+        <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">IntegerConcatenable</span> <span class="hljs-variable">EMPTY</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IntegerConcatenable</span>(<span class="hljs-number">0</span>);
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> Supplier&lt;IntegerConcatenable&gt; <span class="hljs-title function_">empty</span><span class="hljs-params">()</span> {
+            <span class="hljs-keyword">return</span> () -&gt; EMPTY;
+        }
+
+        <span class="hljs-keyword">private</span> <span class="hljs-title function_">IntegerConcatenable</span><span class="hljs-params">(<span class="hljs-type">int</span> value)</span> {
+            <span class="hljs-built_in">this</span>.value = value;
+        }
+
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> IntegerConcatenable <span class="hljs-title function_">of</span><span class="hljs-params">(<span class="hljs-type">int</span> value)</span> {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IntegerConcatenable</span>(value);
+        }
+
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-keyword">public</span> IntegerConcatenable <span class="hljs-title function_">concatenate</span><span class="hljs-params">(IntegerConcatenable other)</span> {
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IntegerConcatenable</span>(<span class="hljs-built_in">this</span>.value + other.value);
+        }
+
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-keyword">public</span> IntegerConcatenable <span class="hljs-title function_">commonPrefix</span><span class="hljs-params">(IntegerConcatenable other)</span> {
+            <span class="hljs-keyword">return</span> <span class="hljs-built_in">this</span>.value &lt; other.value ? <span class="hljs-built_in">this</span> : other;
+        }
+
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">length</span><span class="hljs-params">()</span> {
+            <span class="hljs-keyword">return</span> <span class="hljs-built_in">this</span>.value;
+        }
+
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-keyword">public</span> IntegerConcatenable <span class="hljs-title function_">substring</span><span class="hljs-params">(<span class="hljs-type">int</span> start)</span> {
+            <span class="hljs-keyword">if</span> (start &gt; <span class="hljs-built_in">this</span>.value) {
+                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexOutOfBoundsException</span>(<span class="hljs-string">&quot;Index out of range: &quot;</span> + start);
+            }
+            <span class="hljs-keyword">return</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IntegerConcatenable</span>(<span class="hljs-built_in">this</span>.value - start);
+        }
+
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-keyword">public</span> String <span class="hljs-title function_">toString</span><span class="hljs-params">()</span> {
+            <span class="hljs-keyword">return</span> Integer.toString(<span class="hljs-built_in">this</span>.value);
+        }
+
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-keyword">public</span> <span class="hljs-type">boolean</span> <span class="hljs-title function_">equals</span><span class="hljs-params">(Object o)</span> {
+            <span class="hljs-keyword">if</span> (o == <span class="hljs-literal">null</span> || getClass() != o.getClass()) <span class="hljs-keyword">return</span> <span class="hljs-literal">false</span>;
+            <span class="hljs-type">IntegerConcatenable</span> <span class="hljs-variable">that</span> <span class="hljs-operator">=</span> (IntegerConcatenable) o;
+            <span class="hljs-type">return</span> <span class="hljs-variable">value</span> <span class="hljs-operator">=</span>= that.value;
+        }
+
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> <span class="hljs-title function_">hashCode</span><span class="hljs-params">()</span> {
+            <span class="hljs-keyword">return</span> Integer.hashCode(value);
+        }
+    }</pre></div>
+        
+      
+        
+        <p>We can test out this implementation as well. Note that to read the output, you need to sum up the values from
+edges as you traverse the automaton.</p>
+<p><img src="resources/mihovMaurelIntegerFST.svg" alt=""></p>
+
+        
+          <div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">mihovMaurelIntegerFSTMain</span><span class="hljs-params">()</span> {</pre></div>
+        
+      
+        
+        <p>Insert months of the year into the transducer, with number of days in each month.</p>
+
+        
+          <div class='highlight'><pre>        List&lt;Pair&lt;String, IntegerConcatenable&gt;&gt; pairs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;January&quot;</span>, IntegerConcatenable.of(<span class="hljs-number">31</span>)));
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;February&quot;</span>, IntegerConcatenable.of(<span class="hljs-number">28</span>)));
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;February&quot;</span>, IntegerConcatenable.of(<span class="hljs-number">29</span>)));
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;March&quot;</span>, IntegerConcatenable.of(<span class="hljs-number">31</span>)));
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;April&quot;</span>, IntegerConcatenable.of(<span class="hljs-number">30</span>)));
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;May&quot;</span>, IntegerConcatenable.of(<span class="hljs-number">31</span>)));
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;June&quot;</span>, IntegerConcatenable.of(<span class="hljs-number">30</span>)));
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;July&quot;</span>, IntegerConcatenable.of(<span class="hljs-number">31</span>)));
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;August&quot;</span>, IntegerConcatenable.of(<span class="hljs-number">31</span>)));
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;September&quot;</span>, IntegerConcatenable.of(<span class="hljs-number">30</span>)));
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;October&quot;</span>, IntegerConcatenable.of(<span class="hljs-number">31</span>)));
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;November&quot;</span>, IntegerConcatenable.of(<span class="hljs-number">30</span>)));
+        pairs.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Pair</span>&lt;&gt;(<span class="hljs-string">&quot;December&quot;</span>, IntegerConcatenable.of(<span class="hljs-number">31</span>)));
+        pairs.sort(Comparator.comparing(a -&gt; a.first));
+
+        MihovMaurelFiniteStateTransducer&lt;IntegerConcatenable&gt; transducer =
+                <span class="hljs-keyword">new</span> <span class="hljs-title class_">MihovMaurelFiniteStateTransducer</span>&lt;&gt;(IntegerConcatenable.empty());
+        <span class="hljs-keyword">for</span> (Pair&lt;String, IntegerConcatenable&gt; pair : pairs) {
+            transducer.insert(pair.first, pair.second);
+        }
+        transducer.finish();
+
+        System.out.println(<span class="hljs-string">&quot;Search for &#x27;March&#x27;: &quot;</span> + transducer.search(<span class="hljs-string">&quot;March&quot;</span>)); <span class="hljs-comment">// Should print [31]</span>
+        System.out.println(<span class="hljs-string">&quot;Search for &#x27;February&#x27;: &quot;</span> + transducer.search(<span class="hljs-string">&quot;February&quot;</span>)); <span class="hljs-comment">// Should print [28,29]</span>
+        System.out.println(<span class="hljs-string">&quot;Search for &#x27;Smarch&#x27;: &quot;</span> + transducer.search(<span class="hljs-string">&quot;Smarch&quot;</span>)); <span class="hljs-comment">// Should print null</span>
+
+        System.out.println(transducer.toDot());
+    }</pre></div>
+        
+      
+        
+        <h2 id="wrapping-it-all-up">Wrapping it all up</h2>
+<p>Hopefully that helps demystify the way that Lucene uses finite-state transducers to map from terms to their
+postings lists (via their ordinals). The FST implementation is a powerful tool that can be used to
+efficiently store and retrieve mappings between keys and values, especially when the keys share common prefixes
+and suffixes, which is often the case with human-language text.</p>
+<p>If you want to experiment with the examples above, here is the <code>main</code> method. Unlike most other examples in
+the repository, I added an argument to let you choose which specific implementation to run. This also reflects
+the way I wrote it, since I started with the trie and moved down through the other implementations.</p>
+
+        
+          <div class='highlight'><pre>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> {
+        <span class="hljs-keyword">if</span> (args.length != <span class="hljs-number">1</span>) {
+            System.err.println(<span class="hljs-string">&quot;Usage: java FiniteStateTransducers &lt;command&gt;&quot;</span>);
+            System.err.println(<span class="hljs-string">&quot;Available commands: trie, daciukMihovFSA, mihovMaurelFST, mihovMaurelIntegerFST&quot;</span>);
+            <span class="hljs-keyword">return</span>;
+        }
+        <span class="hljs-keyword">switch</span> (args[<span class="hljs-number">0</span>]) {
+            <span class="hljs-keyword">case</span> <span class="hljs-string">&quot;trie&quot;</span>:
+                trieMain();
+                <span class="hljs-keyword">break</span>;
+            <span class="hljs-keyword">case</span> <span class="hljs-string">&quot;daciukMihovFSA&quot;</span>:
+                daciukMihovFSAMain();
+                <span class="hljs-keyword">break</span>;
+            <span class="hljs-keyword">case</span> <span class="hljs-string">&quot;mihovMaurelFST&quot;</span>:
+                mihovMaurelFSTMain();
+                <span class="hljs-keyword">break</span>;
+            <span class="hljs-keyword">case</span> <span class="hljs-string">&quot;mihovMaurelIntegerFST&quot;</span>:
+                mihovMaurelIntegerFSTMain();
+                <span class="hljs-keyword">break</span>;
+            <span class="hljs-keyword">default</span>:
+                System.err.println(<span class="hljs-string">&quot;Unknown command: &quot;</span> + args[<span class="hljs-number">0</span>]);
+                <span class="hljs-keyword">break</span>;
+        }
+    }
+}</pre></div>
+        
+      
+      <div class="fleur">h</div>
+    </div>
+  </div>
+</body>
+</html>

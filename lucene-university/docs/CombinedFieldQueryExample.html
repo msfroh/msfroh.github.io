@@ -4,136 +4,25 @@
 <head>
   <title>What is Lucene CombinedFieldQuery?</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
   <link rel="stylesheet" media="all" href="docco.css" />
 </head>
 <body>
-  <div id="container">
-    <div id="background"></div>
-    
-      <ul id="jump_to">
-        <li>
-          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
-          <a class="small" href="javascript:void(0);">+</a>
-          <div id="jump_wrapper">
-          <div id="jump_page_wrapper">
-            <div id="jump_page">
-              
-                
-                <a class="source" href="AnalyzerBasics.html">
-                  AnalyzerBasics.java
-                </a>
-              
-                
-                <a class="source" href="BooleanQueryANDInternals.html">
-                  BooleanQueryANDInternals.java
-                </a>
-              
-                
-                <a class="source" href="BooleanQueryIntro.html">
-                  BooleanQueryIntro.java
-                </a>
-              
-                
-                <a class="source" href="BottomUpIndexReader.html">
-                  BottomUpIndexReader.java
-                </a>
-              
-                
-                <a class="source" href="BytesRefHashExample.html">
-                  BytesRefHashExample.java
-                </a>
-              
-                
-                <a class="source" href="CombinedFieldQueryExample.html">
-                  CombinedFieldQueryExample.java
-                </a>
-              
-                
-                <a class="source" href="DirectoryFileContents.html">
-                  DirectoryFileContents.java
-                </a>
-              
-                
-                <a class="source" href="DocValuesSearchExample.html">
-                  DocValuesSearchExample.java
-                </a>
-              
-                
-                <a class="source" href="FunctionQuerySearchExample.html">
-                  FunctionQuerySearchExample.java
-                </a>
-              
-                
-                <a class="source" href="KnnSearchExample.html">
-                  KnnSearchExample.java
-                </a>
-              
-                
-                <a class="source" href="PointTreeRangeQuery.html">
-                  PointTreeRangeQuery.java
-                </a>
-              
-                
-                <a class="source" href="PrimitivesRef.html">
-                  PrimitivesRef.java
-                </a>
-              
-                
-                <a class="source" href="SearchWithTermsEnum.html">
-                  SearchWithTermsEnum.java
-                </a>
-              
-                
-                <a class="source" href="SimpleSearch.html">
-                  SimpleSearch.java
-                </a>
-              
-                
-                <a class="source" href="TextVectorSearchExample.html">
-                  TextVectorSearchExample.java
-                </a>
-              
-                
-                <a class="source" href="VisualizePointTree.html">
-                  VisualizePointTree.java
-                </a>
-              
-            </div>
-          </div>
-        </li>
-      </ul>
-    
-    <ul class="sections">
+  <div class="container">
+    <div class="page">
+
+      <div class="header">
         
-        
-        
-        <li id="section-1">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-1">&#x00a7;</a>
-              </div>
-              <p>Lucene’s <code>CombinedFieldQuery</code> is a powerful query type that allows you to search across multiple fields as if they were
+          
+          <h1 id="what-is-lucene-combinedfieldquery">What is Lucene CombinedFieldQuery?</h1>
+<p>Lucene’s <code>CombinedFieldQuery</code> is a powerful query type that allows you to search across multiple fields as if they were
 a single field. It is particularly useful when you have multiple fields that contribute to the same conceptual aspect
 of a document, and you want to perform a search that considers all of them together.</p>
 <p>For example, if you have separate fields for the “title” and “description” of a document, you can use <code>CombinedFieldQuery</code>
 to treat them as a single searchable entity. Lucene will combine the term frequencies across all the fields when
 computing scores, providing a more holistic search experience.</p>
 <h2 id="key-features-of-combinedfieldquery">Key Features of CombinedFieldQuery:</h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-2">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-2">&#x00a7;</a>
-              </div>
-              <ul>
+<ul>
 <li>The search engine tries to “combine” those fields to make sense of the whole query.</li>
 <li>When you have multiple fields that represent related data, like title, author, and description, and you want to treat them as one field during search.</li>
 <li>Simplifies complex multi-field queries by treating fields as a unified text source.</li>
@@ -142,579 +31,388 @@ computing scores, providing a more holistic search experience.</p>
 </ul>
 <p>In the following example, we demonstrate how to use <code>CombinedFieldQuery</code> to perform a search over the fields <code>author</code>, <code>title</code>, and <code>description</code>.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 21;"><span class="line" id="L21"><span style="color: #D32F2F">package</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">basic</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L22"></span>
-<span class="line" id="L23"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">analysis</span><span style="color: #212121">.</span><span style="color: #D32F2F">standard</span><span style="color: #212121">.</span><span style="color: #D32F2F">StandardAnalyzer</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L24"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">Document</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L25"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">Field</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L26"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">TextField</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L27"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">DirectoryReader</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L28"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexWriter</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L29"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexWriterConfig</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L30"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">Term</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L31"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">sandbox</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">CombinedFieldQuery</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L32"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">BooleanClause</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L33"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">BooleanQuery</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L34"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexSearcher</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L35"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">Query</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L36"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">ScoreDoc</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L37"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">TermQuery</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L38"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">TopDocs</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L39"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">store</span><span style="color: #212121">.</span><span style="color: #D32F2F">ByteBuffersDirectory</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L40"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">store</span><span style="color: #212121">.</span><span style="color: #D32F2F">Directory</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L41"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">BytesRef</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L42"></span>
-<span class="line" id="L43"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">io</span><span style="color: #212121">.</span><span style="color: #D32F2F">IOException</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L44"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L45"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">Locale</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L46"></span>
-<span class="line" id="L47"><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">CombinedFieldQueryExample</span><span style="color: #24292EFF"> {</span></span>
-<span class="line" id="L48"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">main</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF">[] args) </span><span style="color: #D32F2F">throws</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">Exception</span><span style="color: #24292EFF"> {</span></span>
-<span class="line empty-line" id="L49"></span></code></pre></div>
-            
-        </li>
-        
-        
-        <li id="section-3">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-3">&#x00a7;</a>
-              </div>
-              <h3 id="step-1-create-a-new-index">Step 1: Create a new index</h3>
+          
+            <div class='highlight'><pre>
+<span class="hljs-keyword">package</span> example.basic;
 
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-4">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-4">&#x00a7;</a>
-              </div>
-              <p>In-memory ByteBuffersDirectory is used for indexing</p>
+<span class="hljs-keyword">import</span> org.apache.lucene.analysis.standard.StandardAnalyzer;
+<span class="hljs-keyword">import</span> org.apache.lucene.document.Document;
+<span class="hljs-keyword">import</span> org.apache.lucene.document.Field;
+<span class="hljs-keyword">import</span> org.apache.lucene.document.TextField;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.DirectoryReader;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexWriter;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexWriterConfig;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.Term;
+<span class="hljs-keyword">import</span> org.apache.lucene.sandbox.search.CombinedFieldQuery;
+<span class="hljs-keyword">import</span> org.apache.lucene.search.BooleanClause;
+<span class="hljs-keyword">import</span> org.apache.lucene.search.BooleanQuery;
+<span class="hljs-keyword">import</span> org.apache.lucene.search.IndexSearcher;
+<span class="hljs-keyword">import</span> org.apache.lucene.search.Query;
+<span class="hljs-keyword">import</span> org.apache.lucene.search.ScoreDoc;
+<span class="hljs-keyword">import</span> org.apache.lucene.search.TermQuery;
+<span class="hljs-keyword">import</span> org.apache.lucene.search.TopDocs;
+<span class="hljs-keyword">import</span> org.apache.lucene.store.ByteBuffersDirectory;
+<span class="hljs-keyword">import</span> org.apache.lucene.store.Directory;
+<span class="hljs-keyword">import</span> org.apache.lucene.util.BytesRef;
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 51;"><span class="line" id="L51"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Directory</span><span style="color: #24292EFF"> directory </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">ByteBuffersDirectory()</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L52"></span>
-<span class="line empty-line" id="L53"></span></code></pre></div>
-            
-        </li>
-        
-        
-        <li id="section-5">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-5">&#x00a7;</a>
-              </div>
-              <p>Create the configuration for the index writer, using a standard analyzer</p>
+<span class="hljs-keyword">import</span> java.io.IOException;
+<span class="hljs-keyword">import</span> java.util.List;
+<span class="hljs-keyword">import</span> java.util.Locale;
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 54;"><span class="line" id="L54"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">IndexWriterConfig</span><span style="color: #24292EFF"> config </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexWriterConfig(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> StandardAnalyzer())</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L55"></span>
-<span class="line empty-line" id="L56"></span></code></pre></div>
-            
-        </li>
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CombinedFieldQueryExample</span> {
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> Exception {</pre></div>
+          
         
-        
-        <li id="section-6">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-6">&#x00a7;</a>
-              </div>
-              <p>Create an IndexWriter to add documents to the index</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 57;"><span class="line" id="L57"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">IndexWriter</span><span style="color: #24292EFF"> indexWriter </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexWriter(directory</span><span style="color: #212121">,</span><span style="color: #6F42C1"> config)</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L58"></span>
-<span class="line empty-line" id="L59"></span></code></pre></div>
-            
-        </li>
         
-        
-        <li id="section-7">
-            <div class="annotation">
+          <div class="toc">
+            <h3>Table of Contents</h3>
+            <ol>
               
-              <div class="sswrap ">
-                <a class="ss" href="#section-7">&#x00a7;</a>
-              </div>
-              <h3 id="step-2-add-documents-to-the-index">Step 2: Add documents to the index</h3>
+                
+                <li>
+                  <a class="source" href="AnalyzerBasics.html">
+                    AnalyzerBasics.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BooleanQueryANDInternals.html">
+                    BooleanQueryANDInternals.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BooleanQueryIntro.html">
+                    BooleanQueryIntro.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BottomUpIndexReader.html">
+                    BottomUpIndexReader.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BytesRefHashExample.html">
+                    BytesRefHashExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="CombinedFieldQueryExample.html">
+                    CombinedFieldQueryExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DirectoryFileContents.html">
+                    DirectoryFileContents.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DocValuesSearchExample.html">
+                    DocValuesSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="FiniteStateTransducers.html">
+                    FiniteStateTransducers.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="FunctionQuerySearchExample.html">
+                    FunctionQuerySearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="KnnSearchExample.html">
+                    KnnSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="PointTreeRangeQuery.html">
+                    PointTreeRangeQuery.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="PrimitivesRef.html">
+                    PrimitivesRef.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SearchWithTermsEnum.html">
+                    SearchWithTermsEnum.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SimpleSearch.html">
+                    SimpleSearch.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="TextVectorSearchExample.html">
+                    TextVectorSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="VisualizePointTree.html">
+                    VisualizePointTree.java
+                  </a>
+                </li>
+              
+            </ol>
+          </div>
+        
+      </div>
 
-            </div>
-            
-        </li>
+      
         
-        
-        <li id="section-8">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-8">&#x00a7;</a>
-              </div>
-              <p>Add sample documents with author (as a string), title, and description fields</p>
+        <h3 id="step-1-create-a-new-index">Step 1: Create a new index</h3>
+<p>In-memory ByteBuffersDirectory is used for indexing</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 61;"><span class="line" id="L61"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;J.K. Rowling&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">    </span><span style="color: #22863A">&quot;Harry Potter and the Philosopher&#39;s Stone&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">  </span><span style="color: #22863A">&quot;A young wizard embarks on a magical journey.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L62"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;J.R.R. Tolkien&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">   </span><span style="color: #22863A">&quot;The Hobbit: An Unexpected Journey&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">          </span><span style="color: #22863A">&quot;A hobbit sets off on an epic quest with a band of dwarves.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L63"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;George Orwell&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">     </span><span style="color: #22863A">&quot;Nineteen Eighty-Four&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">                       </span><span style="color: #22863A">&quot;A novel depicting a society under constant surveillance and control.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L64"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;F. Scott Fitzgerald&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;The Magnificent Gatsby&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">                    </span><span style="color: #22863A">&quot;A story of wealth, passion, and the American Dream.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L65"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;Harper Lee&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">        </span><span style="color: #22863A">&quot;To Kill a Mockingbird: A Story of Injustice&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;A narrative about racial inequality and moral awakening in the South.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L66"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;Jane Austen&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">       </span><span style="color: #22863A">&quot;Pride and Prejudice: Love and Class&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">       </span><span style="color: #22863A">&quot;A romantic tale that delves into themes of social class and relationships.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L67"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;Mark Twain&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">        </span><span style="color: #22863A">&quot;The Adventures of Huckleberry Finn&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">         </span><span style="color: #22863A">&quot;The escapades of a boy journeying down the Mississippi River.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L68"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;Agatha Christie&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">   </span><span style="color: #22863A">&quot;Murder on the Express Train&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">                </span><span style="color: #22863A">&quot;A mystery novel featuring the famous detective Hercule Poirot.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L69"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;Gabriel García Márquez&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;One Hundred Years of Solitude: A Family Saga&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;A generational saga of the Buendía family in the mythical town of Macondo.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L70"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;F. Scott Fitzgerald&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;This Side of Paradise: A Novel of Youth&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">  </span><span style="color: #22863A">&quot;A narrative exploring the life and romances of Amory Blaine.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L71"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;Khaled Hosseini&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">   </span><span style="color: #22863A">&quot;The Kite Runner: A Story of Redemption&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">     </span><span style="color: #22863A">&quot;A tale of friendship and forgiveness set against the backdrop of Afghanistan.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L72"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;George R.R. Martin&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;A Clash of Kings&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">                           </span><span style="color: #22863A">&quot;The second book in a fantasy series about the battle for the Iron Throne.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L73"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;Herman Melville&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">   </span><span style="color: #22863A">&quot;Moby Dick: The Whale&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">                       </span><span style="color: #22863A">&quot;The journey of Captain Ahab as he hunts the elusive white whale.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L74"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;C.S. Lewis&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">        </span><span style="color: #22863A">&quot;The Chronicles of Narnia: The Lion, the Witch, and the Wardrobe&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;A fantasy series about a magical land filled with adventure.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L75"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;J.D. Salinger&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">     </span><span style="color: #22863A">&quot;The Catcher in the Rye: A Teenage Tale&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">    </span><span style="color: #22863A">&quot;A story highlighting adolescent alienation and rebellion.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L76"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;Chinua Achebe&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">     </span><span style="color: #22863A">&quot;Things Fall Apart: A Tale of Tradition&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">     </span><span style="color: #22863A">&quot;A narrative examining the effects of colonialism on African culture.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L77"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;Ray Bradbury&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">      </span><span style="color: #22863A">&quot;Fahrenheit 451: A Future Without Books&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">     </span><span style="color: #22863A">&quot;A dystopian tale about a world where reading is forbidden.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L78"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">addDocument(indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;Virginia Woolf&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">    </span><span style="color: #22863A">&quot;Mrs. Dalloway: A Day in London&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1">            </span><span style="color: #22863A">&quot;A narrative that portrays a woman&#39;s life and thoughts in post-war England.&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L79"></span>
-<span class="line empty-line" id="L80"></span>
-<span class="line empty-line" id="L81"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>        <span class="hljs-type">Directory</span> <span class="hljs-variable">directory</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">ByteBuffersDirectory</span>();</pre></div>
         
-        <li id="section-9">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-9">&#x00a7;</a>
-              </div>
-              <p>Close the IndexWriter after adding all documents</p>
+      
+        
+        <p>Create the configuration for the index writer, using a standard analyzer</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 82;"><span class="line" id="L82"><span style="color: #24292EFF">        </span><span style="color: #1976D2">indexWriter</span><span style="color: #212121">.</span><span style="color: #6F42C1">close</span><span style="color: #24292EFF">();</span></span>
-<span class="line empty-line" id="L83"></span>
-<span class="line empty-line" id="L84"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>        <span class="hljs-type">IndexWriterConfig</span> <span class="hljs-variable">config</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexWriterConfig</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">StandardAnalyzer</span>());</pre></div>
         
-        <li id="section-10">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-10">&#x00a7;</a>
-              </div>
-              <h3 id="step-3-search-the-index">Step 3: Search the index</h3>
+      
+        
+        <p>Create an IndexWriter to add documents to the index</p>
 
-            </div>
-            
-        </li>
         
+          <div class='highlight'><pre>        <span class="hljs-type">IndexWriter</span> <span class="hljs-variable">indexWriter</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexWriter</span>(directory, config);</pre></div>
         
-        <li id="section-11">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-11">&#x00a7;</a>
-              </div>
-              <p>Open a DirectoryReader to read the index</p>
+      
+        
+        <h3 id="step-2-add-documents-to-the-index">Step 2: Add documents to the index</h3>
+<p>Add sample documents with author (as a string), title, and description fields</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 86;"><span class="line" id="L86"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">DirectoryReader</span><span style="color: #24292EFF"> reader </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">DirectoryReader</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(directory);</span></span>
-<span class="line empty-line" id="L87"></span>
-<span class="line empty-line" id="L88"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>        addDocument(indexWriter, <span class="hljs-string">&quot;J.K. Rowling&quot;</span>,    <span class="hljs-string">&quot;Harry Potter and the Philosopher&#x27;s Stone&quot;</span>,  <span class="hljs-string">&quot;A young wizard embarks on a magical journey.&quot;</span>);
+        addDocument(indexWriter, <span class="hljs-string">&quot;J.R.R. Tolkien&quot;</span>,   <span class="hljs-string">&quot;The Hobbit: An Unexpected Journey&quot;</span>,          <span class="hljs-string">&quot;A hobbit sets off on an epic quest with a band of dwarves.&quot;</span>);
+        addDocument(indexWriter, <span class="hljs-string">&quot;George Orwell&quot;</span>,     <span class="hljs-string">&quot;Nineteen Eighty-Four&quot;</span>,                       <span class="hljs-string">&quot;A novel depicting a society under constant surveillance and control.&quot;</span>);
+        addDocument(indexWriter, <span class="hljs-string">&quot;F. Scott Fitzgerald&quot;</span>, <span class="hljs-string">&quot;The Magnificent Gatsby&quot;</span>,                    <span class="hljs-string">&quot;A story of wealth, passion, and the American Dream.&quot;</span>);
+        addDocument(indexWriter, <span class="hljs-string">&quot;Harper Lee&quot;</span>,        <span class="hljs-string">&quot;To Kill a Mockingbird: A Story of Injustice&quot;</span>, <span class="hljs-string">&quot;A narrative about racial inequality and moral awakening in the South.&quot;</span>);
+        addDocument(indexWriter, <span class="hljs-string">&quot;Jane Austen&quot;</span>,       <span class="hljs-string">&quot;Pride and Prejudice: Love and Class&quot;</span>,       <span class="hljs-string">&quot;A romantic tale that delves into themes of social class and relationships.&quot;</span>);
+        addDocument(indexWriter, <span class="hljs-string">&quot;Mark Twain&quot;</span>,        <span class="hljs-string">&quot;The Adventures of Huckleberry Finn&quot;</span>,         <span class="hljs-string">&quot;The escapades of a boy journeying down the Mississippi River.&quot;</span>);
+        addDocument(indexWriter, <span class="hljs-string">&quot;Agatha Christie&quot;</span>,   <span class="hljs-string">&quot;Murder on the Express Train&quot;</span>,                <span class="hljs-string">&quot;A mystery novel featuring the famous detective Hercule Poirot.&quot;</span>);
+        addDocument(indexWriter, <span class="hljs-string">&quot;Gabriel García Márquez&quot;</span>, <span class="hljs-string">&quot;One Hundred Years of Solitude: A Family Saga&quot;</span>, <span class="hljs-string">&quot;A generational saga of the Buendía family in the mythical town of Macondo.&quot;</span>);
+        addDocument(indexWriter, <span class="hljs-string">&quot;F. Scott Fitzgerald&quot;</span>, <span class="hljs-string">&quot;This Side of Paradise: A Novel of Youth&quot;</span>,  <span class="hljs-string">&quot;A narrative exploring the life and romances of Amory Blaine.&quot;</span>);
+        addDocument(indexWriter, <span class="hljs-string">&quot;Khaled Hosseini&quot;</span>,   <span class="hljs-string">&quot;The Kite Runner: A Story of Redemption&quot;</span>,     <span class="hljs-string">&quot;A tale of friendship and forgiveness set against the backdrop of Afghanistan.&quot;</span>);
+        addDocument(indexWriter, <span class="hljs-string">&quot;George R.R. Martin&quot;</span>, <span class="hljs-string">&quot;A Clash of Kings&quot;</span>,                           <span class="hljs-string">&quot;The second book in a fantasy series about the battle for the Iron Throne.&quot;</span>);
+        addDocument(indexWriter, <span class="hljs-string">&quot;Herman Melville&quot;</span>,   <span class="hljs-string">&quot;Moby Dick: The Whale&quot;</span>,                       <span class="hljs-string">&quot;The journey of Captain Ahab as he hunts the elusive white whale.&quot;</span>);
+        addDocument(indexWriter, <span class="hljs-string">&quot;C.S. Lewis&quot;</span>,        <span class="hljs-string">&quot;The Chronicles of Narnia: The Lion, the Witch, and the Wardrobe&quot;</span>, <span class="hljs-string">&quot;A fantasy series about a magical land filled with adventure.&quot;</span>);
+        addDocument(indexWriter, <span class="hljs-string">&quot;J.D. Salinger&quot;</span>,     <span class="hljs-string">&quot;The Catcher in the Rye: A Teenage Tale&quot;</span>,    <span class="hljs-string">&quot;A story highlighting adolescent alienation and rebellion.&quot;</span>);
+        addDocument(indexWriter, <span class="hljs-string">&quot;Chinua Achebe&quot;</span>,     <span class="hljs-string">&quot;Things Fall Apart: A Tale of Tradition&quot;</span>,     <span class="hljs-string">&quot;A narrative examining the effects of colonialism on African culture.&quot;</span>);
+        addDocument(indexWriter, <span class="hljs-string">&quot;Ray Bradbury&quot;</span>,      <span class="hljs-string">&quot;Fahrenheit 451: A Future Without Books&quot;</span>,     <span class="hljs-string">&quot;A dystopian tale about a world where reading is forbidden.&quot;</span>);
+        addDocument(indexWriter, <span class="hljs-string">&quot;Virginia Woolf&quot;</span>,    <span class="hljs-string">&quot;Mrs. Dalloway: A Day in London&quot;</span>,            <span class="hljs-string">&quot;A narrative that portrays a woman&#x27;s life and thoughts in post-war England.&quot;</span>);</pre></div>
         
-        <li id="section-12">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-12">&#x00a7;</a>
-              </div>
-              <p>Create an IndexSearcher to perform searches on the indexed data</p>
+      
+        
+        <p>Close the IndexWriter after adding all documents</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 89;"><span class="line" id="L89"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">IndexSearcher</span><span style="color: #24292EFF"> searcher </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexSearcher(reader)</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L90"></span>
-<span class="line empty-line" id="L91"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>        indexWriter.close();</pre></div>
         
-        <li id="section-13">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-13">&#x00a7;</a>
-              </div>
-              <h3 id="step-4-execute-different-types-of-queries">Step 4: Execute different types of queries</h3>
+      
+        
+        <h3 id="step-3-search-the-index">Step 3: Search the index</h3>
+<p>Open a DirectoryReader to read the index</p>
 
-            </div>
-            
-        </li>
         
+          <div class='highlight'><pre>        <span class="hljs-type">DirectoryReader</span> <span class="hljs-variable">reader</span> <span class="hljs-operator">=</span> DirectoryReader.open(directory);</pre></div>
         
-        <li id="section-14">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-14">&#x00a7;</a>
-              </div>
-              <ol>
+      
+        
+        <p>Create an IndexSearcher to perform searches on the indexed data</p>
+
+        
+          <div class='highlight'><pre>        <span class="hljs-type">IndexSearcher</span> <span class="hljs-variable">searcher</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexSearcher</span>(reader);</pre></div>
+        
+      
+        
+        <h3 id="step-4-execute-different-types-of-queries">Step 4: Execute different types of queries</h3>
+
+        
+      
+        
+        <ol>
 <li>CombinedFieldQuery: Treats multiple fields as one and combines term frequencies</li>
 </ol>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 94;"><span class="line" id="L94"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">CombinedFieldQuery</span><span style="color: #212121">.</span><span style="color: #D32F2F">Builder</span><span style="color: #24292EFF"> combinedFieldQueryBuilder </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> CombinedFieldQuery</span><span style="color: #212121">.</span><span style="color: #6F42C1">Builder</span><span style="color: #24292EFF">();</span></span>
-<span class="line" id="L95"><span style="color: #24292EFF">        </span><span style="color: #1976D2">combinedFieldQueryBuilder</span><span style="color: #212121">.</span><span style="color: #6F42C1">addField</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;author&quot;</span><span style="color: #24292EFF">)</span><span style="color: #212121">.</span><span style="color: #6F42C1">addField</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;title&quot;</span><span style="color: #24292EFF">)</span><span style="color: #212121">.</span><span style="color: #6F42C1">addField</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;description&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L96"><span style="color: #24292EFF">        </span><span style="color: #1976D2">combinedFieldQueryBuilder</span><span style="color: #212121">.</span><span style="color: #6F42C1">addTerm</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BytesRef(</span><span style="color: #22863A">&quot;Rowling&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L97"><span style="color: #24292EFF">        </span><span style="color: #1976D2">combinedFieldQueryBuilder</span><span style="color: #212121">.</span><span style="color: #6F42C1">addTerm</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BytesRef(</span><span style="color: #22863A">&quot;Potter&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L98"><span style="color: #24292EFF">        </span><span style="color: #1976D2">combinedFieldQueryBuilder</span><span style="color: #212121">.</span><span style="color: #6F42C1">addTerm</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BytesRef(</span><span style="color: #22863A">&quot;magical&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L99"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Query</span><span style="color: #24292EFF"> combinedFieldQuery </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">combinedFieldQueryBuilder</span><span style="color: #212121">.</span><span style="color: #6F42C1">build</span><span style="color: #24292EFF">();</span></span>
-<span class="line empty-line" id="L100"></span>
-<span class="line empty-line" id="L101"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>        CombinedFieldQuery.<span class="hljs-type">Builder</span> <span class="hljs-variable">combinedFieldQueryBuilder</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">CombinedFieldQuery</span>.Builder();
+        combinedFieldQueryBuilder.addField(<span class="hljs-string">&quot;author&quot;</span>).addField(<span class="hljs-string">&quot;title&quot;</span>).addField(<span class="hljs-string">&quot;description&quot;</span>);
+        combinedFieldQueryBuilder.addTerm(<span class="hljs-keyword">new</span> <span class="hljs-title class_">BytesRef</span>(<span class="hljs-string">&quot;Rowling&quot;</span>));
+        combinedFieldQueryBuilder.addTerm(<span class="hljs-keyword">new</span> <span class="hljs-title class_">BytesRef</span>(<span class="hljs-string">&quot;Potter&quot;</span>));
+        combinedFieldQueryBuilder.addTerm(<span class="hljs-keyword">new</span> <span class="hljs-title class_">BytesRef</span>(<span class="hljs-string">&quot;magical&quot;</span>));
+        <span class="hljs-type">Query</span> <span class="hljs-variable">combinedFieldQuery</span> <span class="hljs-operator">=</span> combinedFieldQueryBuilder.build();</pre></div>
         
-        <li id="section-15">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-15">&#x00a7;</a>
-              </div>
-              <ol start="2">
+      
+        
+        <ol start="2">
 <li>BooleanQuery: Separate queries for each field with OR (SHOULD) clauses</li>
 </ol>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 102;"><span class="line" id="L102"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">BooleanQuery</span><span style="color: #212121">.</span><span style="color: #D32F2F">Builder</span><span style="color: #24292EFF"> boolQueryBuilder </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> BooleanQuery</span><span style="color: #212121">.</span><span style="color: #6F42C1">Builder</span><span style="color: #24292EFF">();</span></span>
-<span class="line" id="L103"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> field </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">List</span><span style="color: #212121">.</span><span style="color: #6F42C1">of</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;author&quot;</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;title&quot;</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;description&quot;</span><span style="color: #24292EFF">)) {</span></span>
-<span class="line" id="L104"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> term </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">List</span><span style="color: #212121">.</span><span style="color: #6F42C1">of</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;Rowling&quot;</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;Potter&quot;</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;magical&quot;</span><span style="color: #24292EFF">)) {</span></span>
-<span class="line" id="L105"><span style="color: #24292EFF">                </span><span style="color: #1976D2">boolQueryBuilder</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(field</span><span style="color: #212121">,</span><span style="color: #6F42C1"> term))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">SHOULD</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L106"><span style="color: #24292EFF">            }</span></span>
-<span class="line" id="L107"><span style="color: #24292EFF">        }</span></span>
-<span class="line" id="L108"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">BooleanQuery</span><span style="color: #24292EFF"> boolQuery </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">boolQueryBuilder</span><span style="color: #212121">.</span><span style="color: #6F42C1">build</span><span style="color: #24292EFF">();</span></span>
-<span class="line empty-line" id="L109"></span>
-<span class="line empty-line" id="L110"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>        BooleanQuery.<span class="hljs-type">Builder</span> <span class="hljs-variable">boolQueryBuilder</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">BooleanQuery</span>.Builder();
+        <span class="hljs-keyword">for</span> (String field : List.of(<span class="hljs-string">&quot;author&quot;</span>, <span class="hljs-string">&quot;title&quot;</span>, <span class="hljs-string">&quot;description&quot;</span>)) {
+            <span class="hljs-keyword">for</span> (String term : List.of(<span class="hljs-string">&quot;Rowling&quot;</span>, <span class="hljs-string">&quot;Potter&quot;</span>, <span class="hljs-string">&quot;magical&quot;</span>)) {
+                boolQueryBuilder.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TermQuery</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Term</span>(field, term)), BooleanClause.Occur.SHOULD);
+            }
+        }
+        <span class="hljs-type">BooleanQuery</span> <span class="hljs-variable">boolQuery</span> <span class="hljs-operator">=</span> boolQueryBuilder.build();</pre></div>
         
-        <li id="section-16">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-16">&#x00a7;</a>
-              </div>
-              <ol start="3">
+      
+        
+        <ol start="3">
 <li>docCombinedFieldQuery: Querying the “combined_field” field where all terms are combined which should have the same result as CombinedFieldQuery</li>
 </ol>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 111;"><span class="line" id="L111"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">BooleanQuery</span><span style="color: #24292EFF"> docCombinedFieldQuery </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> BooleanQuery</span><span style="color: #212121">.</span><span style="color: #6F42C1">Builder</span><span style="color: #24292EFF">()</span></span>
-<span class="line" id="L112"><span style="color: #24292EFF">                </span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;combined_field&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;Rowling&quot;</span><span style="color: #6F42C1">))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">SHOULD</span><span style="color: #24292EFF">)</span></span>
-<span class="line" id="L113"><span style="color: #24292EFF">                </span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;combined_field&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;Potter&quot;</span><span style="color: #6F42C1">))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">SHOULD</span><span style="color: #24292EFF">)</span></span>
-<span class="line" id="L114"><span style="color: #24292EFF">                </span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;combined_field&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;magical&quot;</span><span style="color: #6F42C1">))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">SHOULD</span><span style="color: #24292EFF">)</span></span>
-<span class="line" id="L115"><span style="color: #24292EFF">                </span><span style="color: #212121">.</span><span style="color: #6F42C1">build</span><span style="color: #24292EFF">();</span></span>
-<span class="line empty-line" id="L116"></span>
-<span class="line empty-line" id="L117"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>        <span class="hljs-type">BooleanQuery</span> <span class="hljs-variable">docCombinedFieldQuery</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">BooleanQuery</span>.Builder()
+                .add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TermQuery</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Term</span>(<span class="hljs-string">&quot;combined_field&quot;</span>, <span class="hljs-string">&quot;Rowling&quot;</span>)), BooleanClause.Occur.SHOULD)
+                .add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TermQuery</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Term</span>(<span class="hljs-string">&quot;combined_field&quot;</span>, <span class="hljs-string">&quot;Potter&quot;</span>)), BooleanClause.Occur.SHOULD)
+                .add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TermQuery</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Term</span>(<span class="hljs-string">&quot;combined_field&quot;</span>, <span class="hljs-string">&quot;magical&quot;</span>)), BooleanClause.Occur.SHOULD)
+                .build();</pre></div>
         
-        <li id="section-17">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-17">&#x00a7;</a>
-              </div>
-              <h3 id="step-5-execute-and-print-results-for-each-query-type">Step 5: Execute and print results for each query type</h3>
-
-            </div>
-            
-        </li>
+      
         
-        
-        <li id="section-18">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-18">&#x00a7;</a>
-              </div>
-              <h4 id="combinedfieldquery-results">CombinedFieldQuery Results:</h4>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-19">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-19">&#x00a7;</a>
-              </div>
-              <p>Score: 0.98660445, Author: J.K. Rowling, Title: Harry Potter and the Philosopher’s Stone, Description: A young wizard embarks on a magical journey.
+        <h3 id="step-5-execute-and-print-results-for-each-query-type">Step 5: Execute and print results for each query type</h3>
+<h4 id="combinedfieldquery-results">CombinedFieldQuery Results:</h4>
+<p>Score: 0.98660445, Author: J.K. Rowling, Title: Harry Potter and the Philosopher’s Stone, Description: A young wizard embarks on a magical journey.
 Score: 0.8499142, Author: C.S. Lewis, Title: The Chronicles of Narnia: The Lion, the Witch, and the Wardrobe, Description: A fantasy series about a magical land filled with adventure.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 121;"><span class="line" id="L121"><span style="color: #24292EFF">        </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;### CombinedFieldQuery Results:&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L122"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">printResults(searcher</span><span style="color: #212121">,</span><span style="color: #6F42C1"> combinedFieldQuery)</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L123"></span>
-<span class="line empty-line" id="L124"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>        System.out.println(<span class="hljs-string">&quot;### CombinedFieldQuery Results:&quot;</span>);
+        printResults(searcher, combinedFieldQuery);</pre></div>
         
-        <li id="section-20">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-20">&#x00a7;</a>
-              </div>
-              <h4 id="booleanquery-results">BooleanQuery Results:</h4>
-
-            </div>
-            
-        </li>
+      
         
-        
-        <li id="section-21">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-21">&#x00a7;</a>
-              </div>
-              <p>Score: 1.0287321, Author: J.K. Rowling, Title: Harry Potter and the Philosopher’s Stone, Description: A young wizard embarks on a magical journey.
+        <h4 id="booleanquery-results">BooleanQuery Results:</h4>
+<p>Score: 1.0287321, Author: J.K. Rowling, Title: Harry Potter and the Philosopher’s Stone, Description: A young wizard embarks on a magical journey.
 Score: 0.9480082, Author: C.S. Lewis, Title: The Chronicles of Narnia: The Lion, the Witch, and the Wardrobe, Description: A fantasy series about a magical land filled with adventure.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 127;"><span class="line" id="L127"><span style="color: #24292EFF">        </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;\n### BooleanQuery Results:&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L128"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">printResults(searcher</span><span style="color: #212121">,</span><span style="color: #6F42C1"> boolQuery)</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L129"></span>
-<span class="line empty-line" id="L130"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>        System.out.println(<span class="hljs-string">&quot;\n### BooleanQuery Results:&quot;</span>);
+        printResults(searcher, boolQuery);</pre></div>
         
-        <li id="section-22">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-22">&#x00a7;</a>
-              </div>
-              <h4 id="doccombinedfieldquery-results">DocCombinedFieldQuery Results:</h4>
-
-            </div>
-            
-        </li>
+      
         
-        
-        <li id="section-23">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-23">&#x00a7;</a>
-              </div>
-              <p>Score: 0.98660445, Author: J.K. Rowling, Title: Harry Potter and the Philosopher’s Stone, Description: A young wizard embarks on a magical journey.
+        <h4 id="doccombinedfieldquery-results">DocCombinedFieldQuery Results:</h4>
+<p>Score: 0.98660445, Author: J.K. Rowling, Title: Harry Potter and the Philosopher’s Stone, Description: A young wizard embarks on a magical journey.
 Score: 0.8499142, Author: C.S. Lewis, Title: The Chronicles of Narnia: The Lion, the Witch, and the Wardrobe, Description: A fantasy series about a magical land filled with adventure.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 133;"><span class="line" id="L133"><span style="color: #24292EFF">        </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;\n### DocCombinedFieldQuery Results:&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L134"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">printResults(searcher</span><span style="color: #212121">,</span><span style="color: #6F42C1"> docCombinedFieldQuery)</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L135"></span>
-<span class="line" id="L136"><span style="color: #24292EFF">        </span><span style="color: #1976D2">reader</span><span style="color: #212121">.</span><span style="color: #6F42C1">close</span><span style="color: #24292EFF">();</span></span>
-<span class="line" id="L137"><span style="color: #24292EFF">    }</span></span>
-<span class="line empty-line" id="L138"></span>
-<span class="line empty-line" id="L139"></span></code></pre></div>
-            
-        </li>
         
-        
-        <li id="section-24">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-24">&#x00a7;</a>
-              </div>
-              <h3 id="helper-method-to-print-search-results">Helper method to print search results</h3>
+          <div class='highlight'><pre>        System.out.println(<span class="hljs-string">&quot;\n### DocCombinedFieldQuery Results:&quot;</span>);
+        printResults(searcher, docCombinedFieldQuery);
 
-            </div>
-            
-        </li>
+        reader.close();
+    }</pre></div>
         
+      
         
-        <li id="section-25">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-25">&#x00a7;</a>
-              </div>
-              
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 140;"><span class="line" id="L140"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">printResults(</span><span style="color: #D32F2F">IndexSearcher</span><span style="color: #6F42C1"> searcher</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">Query</span><span style="color: #6F42C1"> query)</span><span style="color: #24292EFF"> throws IOException {</span></span>
-<span class="line" id="L141"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">TopDocs</span><span style="color: #24292EFF"> topDocs </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">searcher</span><span style="color: #212121">.</span><span style="color: #6F42C1">search</span><span style="color: #24292EFF">(query</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">10</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L142"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">ScoreDoc</span><span style="color: #24292EFF"> scoreDoc </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">topDocs</span><span style="color: #212121">.</span><span style="color: #1976D2">scoreDocs</span><span style="color: #24292EFF">) {</span></span>
-<span class="line" id="L143"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">Document</span><span style="color: #24292EFF"> doc </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">searcher</span><span style="color: #212121">.</span><span style="color: #6F42C1">storedFields</span><span style="color: #24292EFF">()</span><span style="color: #212121">.</span><span style="color: #6F42C1">document</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">scoreDoc</span><span style="color: #212121">.</span><span style="color: #1976D2">doc</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L144"><span style="color: #24292EFF">            </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;Score: &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">scoreDoc</span><span style="color: #212121">.</span><span style="color: #1976D2">score</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span></span>
-<span class="line" id="L145"><span style="color: #24292EFF">                    </span><span style="color: #22863A">&quot;, Author: &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">get</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;author&quot;</span><span style="color: #24292EFF">) </span><span style="color: #D32F2F">+</span></span>
-<span class="line" id="L146"><span style="color: #24292EFF">                    </span><span style="color: #22863A">&quot;, Title: &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">get</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;title&quot;</span><span style="color: #24292EFF">) </span><span style="color: #D32F2F">+</span></span>
-<span class="line" id="L147"><span style="color: #24292EFF">                    </span><span style="color: #22863A">&quot;, Description: &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">get</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;description&quot;</span><span style="color: #24292EFF">));</span></span>
-<span class="line" id="L148"><span style="color: #24292EFF">        }</span></span>
-<span class="line" id="L149"><span style="color: #24292EFF">    }</span></span>
-<span class="line empty-line" id="L150"></span>
-<span class="line empty-line" id="L151"></span></code></pre></div>
-            
-        </li>
-        
-        
-        <li id="section-26">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-26">&#x00a7;</a>
-              </div>
-              <h3 id="helper-method-to-add-a-document-to-the-index">Helper method to add a document to the index</h3>
+        <h3 id="helper-method-to-print-search-results">Helper method to print search results</h3>
 
-            </div>
-            
-        </li>
         
+          <div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">printResults</span><span class="hljs-params">(IndexSearcher searcher, Query query)</span> <span class="hljs-keyword">throws</span> IOException {
+        <span class="hljs-type">TopDocs</span> <span class="hljs-variable">topDocs</span> <span class="hljs-operator">=</span> searcher.search(query, <span class="hljs-number">10</span>);
+        <span class="hljs-keyword">for</span> (ScoreDoc scoreDoc : topDocs.scoreDocs) {
+            <span class="hljs-type">Document</span> <span class="hljs-variable">doc</span> <span class="hljs-operator">=</span> searcher.storedFields().document(scoreDoc.doc);
+            System.out.println(<span class="hljs-string">&quot;Score: &quot;</span> + scoreDoc.score +
+                    <span class="hljs-string">&quot;, Author: &quot;</span> + doc.get(<span class="hljs-string">&quot;author&quot;</span>) +
+                    <span class="hljs-string">&quot;, Title: &quot;</span> + doc.get(<span class="hljs-string">&quot;title&quot;</span>) +
+                    <span class="hljs-string">&quot;, Description: &quot;</span> + doc.get(<span class="hljs-string">&quot;description&quot;</span>));
+        }
+    }</pre></div>
         
-        <li id="section-27">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-27">&#x00a7;</a>
-              </div>
-              
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 152;"><span class="line" id="L152"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">addDocument(</span><span style="color: #D32F2F">IndexWriter</span><span style="color: #6F42C1"> indexWriter</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">String</span><span style="color: #6F42C1"> author</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">String</span><span style="color: #6F42C1"> title</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">String</span><span style="color: #6F42C1"> description)</span><span style="color: #24292EFF"> throws IOException {</span></span>
-<span class="line empty-line" id="L153"></span></code></pre></div>
-            
-        </li>
+      
         
-        
-        <li id="section-28">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-28">&#x00a7;</a>
-              </div>
-              <p>Create a new document</p>
+        <h3 id="helper-method-to-add-a-document-to-the-index">Helper method to add a document to the index</h3>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 154;"><span class="line" id="L154"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Document</span><span style="color: #24292EFF"> doc </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">Document()</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L155"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">addDocument</span><span class="hljs-params">(IndexWriter indexWriter, String author, String title, String description)</span> <span class="hljs-keyword">throws</span> IOException {</pre></div>
         
-        <li id="section-29">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-29">&#x00a7;</a>
-              </div>
-              <p>Add the author field as a string (stored)</p>
+      
+        
+        <p>Create a new document</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 156;"><span class="line" id="L156"><span style="color: #24292EFF">        </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TextField(</span><span style="color: #22863A">&quot;author&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> author</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">Field</span><span style="color: #212121">.</span><span style="color: #1976D2">Store</span><span style="color: #212121">.</span><span style="color: #1976D2">YES</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">);</span></span>
-<span class="line empty-line" id="L157"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>        <span class="hljs-type">Document</span> <span class="hljs-variable">doc</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Document</span>();</pre></div>
         
-        <li id="section-30">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-30">&#x00a7;</a>
-              </div>
-              <p>Add the title field as a text field (stored)</p>
+      
+        
+        <p>Add the author field as a string (stored)</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 158;"><span class="line" id="L158"><span style="color: #24292EFF">        </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TextField(</span><span style="color: #22863A">&quot;title&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> title</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">Field</span><span style="color: #212121">.</span><span style="color: #1976D2">Store</span><span style="color: #212121">.</span><span style="color: #1976D2">YES</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">);</span></span>
-<span class="line empty-line" id="L159"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>        doc.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TextField</span>(<span class="hljs-string">&quot;author&quot;</span>, author, Field.Store.YES));</pre></div>
         
-        <li id="section-31">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-31">&#x00a7;</a>
-              </div>
-              <p>Add the description field as a text field (stored)</p>
+      
+        
+        <p>Add the title field as a text field (stored)</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 160;"><span class="line" id="L160"><span style="color: #24292EFF">        </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TextField(</span><span style="color: #22863A">&quot;description&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> description</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">Field</span><span style="color: #212121">.</span><span style="color: #1976D2">Store</span><span style="color: #212121">.</span><span style="color: #1976D2">YES</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">);</span></span>
-<span class="line empty-line" id="L161"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>        doc.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TextField</span>(<span class="hljs-string">&quot;title&quot;</span>, title, Field.Store.YES));</pre></div>
         
-        <li id="section-32">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-32">&#x00a7;</a>
-              </div>
-              <p>Add combined_field in one field</p>
+      
+        
+        <p>Add the description field as a text field (stored)</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 162;"><span class="line" id="L162"><span style="color: #24292EFF">        </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TextField(</span><span style="color: #22863A">&quot;combined_field&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">String</span><span style="color: #212121">.</span><span style="color: #6F42C1">format(</span><span style="color: #1976D2">Locale</span><span style="color: #212121">.</span><span style="color: #1976D2">ROOT</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;%s %s %s&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> author</span><span style="color: #212121">,</span><span style="color: #6F42C1"> title</span><span style="color: #212121">,</span><span style="color: #6F42C1"> description)</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">Field</span><span style="color: #212121">.</span><span style="color: #1976D2">Store</span><span style="color: #212121">.</span><span style="color: #1976D2">YES</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">);</span></span>
-<span class="line empty-line" id="L163"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>        doc.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TextField</span>(<span class="hljs-string">&quot;description&quot;</span>, description, Field.Store.YES));</pre></div>
         
-        <li id="section-33">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-33">&#x00a7;</a>
-              </div>
-              <p>Add the document to the index</p>
+      
+        
+        <p>Add combined_field in one field</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 164;"><span class="line" id="L164"><span style="color: #24292EFF">        </span><span style="color: #1976D2">indexWriter</span><span style="color: #212121">.</span><span style="color: #6F42C1">addDocument</span><span style="color: #24292EFF">(doc);</span></span>
-<span class="line" id="L165"><span style="color: #24292EFF">    }</span></span>
-<span class="line" id="L166"><span style="color: #24292EFF">}</span></span>
-<span class="line empty-line" id="L167"></span>
-<span class="line empty-line" id="L168"></span></code></pre></div>
-            
-        </li>
         
-    </ul>
+          <div class='highlight'><pre>        doc.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TextField</span>(<span class="hljs-string">&quot;combined_field&quot;</span>, String.format(Locale.ROOT, <span class="hljs-string">&quot;%s %s %s&quot;</span>, author, title, description), Field.Store.YES));</pre></div>
+        
+      
+        
+        <p>Add the document to the index</p>
+
+        
+          <div class='highlight'><pre>        indexWriter.addDocument(doc);
+    }
+}</pre></div>
+        
+      
+      <div class="fleur">h</div>
+    </div>
   </div>
 </body>
 </html>

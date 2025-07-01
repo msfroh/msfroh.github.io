@@ -4,509 +4,381 @@
 <head>
   <title>BytesRef (and other array references)</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
   <link rel="stylesheet" media="all" href="docco.css" />
 </head>
 <body>
-  <div id="container">
-    <div id="background"></div>
-    
-      <ul id="jump_to">
-        <li>
-          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
-          <a class="small" href="javascript:void(0);">+</a>
-          <div id="jump_wrapper">
-          <div id="jump_page_wrapper">
-            <div id="jump_page">
-              
-                
-                <a class="source" href="AnalyzerBasics.html">
-                  AnalyzerBasics.java
-                </a>
-              
-                
-                <a class="source" href="BooleanQueryANDInternals.html">
-                  BooleanQueryANDInternals.java
-                </a>
-              
-                
-                <a class="source" href="BooleanQueryIntro.html">
-                  BooleanQueryIntro.java
-                </a>
-              
-                
-                <a class="source" href="BottomUpIndexReader.html">
-                  BottomUpIndexReader.java
-                </a>
-              
-                
-                <a class="source" href="BytesRefHashExample.html">
-                  BytesRefHashExample.java
-                </a>
-              
-                
-                <a class="source" href="CombinedFieldQueryExample.html">
-                  CombinedFieldQueryExample.java
-                </a>
-              
-                
-                <a class="source" href="DirectoryFileContents.html">
-                  DirectoryFileContents.java
-                </a>
-              
-                
-                <a class="source" href="DocValuesSearchExample.html">
-                  DocValuesSearchExample.java
-                </a>
-              
-                
-                <a class="source" href="FunctionQuerySearchExample.html">
-                  FunctionQuerySearchExample.java
-                </a>
-              
-                
-                <a class="source" href="KnnSearchExample.html">
-                  KnnSearchExample.java
-                </a>
-              
-                
-                <a class="source" href="PointTreeRangeQuery.html">
-                  PointTreeRangeQuery.java
-                </a>
-              
-                
-                <a class="source" href="PrimitivesRef.html">
-                  PrimitivesRef.java
-                </a>
-              
-                
-                <a class="source" href="SearchWithTermsEnum.html">
-                  SearchWithTermsEnum.java
-                </a>
-              
-                
-                <a class="source" href="SimpleSearch.html">
-                  SimpleSearch.java
-                </a>
-              
-                
-                <a class="source" href="TextVectorSearchExample.html">
-                  TextVectorSearchExample.java
-                </a>
-              
-                
-                <a class="source" href="VisualizePointTree.html">
-                  VisualizePointTree.java
-                </a>
-              
-            </div>
-          </div>
-        </li>
-      </ul>
-    
-    <ul class="sections">
+  <div class="container">
+    <div class="page">
+
+      <div class="header">
         
-        
-        
-        <li id="section-1">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-1">&#x00a7;</a>
-              </div>
-              <p>One of Lucene’s performance advantages is that it is very cautious about allocating memory, striving to reuse buffers
+          
+          <h1 id="bytesref-and-other-array-references">BytesRef (and other array references)</h1>
+<p>One of Lucene’s performance advantages is that it is very cautious about allocating memory, striving to reuse buffers
 where possible. While Java makes management of short-lived objects pretty lightweight, it’s even more lightweight
 to avoid allocating them altogether.</p>
 <p>To simplify the management of arrays used as buffers, Lucene provides some wrapper classes, like <code>BytesRef</code>,
 <code>CharsRef</code>, <code>IntsRef</code>, and <code>LongsRef</code>.</p>
 <p>This example will focus on <code>BytesRef</code>, which is the most widely used within the Lucene codebase.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 11;"><span class="line" id="L11"><span style="color: #D32F2F">package</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">foundations</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L12"></span>
-<span class="line" id="L13"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">ArrayUtil</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L14"></span>
-<span class="line" id="L15"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">io</span><span style="color: #212121">.</span><span style="color: #D32F2F">BufferedWriter</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L16"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">io</span><span style="color: #212121">.</span><span style="color: #D32F2F">IOException</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L17"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">io</span><span style="color: #212121">.</span><span style="color: #D32F2F">InputStream</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L18"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">nio</span><span style="color: #212121">.</span><span style="color: #D32F2F">file</span><span style="color: #212121">.</span><span style="color: #D32F2F">Files</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L19"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">nio</span><span style="color: #212121">.</span><span style="color: #D32F2F">file</span><span style="color: #212121">.</span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L20"></span>
-<span class="line" id="L21"><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">PrimitivesRef</span><span style="color: #24292EFF"> {</span></span>
-<span class="line empty-line" id="L22"></span>
-<span class="line empty-line" id="L23"></span>
-<span class="line empty-line" id="L24"></span></code></pre></div>
-            
-        </li>
+          
+            <div class='highlight'><pre><span class="hljs-keyword">package</span> example.foundations;
+
+<span class="hljs-keyword">import</span> org.apache.lucene.util.ArrayUtil;
+
+<span class="hljs-keyword">import</span> java.io.BufferedWriter;
+<span class="hljs-keyword">import</span> java.io.IOException;
+<span class="hljs-keyword">import</span> java.io.InputStream;
+<span class="hljs-keyword">import</span> java.nio.file.Files;
+<span class="hljs-keyword">import</span> java.nio.file.Path;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">PrimitivesRef</span> {</pre></div>
+          
         
+
         
-        <li id="section-2">
-            <div class="annotation">
+          <div class="toc">
+            <h3>Table of Contents</h3>
+            <ol>
               
-              <div class="sswrap ">
-                <a class="ss" href="#section-2">&#x00a7;</a>
-              </div>
-              <p>Lucene’s <code>BytesRef</code> holds a reference to a byte array, a start offset into the byte array representing the
+                
+                <li>
+                  <a class="source" href="AnalyzerBasics.html">
+                    AnalyzerBasics.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BooleanQueryANDInternals.html">
+                    BooleanQueryANDInternals.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BooleanQueryIntro.html">
+                    BooleanQueryIntro.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BottomUpIndexReader.html">
+                    BottomUpIndexReader.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BytesRefHashExample.html">
+                    BytesRefHashExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="CombinedFieldQueryExample.html">
+                    CombinedFieldQueryExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DirectoryFileContents.html">
+                    DirectoryFileContents.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DocValuesSearchExample.html">
+                    DocValuesSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="FiniteStateTransducers.html">
+                    FiniteStateTransducers.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="FunctionQuerySearchExample.html">
+                    FunctionQuerySearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="KnnSearchExample.html">
+                    KnnSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="PointTreeRangeQuery.html">
+                    PointTreeRangeQuery.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="PrimitivesRef.html">
+                    PrimitivesRef.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SearchWithTermsEnum.html">
+                    SearchWithTermsEnum.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SimpleSearch.html">
+                    SimpleSearch.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="TextVectorSearchExample.html">
+                    TextVectorSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="VisualizePointTree.html">
+                    VisualizePointTree.java
+                  </a>
+                </li>
+              
+            </ol>
+          </div>
+        
+      </div>
+
+      
+        
+        <p>Lucene’s <code>BytesRef</code> holds a reference to a byte array, a start offset into the byte array representing the
 start of the value of interest, and the length of the value of interest. Since we aim to reuse the buffer,
 the length of the value is often less than the length of the array, since the array may have previously
 held a larger value.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 28;"><span class="line" id="L28"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BytesRef</span><span style="color: #24292EFF"> {</span></span>
-<span class="line" id="L29"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">final</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">byte</span><span style="color: #24292EFF">[] EMPTY_BYTES </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">byte</span><span style="color: #24292EFF">[</span><span style="color: #1976D2">0</span><span style="color: #24292EFF">];</span></span>
-<span class="line" id="L30"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">byte</span><span style="color: #24292EFF">[] bytes;</span></span>
-<span class="line" id="L31"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> offset;</span></span>
-<span class="line" id="L32"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> length;</span></span>
-<span class="line empty-line" id="L33"></span>
-<span class="line" id="L34"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BytesRef</span><span style="color: #24292EFF">() {</span></span>
-<span class="line" id="L35"><span style="color: #24292EFF">            bytes </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> EMPTY_BYTES;</span></span>
-<span class="line" id="L36"><span style="color: #24292EFF">        }</span></span>
-<span class="line" id="L37"><span style="color: #24292EFF">    }</span></span>
-<span class="line empty-line" id="L38"></span>
-<span class="line empty-line" id="L39"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">BytesRef</span> {
+        <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">final</span> <span class="hljs-type">byte</span>[] EMPTY_BYTES = <span class="hljs-keyword">new</span> <span class="hljs-title class_">byte</span>[<span class="hljs-number">0</span>];
+        <span class="hljs-keyword">public</span> <span class="hljs-type">byte</span>[] bytes;
+        <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> offset;
+        <span class="hljs-keyword">public</span> <span class="hljs-type">int</span> length;
+
+        <span class="hljs-keyword">public</span> <span class="hljs-title function_">BytesRef</span><span class="hljs-params">()</span> {
+            bytes = EMPTY_BYTES;
+        }
+    }</pre></div>
         
-        <li id="section-3">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-3">&#x00a7;</a>
-              </div>
-              <p>Let’s use <code>BytesRef</code> to simulate tokenizing a text file into lines, and then splitting those lines into
+      
+        
+        <p>Let’s use <code>BytesRef</code> to simulate tokenizing a text file into lines, and then splitting those lines into
 individual words. This is similar to the logic used to tokenize a text file.</p>
 <p>To start, let’s create a helper method that creates a text file. The content is taken from “A Book About Words”
 by G. F. Graham, published in 1869, copied from <a href="https://www.gutenberg.org/ebooks/55200">https://www.gutenberg.org/ebooks/55200</a>.</p>
 <p>Note that by using <code>Files#newBufferedWriter</code>, we guarantee that the resulting file is encoded with the UTF-8
 character set.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 47;"><span class="line" id="L47"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createTextFile()</span><span style="color: #24292EFF"> throws IOException {</span></span>
-<span class="line" id="L48"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF"> file </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">createTempFile</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;.txt&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L49"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">BufferedWriter</span><span style="color: #24292EFF"> writer </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">newBufferedWriter</span><span style="color: #24292EFF">(file)) {</span></span>
-<span class="line" id="L50"><span style="color: #24292EFF">            </span><span style="color: #1976D2">writer</span><span style="color: #212121">.</span><span style="color: #6F42C1">append</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;&quot;&quot;</span></span>
-<span class="line" id="L51"><span style="color: #22863A">                    What is meant by a Language? It is a collection of all the words,</span></span>
-<span class="line" id="L52"><span style="color: #22863A">                    phrases, grammatical forms, idioms, &amp;c., which are used by one</span></span>
-<span class="line" id="L53"><span style="color: #22863A">                    people. It is the outward expression of the tendencies, turn of</span></span>
-<span class="line" id="L54"><span style="color: #22863A">                    mind, and habits of thought of some one nation, and the best</span></span>
-<span class="line" id="L55"><span style="color: #22863A">                    criterion of their intellect and feelings. If this explanation be</span></span>
-<span class="line" id="L56"><span style="color: #22863A">                    admitted, it will naturally follow that the connection between a</span></span>
-<span class="line" id="L57"><span style="color: #22863A">                    people and their language is so close, that the one may be judged</span></span>
-<span class="line" id="L58"><span style="color: #22863A">                    of by the other; and that the language is a lasting monument of the</span></span>
-<span class="line" id="L59"><span style="color: #22863A">                    nature and character of the people.</span></span>
-<span class="line" id="L60"><span style="color: #22863A">                    </span></span>
-<span class="line" id="L61"><span style="color: #22863A">                    Every language, then, has its genius; forms of words, idioms, and</span></span>
-<span class="line" id="L62"><span style="color: #22863A">                    turns of expression peculiar to itself; by which, independently of</span></span>
-<span class="line" id="L63"><span style="color: #22863A">                    other differences, one nation may be distinguished from another.</span></span>
-<span class="line" id="L64"><span style="color: #22863A">                    This condition may be produced by various causes; such as soil,</span></span>
-<span class="line" id="L65"><span style="color: #22863A">                    climate, conquest, immigration, &amp;c. Out of the old Roman, or Latin,</span></span>
-<span class="line" id="L66"><span style="color: #22863A">                    there arose several modern languages of Europe; all known by the</span></span>
-<span class="line" id="L67"><span style="color: #22863A">                    generic name--Romance; viz. Italian, French, Provençal, Spanish,</span></span>
-<span class="line" id="L68"><span style="color: #22863A">                    and Portuguese. These may be called daughters of ancient Latin; and</span></span>
-<span class="line" id="L69"><span style="color: #22863A">                    the natives of all these countries down to the seventh century,</span></span>
-<span class="line" id="L70"><span style="color: #22863A">                    both spoke and wrote that language. But when the Scandinavian and</span></span>
-<span class="line" id="L71"><span style="color: #22863A">                    Germanic tribes invaded the West of Europe, the Latin was broken</span></span>
-<span class="line" id="L72"><span style="color: #22863A">                    up, and was succeeded by Italian, French, Spanish, &amp;c. The Latin</span></span>
-<span class="line" id="L73"><span style="color: #22863A">                    now became gradually more and more corrupt, and was, at length, in</span></span>
-<span class="line" id="L74"><span style="color: #22863A">                    each of these countries, wholly remodelled.</span></span>
-<span class="line" id="L75"><span style="color: #22863A">                    </span></span>
-<span class="line" id="L76"><span style="color: #22863A">                    History has been called ‘the study of the law of change;’ i.e. the</span></span>
-<span class="line" id="L77"><span style="color: #22863A">                    process by which human affairs are transferred from one condition</span></span>
-<span class="line" id="L78"><span style="color: #22863A">                    to another. The history of a language has naturally a close</span></span>
-<span class="line" id="L79"><span style="color: #22863A">                    analogy with political history; the chief difference being that</span></span>
-<span class="line" id="L80"><span style="color: #22863A">                    the materials of the latter are facts, events, and institutions;</span></span>
-<span class="line" id="L81"><span style="color: #22863A">                    whilst the former treats of words, forms, and constructions. Now,</span></span>
-<span class="line" id="L82"><span style="color: #22863A">                    in the same way as a nation never stands still, but is continually</span></span>
-<span class="line" id="L83"><span style="color: #22863A">                    undergoing a silent--perhaps imperceptible--transformation, so</span></span>
-<span class="line" id="L84"><span style="color: #22863A">                    it is with its language. This is proved both by experience and</span></span>
-<span class="line" id="L85"><span style="color: #22863A">                    reason. We need hardly say that the English of the present time</span></span>
-<span class="line" id="L86"><span style="color: #22863A">                    differ widely from the English of the fourteenth century; and we</span></span>
-<span class="line" id="L87"><span style="color: #22863A">                    may be quite sure that the language of this country, two or three</span></span>
-<span class="line" id="L88"><span style="color: #22863A">                    centuries hence, will be very different from what it is at present.</span></span>
-<span class="line" id="L89"><span style="color: #22863A">                    It would be impossible for a nation either to improve or decay, and</span></span>
-<span class="line" id="L90"><span style="color: #22863A">                    for its language at the same time to remain stationary. The one</span></span>
-<span class="line" id="L91"><span style="color: #22863A">                    being a reflex of the other, they must stand or fall together.</span></span>
-<span class="line" id="L92"><span style="color: #22863A">                    &quot;&quot;&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L93"><span style="color: #24292EFF">        }</span></span>
-<span class="line" id="L94"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> file;</span></span>
-<span class="line" id="L95"><span style="color: #24292EFF">    }</span></span>
-<span class="line empty-line" id="L96"></span>
-<span class="line" id="L97"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">main(</span><span style="color: #D32F2F">String</span><span style="color: #6F42C1">[] args)</span><span style="color: #24292EFF"> throws IOException {</span></span>
-<span class="line empty-line" id="L98"></span>
-<span class="line" id="L99"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF"> textFile </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createTextFile()</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L100"></span>
-<span class="line empty-line" id="L101"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> Path <span class="hljs-title function_">createTextFile</span><span class="hljs-params">()</span> <span class="hljs-keyword">throws</span> IOException {
+        <span class="hljs-type">Path</span> <span class="hljs-variable">file</span> <span class="hljs-operator">=</span> Files.createTempFile(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;.txt&quot;</span>);
+        <span class="hljs-keyword">try</span> (<span class="hljs-type">BufferedWriter</span> <span class="hljs-variable">writer</span> <span class="hljs-operator">=</span> Files.newBufferedWriter(file)) {
+            writer.append(<span class="hljs-string">&quot;&quot;&quot;
+                    What is meant by a Language? It is a collection of all the words,
+                    phrases, grammatical forms, idioms, &amp;c., which are used by one
+                    people. It is the outward expression of the tendencies, turn of
+                    mind, and habits of thought of some one nation, and the best
+                    criterion of their intellect and feelings. If this explanation be
+                    admitted, it will naturally follow that the connection between a
+                    people and their language is so close, that the one may be judged
+                    of by the other; and that the language is a lasting monument of the
+                    nature and character of the people.
+                    
+                    Every language, then, has its genius; forms of words, idioms, and
+                    turns of expression peculiar to itself; by which, independently of
+                    other differences, one nation may be distinguished from another.
+                    This condition may be produced by various causes; such as soil,
+                    climate, conquest, immigration, &amp;c. Out of the old Roman, or Latin,
+                    there arose several modern languages of Europe; all known by the
+                    generic name--Romance; viz. Italian, French, Provençal, Spanish,
+                    and Portuguese. These may be called daughters of ancient Latin; and
+                    the natives of all these countries down to the seventh century,
+                    both spoke and wrote that language. But when the Scandinavian and
+                    Germanic tribes invaded the West of Europe, the Latin was broken
+                    up, and was succeeded by Italian, French, Spanish, &amp;c. The Latin
+                    now became gradually more and more corrupt, and was, at length, in
+                    each of these countries, wholly remodelled.
+                    
+                    History has been called ‘the study of the law of change;’ i.e. the
+                    process by which human affairs are transferred from one condition
+                    to another. The history of a language has naturally a close
+                    analogy with political history; the chief difference being that
+                    the materials of the latter are facts, events, and institutions;
+                    whilst the former treats of words, forms, and constructions. Now,
+                    in the same way as a nation never stands still, but is continually
+                    undergoing a silent--perhaps imperceptible--transformation, so
+                    it is with its language. This is proved both by experience and
+                    reason. We need hardly say that the English of the present time
+                    differ widely from the English of the fourteenth century; and we
+                    may be quite sure that the language of this country, two or three
+                    centuries hence, will be very different from what it is at present.
+                    It would be impossible for a nation either to improve or decay, and
+                    for its language at the same time to remain stationary. The one
+                    being a reflex of the other, they must stand or fall together.
+                    &quot;&quot;&quot;</span>);
+        }
+        <span class="hljs-keyword">return</span> file;
+    }
+
+    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> IOException {
+
+        <span class="hljs-type">Path</span> <span class="hljs-variable">textFile</span> <span class="hljs-operator">=</span> createTextFile();</pre></div>
         
-        <li id="section-4">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-4">&#x00a7;</a>
-              </div>
-              <p>We allocate an initially-empty <code>BytesRef</code> for each line. We will dynamically resize it to accommodate
+      
+        
+        <p>We allocate an initially-empty <code>BytesRef</code> for each line. We will dynamically resize it to accommodate
 the maximum size needed for a line. We also allocate a <code>BytesRef</code> that will provide a view over each word in
 each line. Note that the variable memory used by this program is given by the maximum size of
 <code>lineBytesRef.bytes</code>. Everything else operates within bytes of that same buffer.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 105;"><span class="line" id="L105"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">BytesRef</span><span style="color: #24292EFF"> lineBytesRef </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BytesRef()</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L106"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">BytesRef</span><span style="color: #24292EFF"> wordBytesRef </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BytesRef()</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L107"></span>
-<span class="line empty-line" id="L108"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>        <span class="hljs-type">BytesRef</span> <span class="hljs-variable">lineBytesRef</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">BytesRef</span>();
+        <span class="hljs-type">BytesRef</span> <span class="hljs-variable">wordBytesRef</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">BytesRef</span>();</pre></div>
         
-        <li id="section-5">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-5">&#x00a7;</a>
-              </div>
-              <p>We open a basic Java <code>InputStream</code>, so that we can process the input file byte-by-byte.</p>
+      
+        
+        <p>We open a basic Java <code>InputStream</code>, so that we can process the input file byte-by-byte.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 109;"><span class="line" id="L109"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">InputStream</span><span style="color: #24292EFF"> is </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">newInputStream</span><span style="color: #24292EFF">(textFile)) {</span></span>
-<span class="line empty-line" id="L110"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>        <span class="hljs-keyword">try</span> (<span class="hljs-type">InputStream</span> <span class="hljs-variable">is</span> <span class="hljs-operator">=</span> Files.newInputStream(textFile)) {</pre></div>
         
-        <li id="section-6">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-6">&#x00a7;</a>
-              </div>
-              <p>The following loop will collect each line into <code>linesBytesRef</code>.</p>
+      
+        
+        <p>The following loop will collect each line into <code>linesBytesRef</code>.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 111;"><span class="line" id="L111"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> linePos </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L112"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> nextByte;</span></span>
-<span class="line" id="L113"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">while</span><span style="color: #24292EFF"> ((nextByte </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">is</span><span style="color: #212121">.</span><span style="color: #6F42C1">read</span><span style="color: #24292EFF">()) </span><span style="color: #D32F2F">&gt;=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">) {</span></span>
-<span class="line empty-line" id="L114"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>            <span class="hljs-type">int</span> <span class="hljs-variable">linePos</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;
+            <span class="hljs-type">int</span> nextByte;
+            <span class="hljs-keyword">while</span> ((nextByte = is.read()) &gt;= <span class="hljs-number">0</span>) {</pre></div>
         
-        <li id="section-7">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-7">&#x00a7;</a>
-              </div>
-              <p>Let’s consider the case where we’re not at the end of a line yet.</p>
+      
+        
+        <p>Let’s consider the case where we’re not at the end of a line yet.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 115;"><span class="line" id="L115"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (nextByte </span><span style="color: #D32F2F">!=</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&#39;\n&#39;</span><span style="color: #24292EFF">) {</span></span>
-<span class="line empty-line" id="L116"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>                <span class="hljs-keyword">if</span> (nextByte != <span class="hljs-string">&#x27;\n&#x27;</span>) {</pre></div>
         
-        <li id="section-8">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-8">&#x00a7;</a>
-              </div>
-              <p>If the current <code>lineBytesRef</code> is not large enough, we use Lucene’s <code>ArrayUtil#grow</code> helper
+      
+        
+        <p>If the current <code>lineBytesRef</code> is not large enough, we use Lucene’s <code>ArrayUtil#grow</code> helper
 method, which will allocate an exponentially-larger array and copy the existing contents.</p>
 <p>If we did not want to preserve the existing contents, we could use <code>ArrayUtil.growNoCopy</code>.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 120;"><span class="line" id="L120"><span style="color: #24292EFF">                    </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (linePos </span><span style="color: #D32F2F">==</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">lineBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">bytes</span><span style="color: #212121">.</span><span style="color: #1976D2">length</span><span style="color: #24292EFF">) {</span></span>
-<span class="line" id="L121"><span style="color: #24292EFF">                        </span><span style="color: #1976D2">lineBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">bytes</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">ArrayUtil</span><span style="color: #212121">.</span><span style="color: #6F42C1">grow</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">lineBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">bytes</span><span style="color: #212121">,</span><span style="color: #24292EFF"> linePos </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">1</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L122"><span style="color: #24292EFF">                    }</span></span>
-<span class="line empty-line" id="L123"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>                    <span class="hljs-keyword">if</span> (linePos == lineBytesRef.bytes.length) {
+                        lineBytesRef.bytes = ArrayUtil.grow(lineBytesRef.bytes, linePos + <span class="hljs-number">1</span>);
+                    }</pre></div>
         
-        <li id="section-9">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-9">&#x00a7;</a>
-              </div>
-              <p>Append the current character to the line.</p>
+      
+        
+        <p>Append the current character to the line.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 124;"><span class="line" id="L124"><span style="color: #24292EFF">                    </span><span style="color: #1976D2">lineBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">bytes</span><span style="color: #24292EFF">[linePos</span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">] </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">byte</span><span style="color: #24292EFF">) (nextByte </span><span style="color: #D32F2F">&amp;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0xFF</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L125"><span style="color: #24292EFF">                } </span><span style="color: #D32F2F">else</span><span style="color: #24292EFF"> {</span></span>
-<span class="line empty-line" id="L126"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>                    lineBytesRef.bytes[linePos++] = (<span class="hljs-type">byte</span>) (nextByte &amp; <span class="hljs-number">0xFF</span>);
+                } <span class="hljs-keyword">else</span> {</pre></div>
         
-        <li id="section-10">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-10">&#x00a7;</a>
-              </div>
-              <p>Finished the current line. We set the length to the current position.</p>
+      
+        
+        <p>Finished the current line. We set the length to the current position.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 127;"><span class="line" id="L127"><span style="color: #24292EFF">                    </span><span style="color: #1976D2">lineBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">length</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> linePos;</span></span>
-<span class="line empty-line" id="L128"></span>
-<span class="line empty-line" id="L129"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>                    lineBytesRef.length = linePos;</pre></div>
         
-        <li id="section-11">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-11">&#x00a7;</a>
-              </div>
-              <p>In the following method call, <code>wordsBytesRef</code> is just used as a reusable scratch variable
+      
+        
+        <p>In the following method call, <code>wordsBytesRef</code> is just used as a reusable scratch variable
 that lets us filter over a subset of <code>lineBytesRef</code>.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 131;"><span class="line" id="L131"><span style="color: #24292EFF">                    </span><span style="color: #6F42C1">outputWords(lineBytesRef</span><span style="color: #212121">,</span><span style="color: #6F42C1"> wordBytesRef)</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L132"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>                    outputWords(lineBytesRef, wordBytesRef);</pre></div>
         
-        <li id="section-12">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-12">&#x00a7;</a>
-              </div>
-              <p>Reset linePos in preparation for the next line.</p>
+      
+        
+        <p>Reset linePos in preparation for the next line.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 133;"><span class="line" id="L133"><span style="color: #24292EFF">                    linePos </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L134"><span style="color: #24292EFF">                }</span></span>
-<span class="line" id="L135"><span style="color: #24292EFF">            }</span></span>
-<span class="line" id="L136"><span style="color: #24292EFF">        } </span><span style="color: #D32F2F">finally</span><span style="color: #24292EFF"> {</span></span>
-<span class="line empty-line" id="L137"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>                    linePos = <span class="hljs-number">0</span>;
+                }
+            }
+        } <span class="hljs-keyword">finally</span> {</pre></div>
         
-        <li id="section-13">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-13">&#x00a7;</a>
-              </div>
-              <p>Clean up the file when we’re done.</p>
+      
+        
+        <p>Clean up the file when we’re done.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 138;"><span class="line" id="L138"><span style="color: #24292EFF">            </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">deleteIfExists</span><span style="color: #24292EFF">(textFile);</span></span>
-<span class="line" id="L139"><span style="color: #24292EFF">        }</span></span>
-<span class="line" id="L140"><span style="color: #24292EFF">    }</span></span>
-<span class="line empty-line" id="L141"></span>
-<span class="line empty-line" id="L142"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>            Files.deleteIfExists(textFile);
+        }
+    }</pre></div>
         
-        <li id="section-14">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-14">&#x00a7;</a>
-              </div>
-              <p>The following helper method uses <code>wordsBytesRef</code> as a window over <code>lineBytesRef</code>. They share the same underlying
+      
+        
+        <p>The following helper method uses <code>wordsBytesRef</code> as a window over <code>lineBytesRef</code>. They share the same underlying
 byte array, but <code>wordsBytesRef</code> is updated to point to the starting offset and length of each word.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 144;"><span class="line" id="L144"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">outputWords(</span><span style="color: #D32F2F">BytesRef</span><span style="color: #6F42C1"> lineBytesRef</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">BytesRef</span><span style="color: #6F42C1"> wordBytesRef)</span><span style="color: #24292EFF"> {</span></span>
-<span class="line" id="L145"><span style="color: #24292EFF">        </span><span style="color: #1976D2">wordBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">offset</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">lineBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">offset</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L146"><span style="color: #24292EFF">        </span><span style="color: #1976D2">wordBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">bytes</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">lineBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">bytes</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L147"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">lineBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">offset</span><span style="color: #24292EFF">; i </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">lineBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">offset</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">lineBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">length</span><span style="color: #24292EFF">; </span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">i) {</span></span>
-<span class="line" id="L148"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (</span><span style="color: #1976D2">Character</span><span style="color: #212121">.</span><span style="color: #6F42C1">isWhitespace</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">wordBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">bytes</span><span style="color: #24292EFF">[i])) {</span></span>
-<span class="line empty-line" id="L149"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">outputWords</span><span class="hljs-params">(BytesRef lineBytesRef, BytesRef wordBytesRef)</span> {
+        wordBytesRef.offset = lineBytesRef.offset;
+        wordBytesRef.bytes = lineBytesRef.bytes;
+        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> lineBytesRef.offset; i &lt; lineBytesRef.offset + lineBytesRef.length; ++i) {
+            <span class="hljs-keyword">if</span> (Character.isWhitespace(wordBytesRef.bytes[i])) {</pre></div>
         
-        <li id="section-15">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-15">&#x00a7;</a>
-              </div>
-              <p>Reached the end of a word. Update the length of the word, then output it.</p>
+      
+        
+        <p>Reached the end of a word. Update the length of the word, then output it.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 150;"><span class="line" id="L150"><span style="color: #24292EFF">                </span><span style="color: #1976D2">wordBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">length</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">-</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">wordBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">offset</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L151"><span style="color: #24292EFF">                </span><span style="color: #6F42C1">outputWord(wordBytesRef)</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L152"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>                wordBytesRef.length = i - wordBytesRef.offset;
+                outputWord(wordBytesRef);</pre></div>
         
-        <li id="section-16">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-16">&#x00a7;</a>
-              </div>
-              <p>Update the word offset in preparation for the next word.</p>
+      
+        
+        <p>Update the word offset in preparation for the next word.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 153;"><span class="line" id="L153"><span style="color: #24292EFF">                </span><span style="color: #1976D2">wordBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">offset</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">1</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L154"><span style="color: #24292EFF">            }</span></span>
-<span class="line" id="L155"><span style="color: #24292EFF">        }</span></span>
-<span class="line empty-line" id="L156"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>                wordBytesRef.offset = i + <span class="hljs-number">1</span>;
+            }
+        }</pre></div>
         
-        <li id="section-17">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-17">&#x00a7;</a>
-              </div>
-              <p>Output the last word from each line.</p>
+      
+        
+        <p>Output the last word from each line.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 157;"><span class="line" id="L157"><span style="color: #24292EFF">        </span><span style="color: #1976D2">wordBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">length</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">lineBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">length</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">lineBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">offset</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">-</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">wordBytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">offset</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L158"><span style="color: #24292EFF">        </span><span style="color: #6F42C1">outputWord(wordBytesRef)</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L159"><span style="color: #24292EFF">    }</span></span>
-<span class="line empty-line" id="L160"></span>
-<span class="line" id="L161"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">outputWord(</span><span style="color: #D32F2F">BytesRef</span><span style="color: #6F42C1"> bytesRef)</span><span style="color: #24292EFF"> {</span></span>
-<span class="line empty-line" id="L162"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>        wordBytesRef.length = lineBytesRef.length + lineBytesRef.offset - wordBytesRef.offset;
+        outputWord(wordBytesRef);
+    }
+
+    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">outputWord</span><span class="hljs-params">(BytesRef bytesRef)</span> {</pre></div>
         
-        <li id="section-18">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-18">&#x00a7;</a>
-              </div>
-              <p>Output each word character-by-character.</p>
+      
+        
+        <p>Output each word character-by-character.</p>
 <p>Note that because the input above contains some UTF-8 multi-byte characters, we have three branches to
 handle 1-, 2-, and 3-byte characters. This logic is lifted from Lucene’s <code>UnicodeUtil#UTF8toUTF16</code> method,
 which is conveniently called from <code>BytesRef#utf8ToString</code>. (I skipped the 4-byte branch, since it’s
@@ -514,49 +386,37 @@ complicated and not needed for this specific example.)</p>
 <p>In this case, I didn’t want to use <code>BytesRef#utf8ToString</code>, since the goal of this example is to avoid
 allocating any unnecessary extra objects, including the <code>String</code> objects returned by that method.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 171;"><span class="line" id="L171"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">bytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">offset</span><span style="color: #24292EFF">; i </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">bytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">offset</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">bytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">length</span><span style="color: #24292EFF">; </span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">i) {</span></span>
-<span class="line" id="L172"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> b </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">bytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">bytes</span><span style="color: #24292EFF">[i] </span><span style="color: #D32F2F">&amp;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0xff</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L173"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (b </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0xc0</span><span style="color: #24292EFF">) {</span></span>
-<span class="line" id="L174"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">assert</span><span style="color: #24292EFF"> b </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0x80</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L175"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">print</span><span style="color: #24292EFF">((</span><span style="color: #D32F2F">char</span><span style="color: #24292EFF">) b);</span></span>
-<span class="line" id="L176"><span style="color: #24292EFF">            } </span><span style="color: #D32F2F">else</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (b </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0xe0</span><span style="color: #24292EFF">) {</span></span>
-<span class="line" id="L177"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">char</span><span style="color: #24292EFF"> c  </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">char</span><span style="color: #24292EFF">) (((b </span><span style="color: #D32F2F">&amp;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0x1f</span><span style="color: #24292EFF">) </span><span style="color: #D32F2F">&lt;&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">6</span><span style="color: #24292EFF">) </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> (</span><span style="color: #1976D2">bytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">bytes</span><span style="color: #24292EFF">[</span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">i] </span><span style="color: #D32F2F">&amp;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0x3f</span><span style="color: #24292EFF">));</span></span>
-<span class="line" id="L178"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">print</span><span style="color: #24292EFF">(c);</span></span>
-<span class="line" id="L179"><span style="color: #24292EFF">            } </span><span style="color: #D32F2F">else</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (b </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0xf0</span><span style="color: #24292EFF">) {</span></span>
-<span class="line" id="L180"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">char</span><span style="color: #24292EFF"> c </span><span style="color: #D32F2F">=</span></span>
-<span class="line" id="L181"><span style="color: #24292EFF">                        (</span><span style="color: #D32F2F">char</span><span style="color: #24292EFF">) (((b </span><span style="color: #D32F2F">&amp;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0xf</span><span style="color: #24292EFF">) </span><span style="color: #D32F2F">&lt;&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">12</span><span style="color: #24292EFF">) </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> ((</span><span style="color: #1976D2">bytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">bytes</span><span style="color: #24292EFF">[i</span><span style="color: #D32F2F">+</span><span style="color: #1976D2">1</span><span style="color: #24292EFF">] </span><span style="color: #D32F2F">&amp;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0x3f</span><span style="color: #24292EFF">) </span><span style="color: #D32F2F">&lt;&lt;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">6</span><span style="color: #24292EFF">) </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> (</span><span style="color: #1976D2">bytesRef</span><span style="color: #212121">.</span><span style="color: #1976D2">bytes</span><span style="color: #24292EFF">[i </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">2</span><span style="color: #24292EFF">] </span><span style="color: #D32F2F">&amp;</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0x3f</span><span style="color: #24292EFF">));</span></span>
-<span class="line" id="L182"><span style="color: #24292EFF">                i </span><span style="color: #D32F2F">+=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">2</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L183"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">print</span><span style="color: #24292EFF">(c);</span></span>
-<span class="line" id="L184"><span style="color: #24292EFF">            } </span><span style="color: #D32F2F">else</span><span style="color: #24292EFF"> {</span></span>
-<span class="line" id="L185"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">throw</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IllegalArgumentException()</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L186"><span style="color: #24292EFF">            }</span></span>
-<span class="line" id="L187"><span style="color: #24292EFF">        }</span></span>
-<span class="line empty-line" id="L188"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> bytesRef.offset; i &lt; bytesRef.offset + bytesRef.length; ++i) {
+            <span class="hljs-type">int</span> <span class="hljs-variable">b</span> <span class="hljs-operator">=</span> bytesRef.bytes[i] &amp; <span class="hljs-number">0xff</span>;
+            <span class="hljs-keyword">if</span> (b &lt; <span class="hljs-number">0xc0</span>) {
+                <span class="hljs-keyword">assert</span> b &lt; <span class="hljs-number">0x80</span>;
+                System.out.print((<span class="hljs-type">char</span>) b);
+            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (b &lt; <span class="hljs-number">0xe0</span>) {
+                <span class="hljs-type">char</span> <span class="hljs-variable">c</span>  <span class="hljs-operator">=</span> (<span class="hljs-type">char</span>) (((b &amp; <span class="hljs-number">0x1f</span>) &lt;&lt; <span class="hljs-number">6</span>) + (bytesRef.bytes[++i] &amp; <span class="hljs-number">0x3f</span>));
+                System.out.print(c);
+            } <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (b &lt; <span class="hljs-number">0xf0</span>) {
+                <span class="hljs-type">char</span> <span class="hljs-variable">c</span> <span class="hljs-operator">=</span>
+                        (<span class="hljs-type">char</span>) (((b &amp; <span class="hljs-number">0xf</span>) &lt;&lt; <span class="hljs-number">12</span>) + ((bytesRef.bytes[i+<span class="hljs-number">1</span>] &amp; <span class="hljs-number">0x3f</span>) &lt;&lt; <span class="hljs-number">6</span>) + (bytesRef.bytes[i + <span class="hljs-number">2</span>] &amp; <span class="hljs-number">0x3f</span>));
+                i += <span class="hljs-number">2</span>;
+                System.out.print(c);
+            } <span class="hljs-keyword">else</span> {
+                <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IllegalArgumentException</span>();
+            }
+        }</pre></div>
         
-        <li id="section-19">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-19">&#x00a7;</a>
-              </div>
-              <p>Add a newline between words.</p>
+      
+        
+        <p>Add a newline between words.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 189;"><span class="line" id="L189"><span style="color: #24292EFF">        </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">();</span></span>
-<span class="line" id="L190"><span style="color: #24292EFF">    }</span></span>
-<span class="line" id="L191"><span style="color: #24292EFF">}</span></span>
-<span class="line empty-line" id="L192"></span>
-<span class="line empty-line" id="L193"></span></code></pre></div>
-            
-        </li>
         
-    </ul>
+          <div class='highlight'><pre>        System.out.println();
+    }
+}</pre></div>
+        
+      
+      <div class="fleur">h</div>
+    </div>
   </div>
 </body>
 </html>

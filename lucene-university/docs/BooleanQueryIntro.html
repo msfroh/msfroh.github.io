@@ -4,117 +4,18 @@
 <head>
   <title>Boolean query introduction</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
   <link rel="stylesheet" media="all" href="docco.css" />
 </head>
 <body>
-  <div id="container">
-    <div id="background"></div>
-    
-      <ul id="jump_to">
-        <li>
-          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
-          <a class="small" href="javascript:void(0);">+</a>
-          <div id="jump_wrapper">
-          <div id="jump_page_wrapper">
-            <div id="jump_page">
-              
-                
-                <a class="source" href="AnalyzerBasics.html">
-                  AnalyzerBasics.java
-                </a>
-              
-                
-                <a class="source" href="BooleanQueryANDInternals.html">
-                  BooleanQueryANDInternals.java
-                </a>
-              
-                
-                <a class="source" href="BooleanQueryIntro.html">
-                  BooleanQueryIntro.java
-                </a>
-              
-                
-                <a class="source" href="BottomUpIndexReader.html">
-                  BottomUpIndexReader.java
-                </a>
-              
-                
-                <a class="source" href="BytesRefHashExample.html">
-                  BytesRefHashExample.java
-                </a>
-              
-                
-                <a class="source" href="CombinedFieldQueryExample.html">
-                  CombinedFieldQueryExample.java
-                </a>
-              
-                
-                <a class="source" href="DirectoryFileContents.html">
-                  DirectoryFileContents.java
-                </a>
-              
-                
-                <a class="source" href="DocValuesSearchExample.html">
-                  DocValuesSearchExample.java
-                </a>
-              
-                
-                <a class="source" href="FunctionQuerySearchExample.html">
-                  FunctionQuerySearchExample.java
-                </a>
-              
-                
-                <a class="source" href="KnnSearchExample.html">
-                  KnnSearchExample.java
-                </a>
-              
-                
-                <a class="source" href="PointTreeRangeQuery.html">
-                  PointTreeRangeQuery.java
-                </a>
-              
-                
-                <a class="source" href="PrimitivesRef.html">
-                  PrimitivesRef.java
-                </a>
-              
-                
-                <a class="source" href="SearchWithTermsEnum.html">
-                  SearchWithTermsEnum.java
-                </a>
-              
-                
-                <a class="source" href="SimpleSearch.html">
-                  SimpleSearch.java
-                </a>
-              
-                
-                <a class="source" href="TextVectorSearchExample.html">
-                  TextVectorSearchExample.java
-                </a>
-              
-                
-                <a class="source" href="VisualizePointTree.html">
-                  VisualizePointTree.java
-                </a>
-              
-            </div>
-          </div>
-        </li>
-      </ul>
-    
-    <ul class="sections">
+  <div class="container">
+    <div class="page">
+
+      <div class="header">
         
-        
-        
-        <li id="section-1">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-1">&#x00a7;</a>
-              </div>
-              <p>While term queries are the basic build block for searching indexed text, Boolean queries are the most common way
+          
+          <h1 id="boolean-query-introduction">Boolean query introduction</h1>
+<p>While term queries are the basic build block for searching indexed text, Boolean queries are the most common way
 to combine multiple smaller queries to implement more complex matching logic. Though the implementing class is
 called <code>BooleanQuery</code>, they don’t implement true Boolean logical operators (binary AND, binary OR, unary NOT).
 Instead, Lucene’s Boolean queries use four unary operators:</p>
@@ -135,116 +36,204 @@ documents with the color red, etc.</li>
 scores, but change the returned results.</li>
 </ol>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 23;"><span class="line" id="L23"><span style="color: #D32F2F">package</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">basic</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L24"></span>
-<span class="line" id="L25"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">Field</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L26"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">TextField</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L27"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">DirectoryReader</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L28"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexReader</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L29"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexWriter</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L30"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexWriterConfig</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L31"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">LeafReaderContext</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L32"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">Term</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L33"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">BooleanClause</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L34"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">BooleanQuery</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L35"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">DocIdSetIterator</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L36"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexSearcher</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L37"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">Query</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L38"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">ScoreMode</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L39"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">Scorer</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L40"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">TermQuery</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L41"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">Weight</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L42"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">similarities</span><span style="color: #212121">.</span><span style="color: #D32F2F">BasicStats</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L43"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">similarities</span><span style="color: #212121">.</span><span style="color: #D32F2F">SimilarityBase</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L44"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">store</span><span style="color: #212121">.</span><span style="color: #D32F2F">Directory</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L45"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">store</span><span style="color: #212121">.</span><span style="color: #D32F2F">FSDirectory</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L46"></span>
-<span class="line" id="L47"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">io</span><span style="color: #212121">.</span><span style="color: #D32F2F">IOException</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L48"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">nio</span><span style="color: #212121">.</span><span style="color: #D32F2F">file</span><span style="color: #212121">.</span><span style="color: #D32F2F">Files</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L49"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">nio</span><span style="color: #212121">.</span><span style="color: #D32F2F">file</span><span style="color: #212121">.</span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L50"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">ArrayList</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L51"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L52"></span>
-<span class="line" id="L53"><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BooleanQueryIntro</span><span style="color: #24292EFF"> {</span></span>
-<span class="line empty-line" id="L54"></span></code></pre></div>
-            
-        </li>
-        
-        
-        <li id="section-2">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-2">&#x00a7;</a>
-              </div>
-              <h2 id="document-construction">Document construction</h2>
+          
+            <div class='highlight'><pre><span class="hljs-keyword">package</span> example.basic;
 
-            </div>
-            
-        </li>
+<span class="hljs-keyword">import</span> org.apache.lucene.document.Field;
+<span class="hljs-keyword">import</span> org.apache.lucene.document.TextField;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.DirectoryReader;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexReader;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexWriter;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexWriterConfig;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.LeafReaderContext;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.Term;
+<span class="hljs-keyword">import</span> org.apache.lucene.search.BooleanClause;
+<span class="hljs-keyword">import</span> org.apache.lucene.search.BooleanQuery;
+<span class="hljs-keyword">import</span> org.apache.lucene.search.DocIdSetIterator;
+<span class="hljs-keyword">import</span> org.apache.lucene.search.IndexSearcher;
+<span class="hljs-keyword">import</span> org.apache.lucene.search.Query;
+<span class="hljs-keyword">import</span> org.apache.lucene.search.ScoreMode;
+<span class="hljs-keyword">import</span> org.apache.lucene.search.Scorer;
+<span class="hljs-keyword">import</span> org.apache.lucene.search.TermQuery;
+<span class="hljs-keyword">import</span> org.apache.lucene.search.Weight;
+<span class="hljs-keyword">import</span> org.apache.lucene.search.similarities.BasicStats;
+<span class="hljs-keyword">import</span> org.apache.lucene.search.similarities.SimilarityBase;
+<span class="hljs-keyword">import</span> org.apache.lucene.store.Directory;
+<span class="hljs-keyword">import</span> org.apache.lucene.store.FSDirectory;
+
+<span class="hljs-keyword">import</span> java.io.IOException;
+<span class="hljs-keyword">import</span> java.nio.file.Files;
+<span class="hljs-keyword">import</span> java.nio.file.Path;
+<span class="hljs-keyword">import</span> java.util.ArrayList;
+<span class="hljs-keyword">import</span> java.util.List;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">BooleanQueryIntro</span> {</pre></div>
+          
         
+
         
-        <li id="section-3">
-            <div class="annotation">
+          <div class="toc">
+            <h3>Table of Contents</h3>
+            <ol>
               
-              <div class="sswrap ">
-                <a class="ss" href="#section-3">&#x00a7;</a>
-              </div>
-              <p>We will create some text documents containing the prime divisors (less than ten) of their doc IDs (and <code>one</code>).
+                
+                <li>
+                  <a class="source" href="AnalyzerBasics.html">
+                    AnalyzerBasics.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BooleanQueryANDInternals.html">
+                    BooleanQueryANDInternals.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BooleanQueryIntro.html">
+                    BooleanQueryIntro.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BottomUpIndexReader.html">
+                    BottomUpIndexReader.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BytesRefHashExample.html">
+                    BytesRefHashExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="CombinedFieldQueryExample.html">
+                    CombinedFieldQueryExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DirectoryFileContents.html">
+                    DirectoryFileContents.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DocValuesSearchExample.html">
+                    DocValuesSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="FiniteStateTransducers.html">
+                    FiniteStateTransducers.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="FunctionQuerySearchExample.html">
+                    FunctionQuerySearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="KnnSearchExample.html">
+                    KnnSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="PointTreeRangeQuery.html">
+                    PointTreeRangeQuery.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="PrimitivesRef.html">
+                    PrimitivesRef.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SearchWithTermsEnum.html">
+                    SearchWithTermsEnum.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SimpleSearch.html">
+                    SimpleSearch.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="TextVectorSearchExample.html">
+                    TextVectorSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="VisualizePointTree.html">
+                    VisualizePointTree.java
+                  </a>
+                </li>
+              
+            </ol>
+          </div>
+        
+      </div>
+
+      
+        
+        <h2 id="document-construction">Document construction</h2>
+<p>We will create some text documents containing the prime divisors (less than ten) of their doc IDs (and <code>one</code>).
 That is, the document with ID 30 will contain “one two three five”.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 58;"><span class="line" id="L58"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">List&lt;</span><span style="color: #24292EFF">String</span><span style="color: #D32F2F">&gt;</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createDocumentText(</span><span style="color: #D32F2F">int</span><span style="color: #6F42C1"> numDocs)</span><span style="color: #24292EFF"> {</span></span>
-<span class="line" id="L59"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF">&gt; docs </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">ArrayList</span><span style="color: #24292EFF">&lt;&gt;();</span></span>
-<span class="line" id="L60"><span style="color: #24292EFF">        </span><span style="color: #1976D2">docs</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;zero&quot;</span><span style="color: #24292EFF">); </span><span style="color: #C2C3C5">/* First doc will just have &quot;zero&quot;, since the first doc ID is 0 */</span></span>
-<span class="line" id="L61"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> i </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">1</span><span style="color: #24292EFF">; i </span><span style="color: #D32F2F">&lt;</span><span style="color: #24292EFF"> numDocs; i</span><span style="color: #D32F2F">++</span><span style="color: #24292EFF">) {</span></span>
-<span class="line" id="L62"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">StringBuilder</span><span style="color: #24292EFF"> sb </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">StringBuilder()</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L63"><span style="color: #24292EFF">            </span><span style="color: #1976D2">sb</span><span style="color: #212121">.</span><span style="color: #6F42C1">append</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;one&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L64"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (i </span><span style="color: #D32F2F">%</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">2</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">==</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">) {</span></span>
-<span class="line" id="L65"><span style="color: #24292EFF">                </span><span style="color: #1976D2">sb</span><span style="color: #212121">.</span><span style="color: #6F42C1">append</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot; two&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L66"><span style="color: #24292EFF">            }</span></span>
-<span class="line" id="L67"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (i </span><span style="color: #D32F2F">%</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">3</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">==</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">) {</span></span>
-<span class="line" id="L68"><span style="color: #24292EFF">                </span><span style="color: #1976D2">sb</span><span style="color: #212121">.</span><span style="color: #6F42C1">append</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot; three&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L69"><span style="color: #24292EFF">            }</span></span>
-<span class="line" id="L70"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (i </span><span style="color: #D32F2F">%</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">5</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">==</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">) {</span></span>
-<span class="line" id="L71"><span style="color: #24292EFF">                </span><span style="color: #1976D2">sb</span><span style="color: #212121">.</span><span style="color: #6F42C1">append</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot; five&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L72"><span style="color: #24292EFF">            }</span></span>
-<span class="line" id="L73"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (i </span><span style="color: #D32F2F">%</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">7</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">==</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">0</span><span style="color: #24292EFF">) {</span></span>
-<span class="line" id="L74"><span style="color: #24292EFF">                </span><span style="color: #1976D2">sb</span><span style="color: #212121">.</span><span style="color: #6F42C1">append</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot; seven&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L75"><span style="color: #24292EFF">            }</span></span>
-<span class="line" id="L76"><span style="color: #24292EFF">            </span><span style="color: #1976D2">docs</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">sb</span><span style="color: #212121">.</span><span style="color: #6F42C1">toString</span><span style="color: #24292EFF">());</span></span>
-<span class="line" id="L77"><span style="color: #24292EFF">        }</span></span>
-<span class="line" id="L78"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> docs;</span></span>
-<span class="line" id="L79"><span style="color: #24292EFF">    }</span></span>
-<span class="line empty-line" id="L80"></span>
-<span class="line empty-line" id="L81"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> List&lt;String&gt; <span class="hljs-title function_">createDocumentText</span><span class="hljs-params">(<span class="hljs-type">int</span> numDocs)</span> {
+        List&lt;String&gt; docs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+        docs.add(<span class="hljs-string">&quot;zero&quot;</span>); <span class="hljs-comment">/* First doc will just have &quot;zero&quot;, since the first doc ID is 0 */</span>
+        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">1</span>; i &lt; numDocs; i++) {
+            <span class="hljs-type">StringBuilder</span> <span class="hljs-variable">sb</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuilder</span>();
+            sb.append(<span class="hljs-string">&quot;one&quot;</span>);
+            <span class="hljs-keyword">if</span> (i % <span class="hljs-number">2</span> == <span class="hljs-number">0</span>) {
+                sb.append(<span class="hljs-string">&quot; two&quot;</span>);
+            }
+            <span class="hljs-keyword">if</span> (i % <span class="hljs-number">3</span> == <span class="hljs-number">0</span>) {
+                sb.append(<span class="hljs-string">&quot; three&quot;</span>);
+            }
+            <span class="hljs-keyword">if</span> (i % <span class="hljs-number">5</span> == <span class="hljs-number">0</span>) {
+                sb.append(<span class="hljs-string">&quot; five&quot;</span>);
+            }
+            <span class="hljs-keyword">if</span> (i % <span class="hljs-number">7</span> == <span class="hljs-number">0</span>) {
+                sb.append(<span class="hljs-string">&quot; seven&quot;</span>);
+            }
+            docs.add(sb.toString());
+        }
+        <span class="hljs-keyword">return</span> docs;
+    }</pre></div>
         
-        <li id="section-4">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-4">&#x00a7;</a>
-              </div>
-              <h2 id="simplifying-scores">Simplifying scores</h2>
-
-            </div>
-            
-        </li>
+      
         
-        
-        <li id="section-5">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-5">&#x00a7;</a>
-              </div>
-              <p>When I first tried writing this example, the scores were values like 0.9077946 and 0.7806307, because they were
+        <h2 id="simplifying-scores">Simplifying scores</h2>
+<p>When I first tried writing this example, the scores were values like 0.9077946 and 0.7806307, because they were
 using BM25 similarity, which has the following properties:</p>
 <ol>
 <li>A less common term (like “seven”) is worth more than a more common term (like “one”, which occurs in every
@@ -257,45 +246,23 @@ term is added to a document once).</li>
 scoring clause is given a score of 1. The score of a document will correspond to the number of matching scoring
 clauses. Note that “scoring clauses” are MUST or SHOULD.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 96;"><span class="line" id="L96"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">CountMatchingClauseSimilarity</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">extends</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">SimilarityBase</span><span style="color: #24292EFF"> {</span></span>
-<span class="line" id="L97"><span style="color: #24292EFF">        @</span><span style="color: #D32F2F">Override</span></span>
-<span class="line" id="L98"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">protected</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">double</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">score</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">BasicStats</span><span style="color: #24292EFF"> stats</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">double</span><span style="color: #24292EFF"> freq</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">double</span><span style="color: #24292EFF"> docLen) {</span></span>
-<span class="line" id="L99"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">1</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L100"><span style="color: #24292EFF">        }</span></span>
-<span class="line empty-line" id="L101"></span>
-<span class="line" id="L102"><span style="color: #24292EFF">        @</span><span style="color: #D32F2F">Override</span></span>
-<span class="line" id="L103"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">toString</span><span style="color: #24292EFF">() {</span></span>
-<span class="line" id="L104"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;Everything is 1&quot;</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L105"><span style="color: #24292EFF">        }</span></span>
-<span class="line" id="L106"><span style="color: #24292EFF">    }</span></span>
-<span class="line empty-line" id="L107"></span>
-<span class="line empty-line" id="L108"></span></code></pre></div>
-            
-        </li>
         
-        
-        <li id="section-6">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-6">&#x00a7;</a>
-              </div>
-              <h2 id="output-helper">Output helper</h2>
+          <div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">CountMatchingClauseSimilarity</span> <span class="hljs-keyword">extends</span> <span class="hljs-title class_">SimilarityBase</span> {
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-keyword">protected</span> <span class="hljs-type">double</span> <span class="hljs-title function_">score</span><span class="hljs-params">(BasicStats stats, <span class="hljs-type">double</span> freq, <span class="hljs-type">double</span> docLen)</span> {
+            <span class="hljs-keyword">return</span> <span class="hljs-number">1</span>;
+        }
 
-            </div>
-            
-        </li>
+        <span class="hljs-meta">@Override</span>
+        <span class="hljs-keyword">public</span> String <span class="hljs-title function_">toString</span><span class="hljs-params">()</span> {
+            <span class="hljs-keyword">return</span> <span class="hljs-string">&quot;Everything is 1&quot;</span>;
+        }
+    }</pre></div>
         
+      
         
-        <li id="section-7">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-7">&#x00a7;</a>
-              </div>
-              <p>We’re going to run a bunch of queries and output documents and scores. While we could use <code>searcher.search(...)</code>,
+        <h2 id="output-helper">Output helper</h2>
+<p>We’re going to run a bunch of queries and output documents and scores. While we could use <code>searcher.search(...)</code>,
 that will (by default) sort the documents by descending score. In this example, I believe it’s clearer if we
 see the matching documents ordered by their doc IDs, which have the divisors that we listed above.</p>
 <p>This also provides an opportunity to explain some of what happens under the hood when you call <code>search</code>.</p>
@@ -307,306 +274,149 @@ also based on the <code>ScoreMode</code> passed in.</p>
 a <code>DocIdSetIterator</code>, which is able to iterator over the IDs of the documents in the segment that match the
 query. The <code>Scorer</code> also has a <code>score()</code> method that returns the score of the current document.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 125;"><span class="line" id="L125"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">outputSearchResultsAndScores(</span><span style="color: #D32F2F">IndexSearcher</span><span style="color: #6F42C1"> searcher</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">Query</span><span style="color: #6F42C1"> query)</span><span style="color: #24292EFF"> throws IOException {</span></span>
-<span class="line" id="L126"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Weight</span><span style="color: #24292EFF"> weight </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">searcher</span><span style="color: #212121">.</span><span style="color: #6F42C1">createWeight</span><span style="color: #24292EFF">(query</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">ScoreMode</span><span style="color: #212121">.</span><span style="color: #1976D2">COMPLETE</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">1.0f</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L127"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">LeafReaderContext</span><span style="color: #24292EFF"> lrc </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">searcher</span><span style="color: #212121">.</span><span style="color: #6F42C1">getIndexReader</span><span style="color: #24292EFF">()</span><span style="color: #212121">.</span><span style="color: #6F42C1">leaves</span><span style="color: #24292EFF">()) {</span></span>
-<span class="line" id="L128"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">Scorer</span><span style="color: #24292EFF"> scorer </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">weight</span><span style="color: #212121">.</span><span style="color: #6F42C1">scorer</span><span style="color: #24292EFF">(lrc);</span></span>
-<span class="line" id="L129"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">DocIdSetIterator</span><span style="color: #24292EFF"> docIdSetIterator </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">scorer</span><span style="color: #212121">.</span><span style="color: #6F42C1">iterator</span><span style="color: #24292EFF">();</span></span>
-<span class="line" id="L130"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> docId;</span></span>
-<span class="line" id="L131"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">while</span><span style="color: #24292EFF"> ((docId </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">docIdSetIterator</span><span style="color: #212121">.</span><span style="color: #6F42C1">nextDoc</span><span style="color: #24292EFF">()) </span><span style="color: #D32F2F">!=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">DocIdSetIterator</span><span style="color: #212121">.</span><span style="color: #1976D2">NO_MORE_DOCS</span><span style="color: #24292EFF">) {</span></span>
-<span class="line" id="L132"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(docId </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">scorer</span><span style="color: #212121">.</span><span style="color: #6F42C1">score</span><span style="color: #24292EFF">());</span></span>
-<span class="line" id="L133"><span style="color: #24292EFF">            }</span></span>
-<span class="line" id="L134"><span style="color: #24292EFF">        }</span></span>
-<span class="line" id="L135"><span style="color: #24292EFF">    }</span></span>
-<span class="line empty-line" id="L136"></span>
-<span class="line empty-line" id="L137"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">outputSearchResultsAndScores</span><span class="hljs-params">(IndexSearcher searcher, Query query)</span> <span class="hljs-keyword">throws</span> IOException {
+        <span class="hljs-type">Weight</span> <span class="hljs-variable">weight</span> <span class="hljs-operator">=</span> searcher.createWeight(query, ScoreMode.COMPLETE, <span class="hljs-number">1.0f</span>);
+        <span class="hljs-keyword">for</span> (LeafReaderContext lrc : searcher.getIndexReader().leaves()) {
+            <span class="hljs-type">Scorer</span> <span class="hljs-variable">scorer</span> <span class="hljs-operator">=</span> weight.scorer(lrc);
+            <span class="hljs-type">DocIdSetIterator</span> <span class="hljs-variable">docIdSetIterator</span> <span class="hljs-operator">=</span> scorer.iterator();
+            <span class="hljs-type">int</span> docId;
+            <span class="hljs-keyword">while</span> ((docId = docIdSetIterator.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS) {
+                System.out.println(docId + <span class="hljs-string">&quot; &quot;</span> + scorer.score());
+            }
+        }
+    }</pre></div>
         
-        <li id="section-8">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-8">&#x00a7;</a>
-              </div>
-              <h2 id="boolean-query-examples">Boolean query examples</h2>
-
-            </div>
-            
-        </li>
+      
         
-        
-        <li id="section-9">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-9">&#x00a7;</a>
-              </div>
-              <p>Let’s use the helpers above to see how Boolean queries match and score documents. We create 1000 documents
+        <h2 id="boolean-query-examples">Boolean query examples</h2>
+<p>Let’s use the helpers above to see how Boolean queries match and score documents. We create 1000 documents
 (with doc IDs 0 through 999) and add them to an index. We also need to pass our custom <code>Similarity</code>
 implementation to the <code>IndexSearcher</code> to override the default BM25 similarity.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 142;"><span class="line" id="L142"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">main(</span><span style="color: #D32F2F">String</span><span style="color: #6F42C1">[] args)</span><span style="color: #24292EFF"> throws IOException {</span></span>
-<span class="line" id="L143"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF"> tmpDir </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">createTempDirectory</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">BooleanQueryIntro</span><span style="color: #212121">.</span><span style="color: #1976D2">class</span><span style="color: #212121">.</span><span style="color: #6F42C1">getSimpleName</span><span style="color: #24292EFF">());</span></span>
-<span class="line" id="L144"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">Directory</span><span style="color: #24292EFF"> directory </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(tmpDir);</span></span>
-<span class="line" id="L145"><span style="color: #24292EFF">             </span><span style="color: #D32F2F">IndexWriter</span><span style="color: #24292EFF"> writer </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexWriter(directory</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> IndexWriterConfig())</span><span style="color: #24292EFF">) {</span></span>
-<span class="line" id="L146"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> doc </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createDocumentText(</span><span style="color: #1976D2">1000</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">) {</span></span>
-<span class="line" id="L147"><span style="color: #24292EFF">                </span><span style="color: #1976D2">writer</span><span style="color: #212121">.</span><span style="color: #6F42C1">addDocument</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">List</span><span style="color: #212121">.</span><span style="color: #6F42C1">of</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TextField(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> doc</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">Field</span><span style="color: #212121">.</span><span style="color: #1976D2">Store</span><span style="color: #212121">.</span><span style="color: #1976D2">NO</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">));</span></span>
-<span class="line" id="L148"><span style="color: #24292EFF">            }</span></span>
-<span class="line empty-line" id="L149"></span>
-<span class="line" id="L150"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">IndexReader</span><span style="color: #24292EFF"> reader </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">DirectoryReader</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(writer)) {</span></span>
-<span class="line" id="L151"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">IndexSearcher</span><span style="color: #24292EFF"> searcher </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexSearcher(reader)</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L152"><span style="color: #24292EFF">                </span><span style="color: #1976D2">searcher</span><span style="color: #212121">.</span><span style="color: #6F42C1">setSimilarity</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">CountMatchingClauseSimilarity()</span><span style="color: #24292EFF">);</span></span>
-<span class="line empty-line" id="L153"></span>
-<span class="line empty-line" id="L154"></span></code></pre></div>
-            
-        </li>
         
-        
-        <li id="section-10">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-10">&#x00a7;</a>
-              </div>
-              <h3 id="pure-conjunction-and-queries">Pure conjunction (AND queries)</h3>
+          <div class='highlight'><pre>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> IOException {
+        <span class="hljs-type">Path</span> <span class="hljs-variable">tmpDir</span> <span class="hljs-operator">=</span> Files.createTempDirectory(BooleanQueryIntro.class.getSimpleName());
+        <span class="hljs-keyword">try</span> (<span class="hljs-type">Directory</span> <span class="hljs-variable">directory</span> <span class="hljs-operator">=</span> FSDirectory.open(tmpDir);
+             <span class="hljs-type">IndexWriter</span> <span class="hljs-variable">writer</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexWriter</span>(directory, <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexWriterConfig</span>())) {
+            <span class="hljs-keyword">for</span> (String doc : createDocumentText(<span class="hljs-number">1000</span>)) {
+                writer.addDocument(List.of(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TextField</span>(<span class="hljs-string">&quot;text&quot;</span>, doc, Field.Store.NO)));
+            }
 
-            </div>
-            
-        </li>
+            <span class="hljs-keyword">try</span> (<span class="hljs-type">IndexReader</span> <span class="hljs-variable">reader</span> <span class="hljs-operator">=</span> DirectoryReader.open(writer)) {
+                <span class="hljs-type">IndexSearcher</span> <span class="hljs-variable">searcher</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexSearcher</span>(reader);
+                searcher.setSimilarity(<span class="hljs-keyword">new</span> <span class="hljs-title class_">CountMatchingClauseSimilarity</span>());</pre></div>
         
+      
         
-        <li id="section-11">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-11">&#x00a7;</a>
-              </div>
-              <p>Let’s construct a query that matches all documents that are multiples of 2 and 5 (i.e. multiples
+        <h3 id="pure-conjunction-and-queries">Pure conjunction (AND queries)</h3>
+<p>Let’s construct a query that matches all documents that are multiples of 2 and 5 (i.e. multiples
 of 10). All matching documents will have score 2.0, because exactly two clauses match.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 159;"><span class="line" id="L159"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">BooleanQuery</span><span style="color: #24292EFF"> twoAndFive </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> BooleanQuery</span><span style="color: #212121">.</span><span style="color: #6F42C1">Builder</span><span style="color: #24292EFF">()</span></span>
-<span class="line" id="L160"><span style="color: #24292EFF">                        </span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;two&quot;</span><span style="color: #6F42C1">))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">MUST</span><span style="color: #24292EFF">)</span></span>
-<span class="line" id="L161"><span style="color: #24292EFF">                        </span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;five&quot;</span><span style="color: #6F42C1">))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">MUST</span><span style="color: #24292EFF">)</span></span>
-<span class="line" id="L162"><span style="color: #24292EFF">                        </span><span style="color: #212121">.</span><span style="color: #6F42C1">build</span><span style="color: #24292EFF">();</span></span>
-<span class="line" id="L163"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">twoAndFive</span><span style="color: #212121">.</span><span style="color: #6F42C1">toString</span><span style="color: #24292EFF">());</span></span>
-<span class="line" id="L164"><span style="color: #24292EFF">                </span><span style="color: #6F42C1">outputSearchResultsAndScores(searcher</span><span style="color: #212121">,</span><span style="color: #6F42C1"> twoAndFive)</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L165"></span>
-<span class="line empty-line" id="L166"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>                <span class="hljs-type">BooleanQuery</span> <span class="hljs-variable">twoAndFive</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">BooleanQuery</span>.Builder()
+                        .add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TermQuery</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Term</span>(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;two&quot;</span>)), BooleanClause.Occur.MUST)
+                        .add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TermQuery</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Term</span>(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;five&quot;</span>)), BooleanClause.Occur.MUST)
+                        .build();
+                System.out.println(twoAndFive.toString());
+                outputSearchResultsAndScores(searcher, twoAndFive);</pre></div>
         
-        <li id="section-12">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-12">&#x00a7;</a>
-              </div>
-              <h3 id="excluding-a-clause-not">Excluding a clause (NOT)</h3>
-
-            </div>
-            
-        </li>
+      
         
-        
-        <li id="section-13">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-13">&#x00a7;</a>
-              </div>
-              <p>Let’s repeat that experiment, but this time, we will exclude documents that are multiples of 3.
+        <h3 id="excluding-a-clause-not">Excluding a clause (NOT)</h3>
+<p>Let’s repeat that experiment, but this time, we will exclude documents that are multiples of 3.
 The returned documents will all still have score 2.0.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 171;"><span class="line" id="L171"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">BooleanQuery</span><span style="color: #24292EFF"> twoAndFiveNotThree </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> BooleanQuery</span><span style="color: #212121">.</span><span style="color: #6F42C1">Builder</span><span style="color: #24292EFF">()</span></span>
-<span class="line" id="L172"><span style="color: #24292EFF">                        </span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;two&quot;</span><span style="color: #6F42C1">))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">MUST</span><span style="color: #24292EFF">)</span></span>
-<span class="line" id="L173"><span style="color: #24292EFF">                        </span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;five&quot;</span><span style="color: #6F42C1">))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">MUST</span><span style="color: #24292EFF">)</span></span>
-<span class="line" id="L174"><span style="color: #24292EFF">                        </span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;three&quot;</span><span style="color: #6F42C1">))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">MUST_NOT</span><span style="color: #24292EFF">)</span></span>
-<span class="line" id="L175"><span style="color: #24292EFF">                        </span><span style="color: #212121">.</span><span style="color: #6F42C1">build</span><span style="color: #24292EFF">();</span></span>
-<span class="line" id="L176"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">twoAndFiveNotThree</span><span style="color: #212121">.</span><span style="color: #6F42C1">toString</span><span style="color: #24292EFF">());</span></span>
-<span class="line" id="L177"><span style="color: #24292EFF">                </span><span style="color: #6F42C1">outputSearchResultsAndScores(searcher</span><span style="color: #212121">,</span><span style="color: #6F42C1"> twoAndFiveNotThree)</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L178"></span>
-<span class="line empty-line" id="L179"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>                <span class="hljs-type">BooleanQuery</span> <span class="hljs-variable">twoAndFiveNotThree</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">BooleanQuery</span>.Builder()
+                        .add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TermQuery</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Term</span>(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;two&quot;</span>)), BooleanClause.Occur.MUST)
+                        .add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TermQuery</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Term</span>(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;five&quot;</span>)), BooleanClause.Occur.MUST)
+                        .add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TermQuery</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Term</span>(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;three&quot;</span>)), BooleanClause.Occur.MUST_NOT)
+                        .build();
+                System.out.println(twoAndFiveNotThree.toString());
+                outputSearchResultsAndScores(searcher, twoAndFiveNotThree);</pre></div>
         
-        <li id="section-14">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-14">&#x00a7;</a>
-              </div>
-              <h3 id="boosting-a-clause-should">Boosting a clause (SHOULD)</h3>
-
-            </div>
-            
-        </li>
+      
         
-        
-        <li id="section-15">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-15">&#x00a7;</a>
-              </div>
-              <p>We’ll do that again, but we will give a boost to documents that are multiples of 7. So, most
+        <h3 id="boosting-a-clause-should">Boosting a clause (SHOULD)</h3>
+<p>We’ll do that again, but we will give a boost to documents that are multiples of 7. So, most
 of the matches will have score 2.0, but 70, 140, 280, etc. will have score 3.0. (We skip 210 because
 it’s a multiple of 3.)</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 185;"><span class="line" id="L185"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">BooleanQuery</span><span style="color: #24292EFF"> twoAndFiveNotThreeMaybeSeven </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> BooleanQuery</span><span style="color: #212121">.</span><span style="color: #6F42C1">Builder</span><span style="color: #24292EFF">()</span></span>
-<span class="line" id="L186"><span style="color: #24292EFF">                        </span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;two&quot;</span><span style="color: #6F42C1">))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">MUST</span><span style="color: #24292EFF">)</span></span>
-<span class="line" id="L187"><span style="color: #24292EFF">                        </span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;five&quot;</span><span style="color: #6F42C1">))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">MUST</span><span style="color: #24292EFF">)</span></span>
-<span class="line" id="L188"><span style="color: #24292EFF">                        </span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;three&quot;</span><span style="color: #6F42C1">))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">MUST_NOT</span><span style="color: #24292EFF">)</span></span>
-<span class="line" id="L189"><span style="color: #24292EFF">                        </span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;seven&quot;</span><span style="color: #6F42C1">))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">SHOULD</span><span style="color: #24292EFF">)</span></span>
-<span class="line" id="L190"><span style="color: #24292EFF">                        </span><span style="color: #212121">.</span><span style="color: #6F42C1">build</span><span style="color: #24292EFF">();</span></span>
-<span class="line" id="L191"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">twoAndFiveNotThreeMaybeSeven</span><span style="color: #212121">.</span><span style="color: #6F42C1">toString</span><span style="color: #24292EFF">());</span></span>
-<span class="line" id="L192"><span style="color: #24292EFF">                </span><span style="color: #6F42C1">outputSearchResultsAndScores(searcher</span><span style="color: #212121">,</span><span style="color: #6F42C1"> twoAndFiveNotThreeMaybeSeven)</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L193"></span>
-<span class="line empty-line" id="L194"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>                <span class="hljs-type">BooleanQuery</span> <span class="hljs-variable">twoAndFiveNotThreeMaybeSeven</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">BooleanQuery</span>.Builder()
+                        .add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TermQuery</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Term</span>(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;two&quot;</span>)), BooleanClause.Occur.MUST)
+                        .add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TermQuery</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Term</span>(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;five&quot;</span>)), BooleanClause.Occur.MUST)
+                        .add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TermQuery</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Term</span>(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;three&quot;</span>)), BooleanClause.Occur.MUST_NOT)
+                        .add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TermQuery</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Term</span>(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;seven&quot;</span>)), BooleanClause.Occur.SHOULD)
+                        .build();
+                System.out.println(twoAndFiveNotThreeMaybeSeven.toString());
+                outputSearchResultsAndScores(searcher, twoAndFiveNotThreeMaybeSeven);</pre></div>
         
-        <li id="section-16">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-16">&#x00a7;</a>
-              </div>
-              <h3 id="filtering-without-scoring-filter">Filtering without scoring (FILTER)</h3>
-
-            </div>
-            
-        </li>
+      
         
-        
-        <li id="section-17">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-17">&#x00a7;</a>
-              </div>
-              <p>Let’s repeat that last example, but we’ll switch “five” from <code>MUST</code> to <code>FILTER</code>. Most clauses will
+        <h3 id="filtering-without-scoring-filter">Filtering without scoring (FILTER)</h3>
+<p>Let’s repeat that last example, but we’ll switch “five” from <code>MUST</code> to <code>FILTER</code>. Most clauses will
 now have score 1.0, but the multiples of 7 have score 2.0.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 199;"><span class="line" id="L199"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">BooleanQuery</span><span style="color: #24292EFF"> twoFilterFiveNotThreeMaybeSeven </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> BooleanQuery</span><span style="color: #212121">.</span><span style="color: #6F42C1">Builder</span><span style="color: #24292EFF">()</span></span>
-<span class="line" id="L200"><span style="color: #24292EFF">                        </span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;two&quot;</span><span style="color: #6F42C1">))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">MUST</span><span style="color: #24292EFF">)</span></span>
-<span class="line" id="L201"><span style="color: #24292EFF">                        </span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;five&quot;</span><span style="color: #6F42C1">))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">FILTER</span><span style="color: #24292EFF">)</span></span>
-<span class="line" id="L202"><span style="color: #24292EFF">                        </span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;three&quot;</span><span style="color: #6F42C1">))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">MUST_NOT</span><span style="color: #24292EFF">)</span></span>
-<span class="line" id="L203"><span style="color: #24292EFF">                        </span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;seven&quot;</span><span style="color: #6F42C1">))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">SHOULD</span><span style="color: #24292EFF">)</span></span>
-<span class="line" id="L204"><span style="color: #24292EFF">                        </span><span style="color: #212121">.</span><span style="color: #6F42C1">build</span><span style="color: #24292EFF">();</span></span>
-<span class="line" id="L205"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">twoFilterFiveNotThreeMaybeSeven</span><span style="color: #212121">.</span><span style="color: #6F42C1">toString</span><span style="color: #24292EFF">());</span></span>
-<span class="line" id="L206"><span style="color: #24292EFF">                </span><span style="color: #6F42C1">outputSearchResultsAndScores(searcher</span><span style="color: #212121">,</span><span style="color: #6F42C1"> twoFilterFiveNotThreeMaybeSeven)</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L207"></span>
-<span class="line empty-line" id="L208"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>                <span class="hljs-type">BooleanQuery</span> <span class="hljs-variable">twoFilterFiveNotThreeMaybeSeven</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">BooleanQuery</span>.Builder()
+                        .add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TermQuery</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Term</span>(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;two&quot;</span>)), BooleanClause.Occur.MUST)
+                        .add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TermQuery</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Term</span>(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;five&quot;</span>)), BooleanClause.Occur.FILTER)
+                        .add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TermQuery</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Term</span>(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;three&quot;</span>)), BooleanClause.Occur.MUST_NOT)
+                        .add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TermQuery</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Term</span>(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;seven&quot;</span>)), BooleanClause.Occur.SHOULD)
+                        .build();
+                System.out.println(twoFilterFiveNotThreeMaybeSeven.toString());
+                outputSearchResultsAndScores(searcher, twoFilterFiveNotThreeMaybeSeven);</pre></div>
         
-        <li id="section-18">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-18">&#x00a7;</a>
-              </div>
-              <h3 id="pure-disjunction-or-queries">Pure disjunction (OR queries)</h3>
-
-            </div>
-            
-        </li>
+      
         
-        
-        <li id="section-19">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-19">&#x00a7;</a>
-              </div>
-              <p>Remember from the introduction to this example that BooleanQueries do not implement pure Boolean
+        <h3 id="pure-disjunction-or-queries">Pure disjunction (OR queries)</h3>
+<p>Remember from the introduction to this example that BooleanQueries do not implement pure Boolean
 logic. The <code>SHOULD</code> clauses above were not saying “OR seven”. The only way to get “OR” behavior is
 through a BooleanQuery with no MUST or FILTER clauses. The following will output all multiples of
 2 or 7. Most docs will have score 1.0, but multiples of 14 will have score 2.0.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 215;"><span class="line" id="L215"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">BooleanQuery</span><span style="color: #24292EFF"> twoOrSeven </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> BooleanQuery</span><span style="color: #212121">.</span><span style="color: #6F42C1">Builder</span><span style="color: #24292EFF">()</span></span>
-<span class="line" id="L216"><span style="color: #24292EFF">                        </span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;two&quot;</span><span style="color: #6F42C1">))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">SHOULD</span><span style="color: #24292EFF">)</span></span>
-<span class="line" id="L217"><span style="color: #24292EFF">                        </span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;seven&quot;</span><span style="color: #6F42C1">))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">SHOULD</span><span style="color: #24292EFF">)</span></span>
-<span class="line" id="L218"><span style="color: #24292EFF">                        </span><span style="color: #212121">.</span><span style="color: #6F42C1">build</span><span style="color: #24292EFF">();</span></span>
-<span class="line" id="L219"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">twoOrSeven</span><span style="color: #212121">.</span><span style="color: #6F42C1">toString</span><span style="color: #24292EFF">());</span></span>
-<span class="line" id="L220"><span style="color: #24292EFF">                </span><span style="color: #6F42C1">outputSearchResultsAndScores(searcher</span><span style="color: #212121">,</span><span style="color: #6F42C1"> twoOrSeven)</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L221"></span>
-<span class="line empty-line" id="L222"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>                <span class="hljs-type">BooleanQuery</span> <span class="hljs-variable">twoOrSeven</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">BooleanQuery</span>.Builder()
+                        .add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TermQuery</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Term</span>(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;two&quot;</span>)), BooleanClause.Occur.SHOULD)
+                        .add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TermQuery</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Term</span>(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;seven&quot;</span>)), BooleanClause.Occur.SHOULD)
+                        .build();
+                System.out.println(twoOrSeven.toString());
+                outputSearchResultsAndScores(searcher, twoOrSeven);</pre></div>
         
-        <li id="section-20">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-20">&#x00a7;</a>
-              </div>
-              <h3 id="combining-conjunctions-with-disjunctions">Combining conjunctions with disjunctions</h3>
-
-            </div>
-            
-        </li>
+      
         
-        
-        <li id="section-21">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-21">&#x00a7;</a>
-              </div>
-              <p>What if we do want to say “(two AND five) OR seven”? The OR still must be part of a pure disjunction,
+        <h3 id="combining-conjunctions-with-disjunctions">Combining conjunctions with disjunctions</h3>
+<p>What if we do want to say “(two AND five) OR seven”? The OR still must be part of a pure disjunction,
 but we can nest the conjunction under the disjunction. The following will output all multiples of
 10 or 7. The multiples of 7 generally have score 1.0, the multiples of 10 generally have score 2.0,
 but the multiples of 70 have score 3.0.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 229;"><span class="line" id="L229"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">BooleanQuery</span><span style="color: #24292EFF"> twoAndFiveOrSeven </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> BooleanQuery</span><span style="color: #212121">.</span><span style="color: #6F42C1">Builder</span><span style="color: #24292EFF">()</span></span>
-<span class="line" id="L230"><span style="color: #24292EFF">                        </span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> BooleanQuery</span><span style="color: #212121">.</span><span style="color: #6F42C1">Builder</span><span style="color: #24292EFF">()</span></span>
-<span class="line" id="L231"><span style="color: #24292EFF">                                </span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;two&quot;</span><span style="color: #6F42C1">))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">MUST</span><span style="color: #24292EFF">)</span></span>
-<span class="line" id="L232"><span style="color: #24292EFF">                                </span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;five&quot;</span><span style="color: #6F42C1">))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">MUST</span><span style="color: #24292EFF">)</span></span>
-<span class="line" id="L233"><span style="color: #24292EFF">                                </span><span style="color: #212121">.</span><span style="color: #6F42C1">build</span><span style="color: #24292EFF">()</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">SHOULD</span><span style="color: #24292EFF">)</span></span>
-<span class="line" id="L234"><span style="color: #24292EFF">                        </span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TermQuery(</span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> Term(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #22863A">&quot;seven&quot;</span><span style="color: #6F42C1">))</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">BooleanClause</span><span style="color: #212121">.</span><span style="color: #1976D2">Occur</span><span style="color: #212121">.</span><span style="color: #1976D2">SHOULD</span><span style="color: #24292EFF">)</span></span>
-<span class="line" id="L235"><span style="color: #24292EFF">                        </span><span style="color: #212121">.</span><span style="color: #6F42C1">build</span><span style="color: #24292EFF">();</span></span>
-<span class="line" id="L236"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">twoAndFiveOrSeven</span><span style="color: #212121">.</span><span style="color: #6F42C1">toString</span><span style="color: #24292EFF">());</span></span>
-<span class="line" id="L237"><span style="color: #24292EFF">                </span><span style="color: #6F42C1">outputSearchResultsAndScores(searcher</span><span style="color: #212121">,</span><span style="color: #6F42C1"> twoAndFiveOrSeven)</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L238"><span style="color: #24292EFF">            }</span></span>
-<span class="line" id="L239"><span style="color: #24292EFF">        } </span><span style="color: #D32F2F">finally</span><span style="color: #24292EFF"> {</span></span>
-<span class="line" id="L240"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> indexFile </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">listAll</span><span style="color: #24292EFF">(tmpDir)) {</span></span>
-<span class="line" id="L241"><span style="color: #24292EFF">                </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">deleteIfExists</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">tmpDir</span><span style="color: #212121">.</span><span style="color: #6F42C1">resolve</span><span style="color: #24292EFF">(indexFile));</span></span>
-<span class="line" id="L242"><span style="color: #24292EFF">            }</span></span>
-<span class="line" id="L243"><span style="color: #24292EFF">            </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">deleteIfExists</span><span style="color: #24292EFF">(tmpDir);</span></span>
-<span class="line" id="L244"><span style="color: #24292EFF">        }</span></span>
-<span class="line empty-line" id="L245"></span>
-<span class="line" id="L246"><span style="color: #24292EFF">    }</span></span>
-<span class="line" id="L247"><span style="color: #24292EFF">}</span></span>
-<span class="line empty-line" id="L248"></span>
-<span class="line empty-line" id="L249"></span></code></pre></div>
-            
-        </li>
         
-    </ul>
+          <div class='highlight'><pre>                <span class="hljs-type">BooleanQuery</span> <span class="hljs-variable">twoAndFiveOrSeven</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">BooleanQuery</span>.Builder()
+                        .add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">BooleanQuery</span>.Builder()
+                                .add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TermQuery</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Term</span>(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;two&quot;</span>)), BooleanClause.Occur.MUST)
+                                .add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TermQuery</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Term</span>(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;five&quot;</span>)), BooleanClause.Occur.MUST)
+                                .build(), BooleanClause.Occur.SHOULD)
+                        .add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TermQuery</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Term</span>(<span class="hljs-string">&quot;text&quot;</span>, <span class="hljs-string">&quot;seven&quot;</span>)), BooleanClause.Occur.SHOULD)
+                        .build();
+                System.out.println(twoAndFiveOrSeven.toString());
+                outputSearchResultsAndScores(searcher, twoAndFiveOrSeven);
+            }
+        } <span class="hljs-keyword">finally</span> {
+            <span class="hljs-keyword">for</span> (String indexFile : FSDirectory.listAll(tmpDir)) {
+                Files.deleteIfExists(tmpDir.resolve(indexFile));
+            }
+            Files.deleteIfExists(tmpDir);
+        }
+
+    }
+}</pre></div>
+        
+      
+      <div class="fleur">h</div>
+    </div>
   </div>
 </body>
 </html>

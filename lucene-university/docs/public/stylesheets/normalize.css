@@ -211,6 +211,9 @@ sub {
 
 img {
     border: 0;
+    width: 80%;
+    height: auto;
+    align: center;
 }
 
 /*

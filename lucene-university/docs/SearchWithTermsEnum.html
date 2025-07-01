@@ -4,117 +4,18 @@
 <head>
   <title>Searching with a terms enum</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-  <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+  <link rel="stylesheet" media="all" href="public/stylesheets/normalize.css" />
   <link rel="stylesheet" media="all" href="docco.css" />
 </head>
 <body>
-  <div id="container">
-    <div id="background"></div>
-    
-      <ul id="jump_to">
-        <li>
-          <a class="large" href="javascript:void(0);">Jump To &hellip;</a>
-          <a class="small" href="javascript:void(0);">+</a>
-          <div id="jump_wrapper">
-          <div id="jump_page_wrapper">
-            <div id="jump_page">
-              
-                
-                <a class="source" href="AnalyzerBasics.html">
-                  AnalyzerBasics.java
-                </a>
-              
-                
-                <a class="source" href="BooleanQueryANDInternals.html">
-                  BooleanQueryANDInternals.java
-                </a>
-              
-                
-                <a class="source" href="BooleanQueryIntro.html">
-                  BooleanQueryIntro.java
-                </a>
-              
-                
-                <a class="source" href="BottomUpIndexReader.html">
-                  BottomUpIndexReader.java
-                </a>
-              
-                
-                <a class="source" href="BytesRefHashExample.html">
-                  BytesRefHashExample.java
-                </a>
-              
-                
-                <a class="source" href="CombinedFieldQueryExample.html">
-                  CombinedFieldQueryExample.java
-                </a>
-              
-                
-                <a class="source" href="DirectoryFileContents.html">
-                  DirectoryFileContents.java
-                </a>
-              
-                
-                <a class="source" href="DocValuesSearchExample.html">
-                  DocValuesSearchExample.java
-                </a>
-              
-                
-                <a class="source" href="FunctionQuerySearchExample.html">
-                  FunctionQuerySearchExample.java
-                </a>
-              
-                
-                <a class="source" href="KnnSearchExample.html">
-                  KnnSearchExample.java
-                </a>
-              
-                
-                <a class="source" href="PointTreeRangeQuery.html">
-                  PointTreeRangeQuery.java
-                </a>
-              
-                
-                <a class="source" href="PrimitivesRef.html">
-                  PrimitivesRef.java
-                </a>
-              
-                
-                <a class="source" href="SearchWithTermsEnum.html">
-                  SearchWithTermsEnum.java
-                </a>
-              
-                
-                <a class="source" href="SimpleSearch.html">
-                  SimpleSearch.java
-                </a>
-              
-                
-                <a class="source" href="TextVectorSearchExample.html">
-                  TextVectorSearchExample.java
-                </a>
-              
-                
-                <a class="source" href="VisualizePointTree.html">
-                  VisualizePointTree.java
-                </a>
-              
-            </div>
-          </div>
-        </li>
-      </ul>
-    
-    <ul class="sections">
+  <div class="container">
+    <div class="page">
+
+      <div class="header">
         
-        
-        
-        <li id="section-1">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-1">&#x00a7;</a>
-              </div>
-              <p>This example is essentially a repeat of SimpleSearch, but instead of using an <code>IndexSearcher</code>, we will access the
+          
+          <h1 id="searching-with-a-terms-enum">Searching with a terms enum</h1>
+<p>This example is essentially a repeat of SimpleSearch, but instead of using an <code>IndexSearcher</code>, we will access the
 underlying index components via <code>IndexReader</code> – specifically, we’ll:</p>
 <ol>
 <li>Iterate through the index segments under the <code>IndexReader</code> (but there will only be one segment).</li>
@@ -126,421 +27,352 @@ underlying index components via <code>IndexReader</code> – specifically, we’
 <p>This is not intended as a “how-to” example, since you should use <code>IndexSearcher</code> for searching. Instead, it should
 help demystify some of what’s happening under the <code>IndexSearcher</code>.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 15;"><span class="line" id="L15"><span style="color: #D32F2F">package</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">example</span><span style="color: #212121">.</span><span style="color: #D32F2F">basic</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L16"></span>
-<span class="line" id="L17"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">Field</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L18"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">document</span><span style="color: #212121">.</span><span style="color: #D32F2F">TextField</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L19"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">DirectoryReader</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L20"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexReader</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L21"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexWriter</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L22"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexWriterConfig</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L23"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">IndexableField</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L24"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">LeafReader</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L25"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">LeafReaderContext</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L26"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">PostingsEnum</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L27"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">StoredFields</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L28"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">Terms</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L29"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">index</span><span style="color: #212121">.</span><span style="color: #D32F2F">TermsEnum</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L30"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">search</span><span style="color: #212121">.</span><span style="color: #D32F2F">DocIdSetIterator</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L31"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">store</span><span style="color: #212121">.</span><span style="color: #D32F2F">Directory</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L32"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">store</span><span style="color: #212121">.</span><span style="color: #D32F2F">FSDirectory</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L33"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">org</span><span style="color: #212121">.</span><span style="color: #D32F2F">apache</span><span style="color: #212121">.</span><span style="color: #D32F2F">lucene</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">BytesRef</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L34"></span>
-<span class="line" id="L35"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">io</span><span style="color: #212121">.</span><span style="color: #D32F2F">IOException</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L36"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">nio</span><span style="color: #212121">.</span><span style="color: #D32F2F">file</span><span style="color: #212121">.</span><span style="color: #D32F2F">Files</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L37"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">nio</span><span style="color: #212121">.</span><span style="color: #D32F2F">file</span><span style="color: #212121">.</span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L38"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">ArrayList</span><span style="color: #24292EFF">;</span></span>
-<span class="line" id="L39"><span style="color: #D32F2F">import</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">java</span><span style="color: #212121">.</span><span style="color: #D32F2F">util</span><span style="color: #212121">.</span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">;</span></span>
-<span class="line empty-line" id="L40"></span>
-<span class="line" id="L41"><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">class</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">SearchWithTermsEnum</span><span style="color: #24292EFF"> {</span></span>
-<span class="line empty-line" id="L42"></span>
-<span class="line empty-line" id="L43"></span></code></pre></div>
-            
-        </li>
-        
-        
-        <li id="section-2">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-2">&#x00a7;</a>
-              </div>
-              <h2 id="creating-documents">Creating Documents</h2>
+          
+            <div class='highlight'><pre><span class="hljs-keyword">package</span> example.basic;
 
-            </div>
-            
-        </li>
+<span class="hljs-keyword">import</span> org.apache.lucene.document.Field;
+<span class="hljs-keyword">import</span> org.apache.lucene.document.TextField;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.DirectoryReader;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexReader;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexWriter;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexWriterConfig;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.IndexableField;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.LeafReader;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.LeafReaderContext;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.PostingsEnum;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.StoredFields;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.Terms;
+<span class="hljs-keyword">import</span> org.apache.lucene.index.TermsEnum;
+<span class="hljs-keyword">import</span> org.apache.lucene.search.DocIdSetIterator;
+<span class="hljs-keyword">import</span> org.apache.lucene.store.Directory;
+<span class="hljs-keyword">import</span> org.apache.lucene.store.FSDirectory;
+<span class="hljs-keyword">import</span> org.apache.lucene.util.BytesRef;
+
+<span class="hljs-keyword">import</span> java.io.IOException;
+<span class="hljs-keyword">import</span> java.nio.file.Files;
+<span class="hljs-keyword">import</span> java.nio.file.Path;
+<span class="hljs-keyword">import</span> java.util.ArrayList;
+<span class="hljs-keyword">import</span> java.util.List;
+
+<span class="hljs-keyword">public</span> <span class="hljs-keyword">class</span> <span class="hljs-title class_">SearchWithTermsEnum</span> {</pre></div>
+          
         
+
         
-        <li id="section-3">
-            <div class="annotation">
+          <div class="toc">
+            <h3>Table of Contents</h3>
+            <ol>
               
-              <div class="sswrap ">
-                <a class="ss" href="#section-3">&#x00a7;</a>
-              </div>
-              <p>This set of documents is copied over from SimpleSearch. I’m just keeping it here too, because I want every
+                
+                <li>
+                  <a class="source" href="AnalyzerBasics.html">
+                    AnalyzerBasics.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BooleanQueryANDInternals.html">
+                    BooleanQueryANDInternals.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BooleanQueryIntro.html">
+                    BooleanQueryIntro.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BottomUpIndexReader.html">
+                    BottomUpIndexReader.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="BytesRefHashExample.html">
+                    BytesRefHashExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="CombinedFieldQueryExample.html">
+                    CombinedFieldQueryExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DirectoryFileContents.html">
+                    DirectoryFileContents.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="DocValuesSearchExample.html">
+                    DocValuesSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="FiniteStateTransducers.html">
+                    FiniteStateTransducers.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="FunctionQuerySearchExample.html">
+                    FunctionQuerySearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="KnnSearchExample.html">
+                    KnnSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="PointTreeRangeQuery.html">
+                    PointTreeRangeQuery.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="PrimitivesRef.html">
+                    PrimitivesRef.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SearchWithTermsEnum.html">
+                    SearchWithTermsEnum.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="SimpleSearch.html">
+                    SimpleSearch.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="TextVectorSearchExample.html">
+                    TextVectorSearchExample.java
+                  </a>
+                </li>
+              
+                
+                <li>
+                  <a class="source" href="VisualizePointTree.html">
+                    VisualizePointTree.java
+                  </a>
+                </li>
+              
+            </ol>
+          </div>
+        
+      </div>
+
+      
+        
+        <h2 id="creating-documents">Creating Documents</h2>
+<p>This set of documents is copied over from SimpleSearch. I’m just keeping it here too, because I want every
 example class to be fully self-contained.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 47;"><span class="line" id="L47"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">private</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">List&lt;List&lt;</span><span style="color: #24292EFF">IndexableField</span><span style="color: #D32F2F">&gt;&gt;</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createDocuments()</span><span style="color: #24292EFF"> {</span></span>
-<span class="line" id="L48"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF">&gt; texts </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">List</span><span style="color: #212121">.</span><span style="color: #6F42C1">of</span><span style="color: #24292EFF">(</span></span>
-<span class="line" id="L49"><span style="color: #24292EFF">                </span><span style="color: #22863A">&quot;The quick fox jumped over the lazy, brown dog&quot;</span><span style="color: #212121">,</span></span>
-<span class="line" id="L50"><span style="color: #24292EFF">                </span><span style="color: #22863A">&quot;Lorem ipsum, dolor sit amet&quot;</span><span style="color: #212121">,</span></span>
-<span class="line" id="L51"><span style="color: #24292EFF">                </span><span style="color: #22863A">&quot;She left the web, she left the loom, she made three paces through the room&quot;</span><span style="color: #212121">,</span></span>
-<span class="line" id="L52"><span style="color: #24292EFF">                </span><span style="color: #22863A">&quot;The sly fox sneaks past the oblivious dog&quot;</span></span>
-<span class="line" id="L53"><span style="color: #24292EFF">        );</span></span>
-<span class="line" id="L54"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">IndexableField</span><span style="color: #24292EFF">&gt;&gt; docs </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">ArrayList</span><span style="color: #24292EFF">&lt;&gt;();</span></span>
-<span class="line" id="L55"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> text </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> texts) {</span></span>
-<span class="line" id="L56"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">IndexableField</span><span style="color: #24292EFF">&gt; doc </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">ArrayList</span><span style="color: #24292EFF">&lt;&gt;();</span></span>
-<span class="line" id="L57"><span style="color: #24292EFF">            </span><span style="color: #1976D2">doc</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">TextField(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #212121">,</span><span style="color: #6F42C1"> text</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #1976D2">Field</span><span style="color: #212121">.</span><span style="color: #1976D2">Store</span><span style="color: #212121">.</span><span style="color: #1976D2">YES</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L58"><span style="color: #24292EFF">            </span><span style="color: #1976D2">docs</span><span style="color: #212121">.</span><span style="color: #6F42C1">add</span><span style="color: #24292EFF">(doc);</span></span>
-<span class="line" id="L59"><span style="color: #24292EFF">        }</span></span>
-<span class="line" id="L60"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">return</span><span style="color: #24292EFF"> docs;</span></span>
-<span class="line" id="L61"><span style="color: #24292EFF">    }</span></span>
-<span class="line empty-line" id="L62"></span>
-<span class="line empty-line" id="L63"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>    <span class="hljs-keyword">private</span> <span class="hljs-keyword">static</span> List&lt;List&lt;IndexableField&gt;&gt; <span class="hljs-title function_">createDocuments</span><span class="hljs-params">()</span> {
+        List&lt;String&gt; texts = List.of(
+                <span class="hljs-string">&quot;The quick fox jumped over the lazy, brown dog&quot;</span>,
+                <span class="hljs-string">&quot;Lorem ipsum, dolor sit amet&quot;</span>,
+                <span class="hljs-string">&quot;She left the web, she left the loom, she made three paces through the room&quot;</span>,
+                <span class="hljs-string">&quot;The sly fox sneaks past the oblivious dog&quot;</span>
+        );
+        List&lt;List&lt;IndexableField&gt;&gt; docs = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+        <span class="hljs-keyword">for</span> (String text : texts) {
+            List&lt;IndexableField&gt; doc = <span class="hljs-keyword">new</span> <span class="hljs-title class_">ArrayList</span>&lt;&gt;();
+            doc.add(<span class="hljs-keyword">new</span> <span class="hljs-title class_">TextField</span>(<span class="hljs-string">&quot;text&quot;</span>, text, Field.Store.YES));
+            docs.add(doc);
+        }
+        <span class="hljs-keyword">return</span> docs;
+    }</pre></div>
         
-        <li id="section-4">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-4">&#x00a7;</a>
-              </div>
-              <h2 id="example-code">Example code</h2>
+      
+        
+        <h2 id="example-code">Example code</h2>
 
-            </div>
-            
-        </li>
         
+          <div class='highlight'><pre>    <span class="hljs-keyword">public</span> <span class="hljs-keyword">static</span> <span class="hljs-keyword">void</span> <span class="hljs-title function_">main</span><span class="hljs-params">(String[] args)</span> <span class="hljs-keyword">throws</span> IOException {</pre></div>
         
-        <li id="section-5">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-5">&#x00a7;</a>
-              </div>
-              
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 65;"><span class="line" id="L65"><span style="color: #24292EFF">    </span><span style="color: #D32F2F">public</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">static</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">void</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">main(</span><span style="color: #D32F2F">String</span><span style="color: #6F42C1">[] args)</span><span style="color: #24292EFF"> throws IOException {</span></span>
-<span class="line empty-line" id="L66"></span>
-<span class="line empty-line" id="L67"></span></code></pre></div>
-            
-        </li>
+      
         
-        
-        <li id="section-6">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-6">&#x00a7;</a>
-              </div>
-              <p>As in the previous example, we will create a temporary directory, open it as a Lucene <code>Directory</code>, and
+        <p>As in the previous example, we will create a temporary directory, open it as a Lucene <code>Directory</code>, and
 create an <code>IndexWriter</code>. Then we’ll add each of the example documents.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 70;"><span class="line" id="L70"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">Path</span><span style="color: #24292EFF"> tmpDir </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">createTempDirectory</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">SearchWithTermsEnum</span><span style="color: #212121">.</span><span style="color: #1976D2">class</span><span style="color: #212121">.</span><span style="color: #6F42C1">getSimpleName</span><span style="color: #24292EFF">());</span></span>
-<span class="line" id="L71"><span style="color: #24292EFF">        </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">Directory</span><span style="color: #24292EFF"> directory </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(tmpDir);</span></span>
-<span class="line" id="L72"><span style="color: #24292EFF">             </span><span style="color: #D32F2F">IndexWriter</span><span style="color: #24292EFF"> writer </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">IndexWriter(directory</span><span style="color: #212121">,</span><span style="color: #6F42C1"> </span><span style="color: #D32F2F">new</span><span style="color: #6F42C1"> IndexWriterConfig())</span><span style="color: #24292EFF">) {</span></span>
-<span class="line" id="L73"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">List</span><span style="color: #24292EFF">&lt;</span><span style="color: #D32F2F">IndexableField</span><span style="color: #24292EFF">&gt; doc </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">createDocuments()</span><span style="color: #24292EFF">) {</span></span>
-<span class="line" id="L74"><span style="color: #24292EFF">                </span><span style="color: #1976D2">writer</span><span style="color: #212121">.</span><span style="color: #6F42C1">addDocument</span><span style="color: #24292EFF">(doc);</span></span>
-<span class="line empty-line" id="L75"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>        <span class="hljs-type">Path</span> <span class="hljs-variable">tmpDir</span> <span class="hljs-operator">=</span> Files.createTempDirectory(SearchWithTermsEnum.class.getSimpleName());
+        <span class="hljs-keyword">try</span> (<span class="hljs-type">Directory</span> <span class="hljs-variable">directory</span> <span class="hljs-operator">=</span> FSDirectory.open(tmpDir);
+             <span class="hljs-type">IndexWriter</span> <span class="hljs-variable">writer</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexWriter</span>(directory, <span class="hljs-keyword">new</span> <span class="hljs-title class_">IndexWriterConfig</span>())) {
+            <span class="hljs-keyword">for</span> (List&lt;IndexableField&gt; doc : createDocuments()) {
+                writer.addDocument(doc);</pre></div>
         
-        <li id="section-7">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-7">&#x00a7;</a>
-              </div>
-              <p><em>Exercise:</em> If you want to write each document to its own segment, you can uncomment this line:</p>
+      
+        
+        <p><em>Exercise:</em> If you want to write each document to its own segment, you can uncomment this line:</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 76;"><span class="line" id="L76"><span style="color: #24292EFF">                </span><span style="color: #C2C3C5">/* writer.flush(); */</span></span>
-<span class="line" id="L77"><span style="color: #24292EFF">            }</span></span>
-<span class="line empty-line" id="L78"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>                <span class="hljs-comment">/* writer.flush(); */</span>
+            }</pre></div>
         
-        <li id="section-8">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-8">&#x00a7;</a>
-              </div>
-              <p>Open the index reader, but this time we won’t use an <code>IndexSearcher</code>.</p>
+      
+        
+        <p>Open the index reader, but this time we won’t use an <code>IndexSearcher</code>.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 79;"><span class="line" id="L79"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">try</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">IndexReader</span><span style="color: #24292EFF"> reader </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">DirectoryReader</span><span style="color: #212121">.</span><span style="color: #6F42C1">open</span><span style="color: #24292EFF">(writer)) {</span></span>
-<span class="line empty-line" id="L80"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>            <span class="hljs-keyword">try</span> (<span class="hljs-type">IndexReader</span> <span class="hljs-variable">reader</span> <span class="hljs-operator">=</span> DirectoryReader.open(writer)) {</pre></div>
         
-        <li id="section-9">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-9">&#x00a7;</a>
-              </div>
-              <p>The <code>IndexReader</code> provided by <code>DirectoryReader</code> is a form of <code>CompositeReader</code>, made up of
+      
+        
+        <p>The <code>IndexReader</code> provided by <code>DirectoryReader</code> is a form of <code>CompositeReader</code>, made up of
 underlying “leaves”. These leaves are the flushed write-once segments of the index.</p>
 <p>In this case, because we only flushed once, in the <code>DirectoryReader.open()</code> call, the index
 only has one segment.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 86;"><span class="line" id="L86"><span style="color: #24292EFF">                </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;Our reader has &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">reader</span><span style="color: #212121">.</span><span style="color: #6F42C1">leaves</span><span style="color: #24292EFF">()</span><span style="color: #212121">.</span><span style="color: #6F42C1">size</span><span style="color: #24292EFF">() </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; segment(s)&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line empty-line" id="L87"></span>
-<span class="line empty-line" id="L88"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>                System.out.println(<span class="hljs-string">&quot;Our reader has &quot;</span> + reader.leaves().size() + <span class="hljs-string">&quot; segment(s)&quot;</span>);</pre></div>
         
-        <li id="section-10">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-10">&#x00a7;</a>
-              </div>
-              <p>We’ll iterate through the list of segments, because that’s essentially what <code>IndexSearcher</code> does,
+      
+        
+        <p>We’ll iterate through the list of segments, because that’s essentially what <code>IndexSearcher</code> does,
 though in this case it’s a list of length 1.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 91;"><span class="line" id="L91"><span style="color: #24292EFF">                </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">LeafReaderContext</span><span style="color: #24292EFF"> leafReaderContext </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">reader</span><span style="color: #212121">.</span><span style="color: #6F42C1">leaves</span><span style="color: #24292EFF">()) {</span></span>
-<span class="line empty-line" id="L92"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>                <span class="hljs-keyword">for</span> (LeafReaderContext leafReaderContext : reader.leaves()) {</pre></div>
         
-        <li id="section-11">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-11">&#x00a7;</a>
-              </div>
-              <p>We load the terms for the “text” field. The way we tokenized the text field (using the
+      
+        
+        <p>We load the terms for the “text” field. The way we tokenized the text field (using the
 default, implicit <code>StandardAnalyzer</code>), there is one term for each unique word in the documents.</p>
 <p>If we have multiple segments (if we uncommented the <code>writer.flush()</code> line above), we see that
 each segment has its own term dictionary.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 98;"><span class="line" id="L98"><span style="color: #24292EFF">                    </span><span style="color: #D32F2F">LeafReader</span><span style="color: #24292EFF"> leafReader </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">leafReaderContext</span><span style="color: #212121">.</span><span style="color: #6F42C1">reader</span><span style="color: #24292EFF">();</span></span>
-<span class="line" id="L99"><span style="color: #24292EFF">                    </span><span style="color: #D32F2F">Terms</span><span style="color: #24292EFF"> textTerms </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">Terms</span><span style="color: #212121">.</span><span style="color: #6F42C1">getTerms</span><span style="color: #24292EFF">(leafReader</span><span style="color: #212121">,</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L100"><span style="color: #24292EFF">                    </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;Segment &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">leafReaderContext</span><span style="color: #212121">.</span><span style="color: #1976D2">ord</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; has &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">textTerms</span><span style="color: #212121">.</span><span style="color: #6F42C1">size</span><span style="color: #24292EFF">() </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; terms&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line empty-line" id="L101"></span>
-<span class="line empty-line" id="L102"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>                    <span class="hljs-type">LeafReader</span> <span class="hljs-variable">leafReader</span> <span class="hljs-operator">=</span> leafReaderContext.reader();
+                    <span class="hljs-type">Terms</span> <span class="hljs-variable">textTerms</span> <span class="hljs-operator">=</span> Terms.getTerms(leafReader, <span class="hljs-string">&quot;text&quot;</span>);
+                    System.out.println(<span class="hljs-string">&quot;Segment &quot;</span> + leafReaderContext.ord + <span class="hljs-string">&quot; has &quot;</span> + textTerms.size() + <span class="hljs-string">&quot; terms&quot;</span>);</pre></div>
         
-        <li id="section-12">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-12">&#x00a7;</a>
-              </div>
-              <p>We can iterate through all the terms using a <code>TermsEnum</code>:</p>
+      
+        
+        <p>We can iterate through all the terms using a <code>TermsEnum</code>:</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 104;"><span class="line" id="L104"><span style="color: #24292EFF">                    </span><span style="color: #D32F2F">TermsEnum</span><span style="color: #24292EFF"> textTermsEnum </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">textTerms</span><span style="color: #212121">.</span><span style="color: #6F42C1">iterator</span><span style="color: #24292EFF">();</span></span>
-<span class="line" id="L105"><span style="color: #24292EFF">                    </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;The terms are:&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L106"><span style="color: #24292EFF">                    </span><span style="color: #D32F2F">BytesRef</span><span style="color: #24292EFF"> curTerm;</span></span>
-<span class="line" id="L107"><span style="color: #24292EFF">                    </span><span style="color: #D32F2F">while</span><span style="color: #24292EFF"> ((curTerm </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">textTermsEnum</span><span style="color: #212121">.</span><span style="color: #6F42C1">next</span><span style="color: #24292EFF">()) </span><span style="color: #D32F2F">!=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">null</span><span style="color: #24292EFF">) {</span></span>
-<span class="line" id="L108"><span style="color: #24292EFF">                        </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">curTerm</span><span style="color: #212121">.</span><span style="color: #6F42C1">utf8ToString</span><span style="color: #24292EFF">());</span></span>
-<span class="line" id="L109"><span style="color: #24292EFF">                    }</span></span>
-<span class="line empty-line" id="L110"></span>
-<span class="line empty-line" id="L111"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>                    <span class="hljs-type">TermsEnum</span> <span class="hljs-variable">textTermsEnum</span> <span class="hljs-operator">=</span> textTerms.iterator();
+                    System.out.println(<span class="hljs-string">&quot;The terms are:&quot;</span>);
+                    BytesRef curTerm;
+                    <span class="hljs-keyword">while</span> ((curTerm = textTermsEnum.next()) != <span class="hljs-literal">null</span>) {
+                        System.out.println(curTerm.utf8ToString());
+                    }</pre></div>
         
-        <li id="section-13">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-13">&#x00a7;</a>
-              </div>
-              <p>When searching, though, we don’t iterate through all the terms, instead we use the <code>seekExact</code>
+      
+        
+        <p>When searching, though, we don’t iterate through all the terms, instead we use the <code>seekExact</code>
 method.</p>
 <p>Under the hood, all terms are indexed as arrays of bytes. Text terms are converted
 to bytes by UTF-8 encoding. We can use the <code>new BytesRef(CharSequence)</code> constructor to
 do the conversion.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 118;"><span class="line" id="L118"><span style="color: #24292EFF">                    textTermsEnum </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">textTerms</span><span style="color: #212121">.</span><span style="color: #6F42C1">iterator</span><span style="color: #24292EFF">(); </span><span style="color: #C2C3C5">/* Reset our iterator, since it previously hit the end */</span></span>
-<span class="line" id="L119"><span style="color: #24292EFF">                    </span><span style="color: #D32F2F">if</span><span style="color: #24292EFF"> (</span><span style="color: #1976D2">textTermsEnum</span><span style="color: #212121">.</span><span style="color: #6F42C1">seekExact</span><span style="color: #24292EFF">(</span><span style="color: #D32F2F">new</span><span style="color: #24292EFF"> </span><span style="color: #6F42C1">BytesRef(</span><span style="color: #22863A">&quot;fox&quot;</span><span style="color: #6F42C1">)</span><span style="color: #24292EFF">)) {</span></span>
-<span class="line" id="L120"><span style="color: #24292EFF">                        </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;Found term &#39;fox&#39; in segment &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">leafReaderContext</span><span style="color: #212121">.</span><span style="color: #1976D2">ord</span><span style="color: #24292EFF">);</span></span>
-<span class="line empty-line" id="L121"></span>
-<span class="line empty-line" id="L122"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>                    textTermsEnum = textTerms.iterator(); <span class="hljs-comment">/* Reset our iterator, since it previously hit the end */</span>
+                    <span class="hljs-keyword">if</span> (textTermsEnum.seekExact(<span class="hljs-keyword">new</span> <span class="hljs-title class_">BytesRef</span>(<span class="hljs-string">&quot;fox&quot;</span>))) {
+                        System.out.println(<span class="hljs-string">&quot;Found term &#x27;fox&#x27; in segment &quot;</span> + leafReaderContext.ord);</pre></div>
         
-        <li id="section-14">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-14">&#x00a7;</a>
-              </div>
-              <p>Once the <code>TermsEnum</code> is pointing at a specific term, we can efficiently (<code>O(1)</code> time) see how
+      
+        
+        <p>Once the <code>TermsEnum</code> is pointing at a specific term, we can efficiently (<code>O(1)</code> time) see how
 many documents contain the term.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 125;"><span class="line" id="L125"><span style="color: #24292EFF">                        </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;The term &#39;fox&#39; occurs in &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">textTermsEnum</span><span style="color: #212121">.</span><span style="color: #6F42C1">docFreq</span><span style="color: #24292EFF">() </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot; documents in the current segment.&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line empty-line" id="L126"></span>
-<span class="line empty-line" id="L127"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>                        System.out.println(<span class="hljs-string">&quot;The term &#x27;fox&#x27; occurs in &quot;</span> + textTermsEnum.docFreq() + <span class="hljs-string">&quot; documents in the current segment.&quot;</span>);</pre></div>
         
-        <li id="section-15">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-15">&#x00a7;</a>
-              </div>
-              <p>To find the specific documents matching a term, we retrieve a <code>PostingsEnum</code>. The <code>null</code>
+      
+        
+        <p>To find the specific documents matching a term, we retrieve a <code>PostingsEnum</code>. The <code>null</code>
 parameter could be an old <code>PostingsEnum</code> that we want to reuse to reduce object allocation
 overhead, but we don’t have an old <code>PostingsEnum</code>.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 131;"><span class="line" id="L131"><span style="color: #24292EFF">                        </span><span style="color: #D32F2F">PostingsEnum</span><span style="color: #24292EFF"> postingsEnum </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">textTermsEnum</span><span style="color: #212121">.</span><span style="color: #6F42C1">postings</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">null</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L132"><span style="color: #24292EFF">                        </span><span style="color: #D32F2F">int</span><span style="color: #24292EFF"> docId;</span></span>
-<span class="line" id="L133"><span style="color: #24292EFF">                        </span><span style="color: #D32F2F">while</span><span style="color: #24292EFF"> ((docId </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">postingsEnum</span><span style="color: #212121">.</span><span style="color: #6F42C1">nextDoc</span><span style="color: #24292EFF">()) </span><span style="color: #D32F2F">!=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">DocIdSetIterator</span><span style="color: #212121">.</span><span style="color: #1976D2">NO_MORE_DOCS</span><span style="color: #24292EFF">) {</span></span>
-<span class="line empty-line" id="L134"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>                        <span class="hljs-type">PostingsEnum</span> <span class="hljs-variable">postingsEnum</span> <span class="hljs-operator">=</span> textTermsEnum.postings(<span class="hljs-literal">null</span>);
+                        <span class="hljs-type">int</span> docId;
+                        <span class="hljs-keyword">while</span> ((docId = postingsEnum.nextDoc()) != DocIdSetIterator.NO_MORE_DOCS) {</pre></div>
         
-        <li id="section-16">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-16">&#x00a7;</a>
-              </div>
-              <p>The matching document IDs are local to the current segment. That is, each segment
+      
+        
+        <p>The matching document IDs are local to the current segment. That is, each segment
 starts counting doc IDs again from 0.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 137;"><span class="line" id="L137"><span style="color: #24292EFF">                            </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;Matching doc with id &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> docId </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #22863A">&quot;:&quot;</span><span style="color: #24292EFF">);</span></span>
-<span class="line empty-line" id="L138"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>                            System.out.println(<span class="hljs-string">&quot;Matching doc with id &quot;</span> + docId + <span class="hljs-string">&quot;:&quot;</span>);</pre></div>
         
-        <li id="section-17">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-17">&#x00a7;</a>
-              </div>
-              <p>As with the SimpleSearch example, we can load the stored fields to retrieve the full
+      
+        
+        <p>As with the SimpleSearch example, we can load the stored fields to retrieve the full
 <code>text</code> field value. In this case, though, we’re loading the segment-local <code>StoredFields</code>.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 140;"><span class="line" id="L140"><span style="color: #24292EFF">                            </span><span style="color: #D32F2F">StoredFields</span><span style="color: #24292EFF"> storedFields </span><span style="color: #D32F2F">=</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">leafReader</span><span style="color: #212121">.</span><span style="color: #6F42C1">storedFields</span><span style="color: #24292EFF">();</span></span>
-<span class="line" id="L141"><span style="color: #24292EFF">                            </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">storedFields</span><span style="color: #212121">.</span><span style="color: #6F42C1">document</span><span style="color: #24292EFF">(docId)</span><span style="color: #212121">.</span><span style="color: #6F42C1">get</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;text&quot;</span><span style="color: #24292EFF">));</span></span>
-<span class="line" id="L142"><span style="color: #24292EFF">                        }</span></span>
-<span class="line" id="L143"><span style="color: #24292EFF">                    } </span><span style="color: #D32F2F">else</span><span style="color: #24292EFF"> {</span></span>
-<span class="line empty-line" id="L144"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>                            <span class="hljs-type">StoredFields</span> <span class="hljs-variable">storedFields</span> <span class="hljs-operator">=</span> leafReader.storedFields();
+                            System.out.println(storedFields.document(docId).get(<span class="hljs-string">&quot;text&quot;</span>));
+                        }
+                    } <span class="hljs-keyword">else</span> {</pre></div>
         
-        <li id="section-18">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-18">&#x00a7;</a>
-              </div>
-              <p>This should only happen if we explicitly flush.</p>
+      
+        
+        <p>This should only happen if we explicitly flush.</p>
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 146;"><span class="line" id="L146"><span style="color: #24292EFF">                        </span><span style="color: #1976D2">System</span><span style="color: #212121">.</span><span style="color: #1976D2">out</span><span style="color: #212121">.</span><span style="color: #6F42C1">println</span><span style="color: #24292EFF">(</span><span style="color: #22863A">&quot;Did not find term &#39;fox&#39; in segment &quot;</span><span style="color: #24292EFF"> </span><span style="color: #D32F2F">+</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">leafReaderContext</span><span style="color: #212121">.</span><span style="color: #1976D2">ord</span><span style="color: #24292EFF">);</span></span>
-<span class="line" id="L147"><span style="color: #24292EFF">                    }</span></span>
-<span class="line empty-line" id="L148"></span></code></pre></div>
-            
-        </li>
+        
+          <div class='highlight'><pre>                        System.out.println(<span class="hljs-string">&quot;Did not find term &#x27;fox&#x27; in segment &quot;</span> + leafReaderContext.ord);
+                    }</pre></div>
+        
+      
         
         
-        <li id="section-19">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-19">&#x00a7;</a>
-              </div>
-              
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 149;"><span class="line" id="L149"><span style="color: #24292EFF">                }</span></span>
-<span class="line" id="L150"><span style="color: #24292EFF">            }</span></span>
-<span class="line" id="L151"><span style="color: #24292EFF">        } </span><span style="color: #D32F2F">finally</span><span style="color: #24292EFF"> {</span></span>
-<span class="line empty-line" id="L152"></span></code></pre></div>
-            
-        </li>
         
+          <div class='highlight'><pre>                }
+            }
+        } <span class="hljs-keyword">finally</span> {</pre></div>
         
-        <li id="section-20">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-20">&#x00a7;</a>
-              </div>
-              <h2 id="cleanup">Cleanup</h2>
+      
+        
+        <h2 id="cleanup">Cleanup</h2>
+<p>As in the previous example, we’ll clean up the temporary files to avoid cluttering your hard disk.</p>
 
-            </div>
-            
-        </li>
         
-        
-        <li id="section-21">
-            <div class="annotation">
-              
-              <div class="sswrap ">
-                <a class="ss" href="#section-21">&#x00a7;</a>
-              </div>
-              <p>As in the previous example, we’ll clean up the temporary files to avoid cluttering your hard disk.</p>
+          <div class='highlight'><pre>            <span class="hljs-keyword">for</span> (String indexFile : FSDirectory.listAll(tmpDir)) {
+                Files.deleteIfExists(tmpDir.resolve(indexFile));
+            }
+            Files.deleteIfExists(tmpDir);
+        }
 
-            </div>
-            
-            <div class="content"><pre class="shiki" style="background-color: transparent"><code style="--line-start-number: 155;"><span class="line" id="L155"><span style="color: #24292EFF">            </span><span style="color: #D32F2F">for</span><span style="color: #24292EFF"> (</span><span style="color: #D32F2F">String</span><span style="color: #24292EFF"> indexFile </span><span style="color: #D32F2F">:</span><span style="color: #24292EFF"> </span><span style="color: #1976D2">FSDirectory</span><span style="color: #212121">.</span><span style="color: #6F42C1">listAll</span><span style="color: #24292EFF">(tmpDir)) {</span></span>
-<span class="line" id="L156"><span style="color: #24292EFF">                </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">deleteIfExists</span><span style="color: #24292EFF">(</span><span style="color: #1976D2">tmpDir</span><span style="color: #212121">.</span><span style="color: #6F42C1">resolve</span><span style="color: #24292EFF">(indexFile));</span></span>
-<span class="line" id="L157"><span style="color: #24292EFF">            }</span></span>
-<span class="line" id="L158"><span style="color: #24292EFF">            </span><span style="color: #1976D2">Files</span><span style="color: #212121">.</span><span style="color: #6F42C1">deleteIfExists</span><span style="color: #24292EFF">(tmpDir);</span></span>
-<span class="line" id="L159"><span style="color: #24292EFF">        }</span></span>
-<span class="line empty-line" id="L160"></span>
-<span class="line" id="L161"><span style="color: #24292EFF">    }</span></span>
-<span class="line empty-line" id="L162"></span>
-<span class="line empty-line" id="L163"></span>
-<span class="line" id="L164"><span style="color: #24292EFF">}</span></span>
-<span class="line empty-line" id="L165"></span>
-<span class="line empty-line" id="L166"></span></code></pre></div>
-            
-        </li>
+    }
+
+
+}</pre></div>
         
-    </ul>
+      
+      <div class="fleur">h</div>
+    </div>
   </div>
 </body>
 </html>
